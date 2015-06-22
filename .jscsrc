@@ -1,0 +1,11 @@
+{
+  "preset": "google",
+  "disallowSpacesInAnonymousFunctionExpression": null,
+  "validateLineBreaks": "LF",
+  "validateIndentation": 2,
+  "excludeFiles": ["jspm_packages/**", "node_modules/**"],
+  "validateQuoteMarks": "\"",
+  "disallowKeywordsOnNewLine": [],
+  "esprima": "esprima-fb",
+  "maximumLineLength": 999
+}

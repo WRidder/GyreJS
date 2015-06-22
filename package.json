@@ -1,0 +1,25 @@
+{
+  "name": "gyrejs",
+  "version": "0.0.1",
+  "description": "Experimental data fetching and state library geared towards ReactJS",
+  "main": "index.js",
+  "scripts": {
+    "test": "karma start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WRidder/gyrejs.git"
+  },
+  "keywords": [
+    "flux",
+    "frp",
+    "kefir",
+    "reactjs"
+  ],
+  "author": "Wilbert van de Ridder",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/WRidder/gyrejs/issues"
+  },
+  "homepage": "https://github.com/WRidder/gyrejs#readme"
+}
