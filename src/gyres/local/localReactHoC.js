@@ -19,7 +19,7 @@ const localHoCFactory = (reducer) => {
     return React.createClass({
       displayName: "GyreJS-localHoC",
       getInitialState() {
-        return initialData;
+        return initialData || null;
       },
       componentWillMount() {
         this.unRegisterReducer = reducer(matcher, this.handleNewData);
