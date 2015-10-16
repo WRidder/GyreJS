@@ -1,5 +1,5 @@
 # GyreJS
-Data fetching and state library geared towards ReactJS. 
+Data fetching and state library geared towards ReactJS. This is an experimental project.
 
 ## Vision
 ### Flow
@@ -19,31 +19,18 @@ Data fetching and state library geared towards ReactJS.
 |            |     |    |            |                |             |
 |            |     |    +------------+                +-------------+
 |            |     |                                                 
-|            |     |      Supercell                                  
+|            |     |      Store / Action handlers / Reducer                                  
 +------------+     |      - State source                             
                    +      - Data fetching/saving
                           - Optimistic updates              
 ```
 
-### Implementation examples
-**Actions**
-```javascript
-// Action example
-```
-
-**HoC**
-```javascript
-// Data subscription through a HoC example
-```
-
 ## Intended features
-- Based on FRP streams
 - Minimal surface API
 - HoC for ReactJS (data wrapper) 
 - Isomorphic
 - Snapshots / rollback
 - Immutable data
-- Derived data sources
 
 ## Inspiration
 ### Articles
@@ -51,6 +38,7 @@ Data fetching and state library geared towards ReactJS.
 - [The two pillars of Javascript FRP](https://medium.com/javascript-scene/the-two-pillars-of-javascript-pt-2-functional-programming-a63aa53a41a4)
 
 ### Libraries
+- [Redux](http://redux.org)
 - [Marty/Alt](http://alt.js.org)
 - [KefirJS](http://www.kefirjs.org)
 - [RxJS](https://github.com/Reactive-Extensions/RxJS)

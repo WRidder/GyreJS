@@ -8,19 +8,8 @@
     "jasmine": true,
     "node": true
   },
-  "ecmaFeatures": {
-    "arrowFunctions": true,
-    "blockBindings": true,
-    "classes": true,
-    "forOf": true,
-    "jsx": true,
-    "modules": true,
-    "spread": true,
-    "superInFunctions": true
-  },
   "globals": {
     "babel": true,
-    "System": true,
     "sinon": true
   },
   "rules": {
