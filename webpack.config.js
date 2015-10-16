@@ -18,7 +18,10 @@ module.exports = {
       }
     ]
   },
-  externals: ["immutable", "react"],
+  externals: {
+    immutable: "Immutable",
+    react: "React"
+  },
   plugins: [
     new webpack.optimize.UglifyJsPlugin({
       compress: {
