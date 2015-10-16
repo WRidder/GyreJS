@@ -1,10 +1,22 @@
 {
   "name": "gyrejs",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Experimental data fetching and state library geared towards ReactJS",
   "main": "lib/gyrejs-min.js",
+  "jsnext:main": "src/index.js",
   "scripts": {
-    "test": "node './tests/index.js' | tap-spec"
+    "clean": "rimraf lib dist coverage",
+    "lint": "eslint src",
+    "test": "node './tests/index.js' | tap-spec",
+    "check": "npm run lint && npm run test",
+    "build:lib": "babel src --out-dir lib",
+    "build:umd": "webpack src/index.js dist/gyrejs.js --config webpack.config.development.js",
+    "build:umd:min": "webpack src/index.js dist/gyrejs.min.js --config webpack.config.production.js",
+    "build": "npm run build:lib && npm run build:umd && npm run build:umd:min",
+    "preversion": "npm run clean && npm run check",
+    "version": "npm run build",
+    "postversion": "git push && git push --tags && npm run clean",
+    "prepublish": "npm run clean && npm run build"
   },
   "repository": {
     "type": "git",
@@ -12,7 +24,10 @@
   },
   "keywords": [
     "flux",
-    "reactjs"
+    "reactjs",
+    "immutable",
+    "state",
+    "predictable"
   ],
   "author": "Wilbert van de Ridder",
   "license": "MIT",
@@ -23,16 +38,26 @@
   "devDependencies": {
     "babel": "5.8.23",
     "babel-core": "^5.8.25",
+    "babel-eslint": "^4.1.3",
     "babel-loader": "^5.3.2",
     "eslint": "1.6.0",
-    "eslint-plugin-react": "3.5.1",
-    "pre-commit": "1.1.1",
+    "eslint-config-airbnb": "^0.1.0",
+    "eslint-plugin-react": "^3.5.1",
     "react": "0.14.0",
-    "run-sequence": "1.1.4",
+    "rimraf": "^2.4.3",
     "tap-spec": "^4.1.0",
     "tape": "^4.2.1"
   },
   "dependencies": {
     "immutable": "^3.7.5"
-  }
+  },
+  "npmName": "gyrejs",
+  "npmFileMap": [
+    {
+      "basePath": "/lib/",
+      "files": [
+        "*.js"
+      ]
+    }
+  ]
 }

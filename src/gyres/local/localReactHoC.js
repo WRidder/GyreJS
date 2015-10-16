@@ -3,15 +3,16 @@ import React from "react";
 /**
  * Higher order Component factory for local gyre.
  *
- * @param reducer
- * @returns {Function}
+ * @param {Function} reducer Reducer factory
+ * @returns {Function} HoC Factory
  */
 const localHoCFactory = (reducer) => {
   /**
    * localHoC()
    *
-   * @param matcher
-   * @param DefaultComponent
+   * @param {String} matcher Matcher
+   * @param {Object} DefaultComponent Default component
+   * @returns {Object} React class
    */
   return (matcher, DefaultComponent) => {
     return React.createClass({
@@ -33,7 +34,7 @@ const localHoCFactory = (reducer) => {
       },
       render() {
         // Render wrapped component with current props and state as props.
-        let Component = (this.state && this.state.success) ? DefaultComponent : null;
+        const Component = (this.state && this.state.success) ? DefaultComponent : null;
         return Component ? <Component {...this.props} {...this.state}/> : false;
       }
     });

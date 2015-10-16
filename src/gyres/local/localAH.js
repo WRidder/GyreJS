@@ -1,22 +1,23 @@
 /**
  * localAH()
  *
- * @param {Object} store
- * @param {String} nameSpace
- * @param {Boolean} [debugMode]
- * @returns {{addAction: Function, dispatch: Function}}
+ * @param {Object} store instance
+ * @param {String} nameSpace state key
+ * @param {Boolean} [debugMode] Whether to enable debugging
+ * @returns {{addAction: Function, dispatch: Function}} API
  */
 const localAH = (store, nameSpace, debugMode) => {
   // Private variables
   const actionMap = new Map();
-  let stateHistory = [];
+  const stateHistory = [];
 
   // Public functions
   /**
    * addAction()
    *
-   * @param id
-   * @param func
+   * @param {String} id Action ID
+   * @param {Function} func Reducer function
+   * @returns {void}
    */
   const addAction = (id, func) => {
     actionMap.set(id, (args) => {
@@ -31,8 +32,9 @@ const localAH = (store, nameSpace, debugMode) => {
   /**
    * dispatch()
    *
-   * @param id
-   * @param args
+   * @param {String} id Id
+   * @param {Array} args Function arguments
+   * @returns {void}
    */
   const dispatch = (id, ...args) => {
     if (actionMap.has(id)) {
@@ -46,7 +48,7 @@ const localAH = (store, nameSpace, debugMode) => {
   /**
    * getStateList() returns the state list.
    *
-   * @returns {Array}
+   * @returns {Array} Full state history
    */
   const getStateHistory = () => {
     return stateHistory;
