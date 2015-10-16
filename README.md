@@ -1,4 +1,5 @@
 # GyreJS
+[![Build Status](https://travis-ci.org/WRidder/gyrejs.svg)](https://travis-ci.org/WRidder/gyrejs)  
 Data fetching and state library geared towards ReactJS. This is an experimental project.
 
 ## Vision
