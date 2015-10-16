@@ -19,11 +19,10 @@ const store = () => {
    *
    * @returns {void}
    */
-  const sendUpdate = () => {
+  const sendUpdate = () =>
     reducerMap.forEach((reducer) => {
       reducer(state);
     });
-  };
 
   /**
    * removeReducer() - Factory
@@ -32,11 +31,7 @@ const store = () => {
    * @param {Number} id Reducer Id
    * @returns {Function} removal function.
    */
-  const removeReducer = (id) => {
-    return () => {
-      reducerMap.delete(id);
-    };
-  };
+  const removeReducer = (id) => () => reducerMap.delete(id);
 
   /**
    * setState() Overwrite the current state in the store.
@@ -78,20 +73,16 @@ const store = () => {
    *
    * @returns {Immutable.Map} Current state
    */
-  const getState = () => {
-    return state;
-  };
+  const getState = () => state;
 
   /**
    * setState()
    *
-   * @param {Immutable.Map|Object} newState State
+   * @param {Immutable.Map|Object} nState State
    * @param {String} [nameSpace] Namespace
    * @returns {Immutable.Map} New state
    */
-  const setState = (newState, nameSpace) => {
-    return setNewState(newState, nameSpace);
-  };
+  const setState = (nState, nameSpace) => setNewState(nState, nameSpace);
 
   /**
    * updateState() applies a given reducer function to the state, which

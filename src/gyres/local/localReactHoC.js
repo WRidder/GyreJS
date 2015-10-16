@@ -12,13 +12,14 @@ const localHoCFactory = (reducer) => {
    *
    * @param {String} matcher Matcher
    * @param {Object} DefaultComponent Default component
+   * @param {*} initialData Initial state
    * @returns {Object} React class
    */
-  return (matcher, DefaultComponent) => {
+  return (matcher, DefaultComponent, initialData) => {
     return React.createClass({
       displayName: "GyreJS-localHoC",
       getInitialState() {
-        return null;
+        return initialData;
       },
       componentWillMount() {
         this.unRegisterReducer = reducer(matcher, this.handleNewData);
@@ -26,15 +27,17 @@ const localHoCFactory = (reducer) => {
       componentWillUnmount() {
         this.unRegisterReducer();
       },
-      handleNewData(success, data) {
+      shouldComponentUpdate(nextState) {
+        return this.state !== nextState;
+      },
+      handleNewData(data) {
         this.setState({
-          data,
-          success
+          data
         });
       },
       render() {
         // Render wrapped component with current props and state as props.
-        const Component = (this.state && this.state.success) ? DefaultComponent : null;
+        const Component = (this.state) ? DefaultComponent : null;
         return Component ? <Component {...this.props} {...this.state}/> : false;
       }
     });

@@ -21,24 +21,32 @@ const localFactory = (store, NS, debugMode = false) => {
    * @param {Function} cb Callback
    * @returns {Function} Reducer factory
    */
-  const getReducer = (matcher, cb) => {
-    return LocalReducer(store, matcher, cb, nameSpace, debugMode);
-  };
+  const getReducer = (matcher, cb) =>
+    LocalReducer(store, matcher, cb, nameSpace, debugMode);
 
   /**
    * Getter for ReactJS HoC
    *
    * @returns {Function} HoC Factory
    */
-  const getHoC = () => {
-    return LocalReactHoC(getReducer);
-  };
+  const getHoC = () =>
+    LocalReactHoC(getReducer);
+
+  /**
+   * setState()
+   *
+   * @param {Object|Immutable.Map} tState The state to set to this gyre.
+   * @returns {Immutable.Map} Current store state.
+   */
+  const setState = (tState) =>
+    store.setState(tState, nameSpace);
 
   // API
   return {
     AH: LocalAH(store, nameSpace, debugMode),
     getHoC,
-    getReducer
+    getReducer,
+    setState
   };
 };
 

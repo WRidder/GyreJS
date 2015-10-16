@@ -14,12 +14,10 @@ const reducer = (store, matcher, cb, nameSpace) => {
 
     if (state) {
       const data = state.get(matcher);
-      if (data) {
-        cb(true, data);
-      }
-      else {
-        cb(false);
-      }
+      cb(data);
+    }
+    else {
+      cb(void(0));
     }
   };
 

@@ -1,4 +1,3 @@
-"use strict";
 var test = require("tape");
 var Immutable = require("immutable");
 var {Store} = require("../src/index");
@@ -46,6 +45,18 @@ test("Store: can set and get a state", function (t) {
   const returnState = store.setState(state);
   t.equal(state, returnState, "return state should equal given state.");
   t.equal(state, store.getState(), "getState() should now equal given state.");
+});
+
+test("Store: can set and get a state using plain JSON", function (t) {
+  t.plan(2);
+
+  const store = Store();
+  const state = {test: "foo"};
+
+  // Set state and verify return value
+  const returnState = store.setState(state);
+  t.equal(JSON.stringify(state), JSON.stringify(returnState.toJSON()), "return state should equal given state.");
+  t.equal(JSON.stringify(state), JSON.stringify(store.getState().toJSON()), "getState() should now equal given state.");
 });
 
 test("Store: can set and get a namespaced state", function (t) {

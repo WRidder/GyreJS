@@ -207,11 +207,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return _localReactHoC2["default"](getReducer);
 	  };
 
+	  var setState = function setState(tState) {
+	    return store.setState(NS, tState);
+	  };
+
 	  // API
 	  return {
 	    AH: _localAH2["default"](store, nameSpace, debugMode),
 	    getHoC: getHoC,
-	    getReducer: getReducer
+	    getReducer: getReducer,
+	    setState: setState
 	  };
 	};
 

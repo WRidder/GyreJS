@@ -19,7 +19,7 @@ const localAH = (store, nameSpace, debugMode) => {
    * @param {Function} func Reducer function
    * @returns {void}
    */
-  const addAction = (id, func) => {
+  const addAction = (id, func) =>
     actionMap.set(id, (args) => {
       const newState = store.updateState(nameSpace, func, args, id);
       if (debugMode) {
@@ -27,7 +27,6 @@ const localAH = (store, nameSpace, debugMode) => {
         console.log(`>> GyreJS-'${nameSpace}'-store: Applying action '${id}'`, args, func);
       }
     });
-  };
 
   /**
    * dispatch()
@@ -50,9 +49,7 @@ const localAH = (store, nameSpace, debugMode) => {
    *
    * @returns {Array} Full state history
    */
-  const getStateHistory = () => {
-    return stateHistory;
-  };
+  const getStateHistory = () => stateHistory;
 
   // API
   return {
