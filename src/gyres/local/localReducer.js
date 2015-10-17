@@ -11,10 +11,13 @@ const reducer = (store, matcher, cb, nameSpace) => {
   // Private functions
   const update = (stateVar) => {
     const state = nameSpace ? stateVar.get(nameSpace) : stateVar;
+    const matchValue = Array.isArray(matcher) ? matcher : [matcher];
 
     if (state) {
-      const data = state.get(matcher);
-      cb(data);
+      cb(matchValue.reduce((memo, val) => {
+        memo[val] = state.get(val);
+        return memo;
+      }, {}));
     }
     else {
       cb(void(0));
