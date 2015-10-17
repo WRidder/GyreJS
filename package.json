@@ -17,7 +17,8 @@
     "version": "npm run build",
     "postversion": "git push && git push --tags && npm run clean",
     "prepublish": "npm run clean && npm run build",
-    "watch": "watch 'npm run check' src tests"
+    "watch": "watch 'npm run check' src tests",
+    "watch:build": "watch 'npm run build' src"
   },
   "repository": {
     "type": "git",

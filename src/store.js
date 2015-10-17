@@ -20,9 +20,7 @@ const store = () => {
    * @returns {void}
    */
   const sendUpdate = () =>
-    reducerMap.forEach((reducer) => {
-      reducer(state);
-    });
+    reducerMap.forEach(reducer => reducer(state));
 
   /**
    * removeReducer() - Factory

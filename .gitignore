@@ -8,3 +8,4 @@ lib
 dist
 test_reports
 test.html
+test.js

@@ -1,27 +1,28 @@
 var test = require("tape");
 var Immutable = require("immutable");
-var {Store, LocalFactory} = require("../src/index");
+var Store = require("../src/store");
+var LocalGyreFactory = require("../src/gyres/local/localFactory");
 
-test("LocalFactory: factory should return a function", function (t) {
+test("LocalGyreFactory: factory should return a function", function (t) {
   t.plan(1);
-  t.equal(typeof LocalFactory, "function");
+  t.equal(typeof LocalGyreFactory, "function");
 });
 
-test("LocalFactory: should expose an API", function (t) {
+test.skip("LocalGyreFactory: should expose an API", function (t) {
   t.plan(2);
 
   const store = Store();
-  const localGyre = LocalFactory(store, "anotherNS");
+  const localGyre = LocalGyreFactory(store, "anotherNS");
   const localGyreKeys = Object.keys(localGyre);
-  t.assert(localGyreKeys.length === 4, "Exposes 4 methods.");
-  t.equal(localGyreKeys.toString(), "AH,getHoC,getReducer,setState", "Names the methods.");
+  t.assert(localGyreKeys.length === 5, "Exposes 5 methods.");
+  t.equal(localGyreKeys.toString(), "addAction,dispatch,getReducer,getStateHistory,setState", "Names the methods.");
 });
 
-test("LocalFactory: should be able to set its own state", function (t) {
+test("LocalGyreFactory: should be able to set its own state", function (t) {
   t.plan(1);
 
   const store = Store();
-  const localGyre = LocalFactory(store, "anotherNS");
+  const localGyre = LocalGyreFactory(store, "anotherNS");
 
   const newState = Immutable.Map({
     test: "foo"

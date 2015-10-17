@@ -1,12 +1,11 @@
-import React from "react";
-
 /**
  * Higher order Component factory for local gyre.
  *
+ * @param {Object} React Current react instance
  * @param {Function} reducer Reducer factory
  * @returns {Function} HoC Factory
  */
-const localHoCFactory = (reducer) => {
+const localHoCFactory = (React, reducer) => {
   /**
    * localHoC()
    *
@@ -36,9 +35,7 @@ const localHoCFactory = (reducer) => {
         });
       },
       render() {
-        // Render wrapped component with current props and state as props.
-        const Component = (this.state) ? DefaultComponent : null;
-        return Component ? <Component {...this.props} {...this.state}/> : false;
+        return this.state ? <DefaultComponent {...this.props} {...this.state}/> : false;
       }
     });
   };

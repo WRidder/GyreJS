@@ -1,17 +1,20 @@
 import LocalAH from "./localAH";
 import LocalReducer from "./localReducer";
-import LocalReactHoC from "./localReactHoC";
+
+// React components
+import reactHoC from "./localReactHoC";
 
 /**
- * localFactory()
+ *  * localFactory()
  *
  * @param {Object} store Store instance
  * @param {String} NS Namespace
  * @param {Boolean} [debugMode] Debug mode switch
- * @returns {{AH: *, getHoC: Function, getReducer: Function}} API
+ * @returns {{addAction: Function, dispatch: Function, getHoC: Function, getStateHistory: Function, setState: Function}} API
  */
 const localFactory = (store, NS, debugMode = false) => {
   const nameSpace = NS || "local";
+  const AH = LocalAH(store, nameSpace, debugMode);
 
   // Public functions
   /**
@@ -25,14 +28,6 @@ const localFactory = (store, NS, debugMode = false) => {
     LocalReducer(store, matcher, cb, nameSpace, debugMode);
 
   /**
-   * Getter for ReactJS HoC
-   *
-   * @returns {Function} HoC Factory
-   */
-  const getHoC = () =>
-    LocalReactHoC(getReducer);
-
-  /**
    * setState()
    *
    * @param {Object|Immutable.Map} tState The state to set to this gyre.
@@ -43,10 +38,13 @@ const localFactory = (store, NS, debugMode = false) => {
 
   // API
   return {
-    AH: LocalAH(store, nameSpace, debugMode),
-    getHoC,
+    addAction: AH.addAction,
+    addActions: AH.addActions,
+    dispatch: AH.dispatch,
     getReducer,
-    setState
+    reactHoC,
+    setState,
+    use: AH.use
   };
 };
 

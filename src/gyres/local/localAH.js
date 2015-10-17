@@ -1,61 +1,74 @@
 /**
  * localAH()
  *
- * @param {Object} store instance
- * @param {String} nameSpace state key
- * @param {Boolean} [debugMode] Whether to enable debugging
- * @returns {{addAction: Function, dispatch: Function}} API
+ * @param {Object} store instance.
+ * @param {String} nameSpace state key.
+ * @returns {{addAction: Function, dispatch: Function}} API.
  */
-const localAH = (store, nameSpace, debugMode) => {
+const localAH = (store, nameSpace) => {
   // Private variables
   const actionMap = new Map();
-  const stateHistory = [];
+  const middleWare = [];
 
   // Public functions
   /**
    * addAction()
    *
-   * @param {String} id Action ID
-   * @param {Function} func Reducer function
+   * @param {String} id Action ID.
+   * @param {Function} func Reducer function.
    * @returns {void}
    */
   const addAction = (id, func) =>
     actionMap.set(id, (args) => {
-      const newState = store.updateState(nameSpace, func, args, id);
-      if (debugMode) {
-        stateHistory.push(newState);
-        console.log(`>> GyreJS-'${nameSpace}'-store: Applying action '${id}'`, args, func);
-      }
+      store.updateState(nameSpace, func, args, id);
     });
+
+  /**
+   * addActions()
+   *
+   * @param {Object} actions Key/func object of actions.
+   * @returns {void}
+   */
+  const addActions = (actions) => {
+    Object.keys(actions).forEach(action => {
+      addAction(action, actions[action]);
+    });
+  };
 
   /**
    * dispatch()
    *
    * @param {String} id Id
-   * @param {Array} args Function arguments
+   * @param {Array} args Function arguments.
    * @returns {void}
    */
   const dispatch = (id, ...args) => {
     if (actionMap.has(id)) {
-      actionMap.get(id)(args);
+      middleWare.reduce((prev, next) =>
+        () => next(nameSpace, id, args, prev),
+          () => actionMap.get(id)(args))();
     }
     else {
-      console.warn(`GyreJS-AH: Unregistered action requested: '${id}' with arguments:`, args);
+      console.warn(`GyreJS-'${nameSpace}'-AH: Unregistered action requested: '${id}' with arguments:`, args);
     }
   };
 
   /**
-   * getStateList() returns the state list.
+   * use()
    *
-   * @returns {Array} Full state history
+   * @param {Function} mware Middleware function.
+   * @returns {void}
    */
-  const getStateHistory = () => stateHistory;
+  const use = (mware) => {
+    middleWare.unshift(mware);
+  };
 
   // API
   return {
     addAction,
+    addActions,
     dispatch,
-    getStateHistory
+    use
   };
 };
 
