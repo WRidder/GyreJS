@@ -20,15 +20,16 @@ const localAH = (store, nameSpace) => {
    */
   const dispatch = (id, ...args) => {
     if (actionMap.has(id)) {
+      // Invoke all registered middleWare before running the final action.
       middleWare.reduce((prev, next) =>
-          () => next(nameSpace, id, args, prev),
+          () => next(nameSpace, id, args, prev, dispatch),
         () => actionMap.get(id)(args))();
     }
     else {
-      console.warn(`GyreJS-'${nameSpace}'-AH: Unregistered action requested: '${id}' with arguments:`, args);
+      console.warn(`>> GyreJS-'${nameSpace}'-gyre: Unregistered action dispatched: '${id}' with arguments:`,
+        args, ". (This is a no-op)");
     }
   };
-
 
   /**
    * addAction()

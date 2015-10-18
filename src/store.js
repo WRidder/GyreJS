@@ -7,11 +7,9 @@ const IMap = Immutable.Map;
  * @returns {{addReducer: Function, getState: Function, setState: Function, updateState: Function}} API
  */
 const store = () => {
-  let state = IMap({});
-
   // Private variables
-  let rId = 0;
-  const reducerMap = new Map();
+  let state = IMap({});
+  let reducerList = [];
 
   // Private functions
   /**
@@ -20,28 +18,29 @@ const store = () => {
    * @returns {void}
    */
   const sendUpdate = () =>
-    reducerMap.forEach(reducer => reducer(state));
+    reducerList.forEach(reducer => reducer(state));
 
   /**
    * removeReducer() - Factory
    * Remove reducer from the store
    *
-   * @param {Number} id Reducer Id
+   * @param {Function} cb Reducer callback.
    * @returns {Function} removal function.
    */
-  const removeReducer = (id) => () => reducerMap.delete(id);
+  const removeReducer = (cb) =>
+    () =>
+      reducerList = reducerList.filter(reducer => reducer !== cb);
 
   /**
    * setState() Overwrite the current state in the store.
    * Use for setting an initial state or debugging.
    *
-   * @param {Immutable.Map|Object} newState New state
-   * @param {String} [nameSpace] Namespace
+   * @param {Immutable.Map} newState New state.
+   * @param {String} nameSpace Namespace.
    * @returns {Immutable.Map} state Current state
    */
   const setNewState = (newState, nameSpace) => {
-    const tState = IMap.isMap(newState) ? newState : IMap(newState);
-    state = nameSpace ? state.set(nameSpace, tState) : tState;
+    state = state.set(nameSpace, newState);
     sendUpdate();
     return state;
   };
@@ -50,20 +49,18 @@ const store = () => {
   /**
    * Register a faucet with the store and send initial data.
    *
-   * @param {Function} cb callback
-   * @returns {Function} un-register function
+   * @param {Function} cb callback.
+   * @returns {Function} un-register function.
    */
   const addReducer = (cb) => {
-    const id = rId++;
-
     // Save to local register
-    reducerMap.set(id, cb);
+    reducerList.push(cb);
 
     // Send state to reducer
     cb(state);
 
     // Return remover
-    return removeReducer(id);
+    return removeReducer(cb);
   };
 
   /**
@@ -80,7 +77,8 @@ const store = () => {
    * @param {String} [nameSpace] Namespace.
    * @returns {Immutable.Map} New state.
    */
-  const setState = (nState, nameSpace) => setNewState(nState, nameSpace);
+  const setState = (nState, nameSpace) =>
+    setNewState(IMap.isMap(nState) ? nState : IMap(nState), nameSpace);
 
   /**
    * updateState() applies a given reducer function to the state, which
@@ -97,7 +95,7 @@ const store = () => {
     if (dispatch) {
       farg.concat(dispatch);
     }
-    setNewState(func(...farg.concat(args)), nameSpace);
+    setNewState(func(...farg.concat(args)) || state.get(nameSpace), nameSpace);
     return state;
   };
 
