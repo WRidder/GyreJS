@@ -24,11 +24,11 @@ const localHoCFactory = (reducer) => {
       componentWillMount() {
         this.unRegisterReducer = reducer(matcher, this.handleNewData);
       },
-      componentWillUnmount() {
-        this.unRegisterReducer();
-      },
       shouldComponentUpdate(nextState) {
         return this.state.data !== nextState.data;
+      },
+      componentWillUnmount() {
+        this.unRegisterReducer();
       },
       handleNewData(data) {
         this.setState({
