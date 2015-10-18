@@ -1,24 +1,25 @@
 /**
  * Higher order Component factory for local gyre.
  *
- * @param {Object} React Current react instance
- * @param {Function} reducer Reducer factory
- * @returns {Function} HoC Factory
+ * @param {Function} reducer Reducer factory.
+ * @returns {Function} HoC Factory.
  */
-const localHoCFactory = (React, reducer) => {
+const localHoCFactory = (reducer) => {
   /**
    * localHoC()
    *
-   * @param {String} matcher Matcher
-   * @param {Object} DefaultComponent Default component
-   * @param {*} initialData Initial state
+   * @param {String} matcher Matcher.
+   * @param {Object} DefaultComponent Default component.
+   * @param {*} initialData Initial state.
    * @returns {Object} React class
    */
-  return (matcher, DefaultComponent, initialData) => {
+  return (matcher, DefaultComponent) => {
     return React.createClass({
       displayName: "GyreJS-localHoC",
       getInitialState() {
-        return initialData || null;
+        return {
+          data: null
+        };
       },
       componentWillMount() {
         this.unRegisterReducer = reducer(matcher, this.handleNewData);
@@ -27,7 +28,7 @@ const localHoCFactory = (React, reducer) => {
         this.unRegisterReducer();
       },
       shouldComponentUpdate(nextState) {
-        return this.state !== nextState;
+        return this.state.data !== nextState.data;
       },
       handleNewData(data) {
         this.setState({
@@ -35,7 +36,9 @@ const localHoCFactory = (React, reducer) => {
         });
       },
       render() {
-        return this.state ? <DefaultComponent {...this.props} {...this.state}/> : false;
+        return typeof this.state.data !== "undefined"
+          ? <DefaultComponent {...this.props} {...this.state}/>
+          : false;
       }
     });
   };

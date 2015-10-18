@@ -2,7 +2,7 @@
  * reducer()
  *
  * @param {Object} store Store instance
- * @param {String} matcher Matcher
+ * @param {Array|String} matcher Matcher
  * @param {Function} cb Callback
  * @param {String} nameSpace Namespace
  * @returns {Function} Un-register function
@@ -10,7 +10,7 @@
 const reducer = (store, matcher, cb, nameSpace) => {
   // Private functions
   const update = (stateVar) => {
-    const state = nameSpace ? stateVar.get(nameSpace) : stateVar;
+    const state = stateVar.get(nameSpace);
     const matchValue = Array.isArray(matcher) ? matcher : [matcher];
 
     if (state) {

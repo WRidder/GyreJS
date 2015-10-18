@@ -12,30 +12,6 @@ const localAH = (store, nameSpace) => {
 
   // Public functions
   /**
-   * addAction()
-   *
-   * @param {String} id Action ID.
-   * @param {Function} func Reducer function.
-   * @returns {void}
-   */
-  const addAction = (id, func) =>
-    actionMap.set(id, (args) => {
-      store.updateState(nameSpace, func, args, id);
-    });
-
-  /**
-   * addActions()
-   *
-   * @param {Object} actions Key/func object of actions.
-   * @returns {void}
-   */
-  const addActions = (actions) => {
-    Object.keys(actions).forEach(action => {
-      addAction(action, actions[action]);
-    });
-  };
-
-  /**
    * dispatch()
    *
    * @param {String} id Id
@@ -45,12 +21,41 @@ const localAH = (store, nameSpace) => {
   const dispatch = (id, ...args) => {
     if (actionMap.has(id)) {
       middleWare.reduce((prev, next) =>
-        () => next(nameSpace, id, args, prev),
-          () => actionMap.get(id)(args))();
+          () => next(nameSpace, id, args, prev),
+        () => actionMap.get(id)(args))();
     }
     else {
       console.warn(`GyreJS-'${nameSpace}'-AH: Unregistered action requested: '${id}' with arguments:`, args);
     }
+  };
+
+
+  /**
+   * addAction()
+   *
+   * @param {String} id Action ID.
+   * @param {Function} func Reducer function.
+   * @param {Boolean} passDispatch Whether to pass the dispatch method to
+   * the actions.
+   * @returns {void}
+   */
+  const addAction = (id, func, passDispatch) =>
+    actionMap.set(id, (args) => {
+      store.updateState(nameSpace, func, args, passDispatch ? dispatch : null);
+    });
+
+  /**
+   * addActions()
+   *
+   * @param {Object} actions Key/func object of actions.
+   * @param {Boolean} passDispatch Whether to pass the dispatch method to
+   * the actions.
+   * @returns {void}
+   */
+  const addActions = (actions, passDispatch) => {
+    Object.keys(actions).forEach(action => {
+      addAction(action, actions[action], passDispatch);
+    });
   };
 
   /**

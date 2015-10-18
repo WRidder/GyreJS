@@ -2,7 +2,8 @@
  * Import libs
  */
 import Store from "./store";
-import LocalGyreFactory from "./gyres/local/localFactory";
+import LocalGyre from "./gyres/local/factory";
+import SimpleRestGyre from "./gyres/simpleRest/factory";
 
 // Middleware
 import dispatchLogger from "./middleWare/dispatchLogger";
@@ -13,19 +14,25 @@ const middleWare = {
 // Private variables
 const gyres = new Map();
 const store = Store();
+const usedNameSpaces = [];
 
 // Public functions
 /**
  * createGyre()
  *
- * @param {String} id Id of a registered gyre.
+ * @param {String} id Id of a registered gyre factory.
+ * @param {String} [nameSpace] Namespace of new gyre.
  * @returns {Object} Gyre instance.
  */
-const createGyre = (id) => {
+const createGyre = (id, nameSpace) => {
   if (!gyres.has(id)) {
-    console.warn(`GyreJS: Gyre '${id}' not registered.`);
+    console.warn(`GyreJS: Gyre factory '${id}' not registered.`);
   }
-  return gyres.get(id)(store);
+  if (usedNameSpaces.indexOf(nameSpace) !== -1) {
+    throw new Error(`GyreJS ('${id}'): A gyre using the namespace '${nameSpace}' not registered.`);
+  }
+  usedNameSpaces.push(nameSpace);
+  return gyres.get(id)(store, nameSpace);
 };
 
 /**
@@ -40,7 +47,8 @@ const registerGyreFactory = (id, factory) => {
 };
 
 // Register standard gyres
-registerGyreFactory("local", LocalGyreFactory);
+registerGyreFactory("local", LocalGyre);
+registerGyreFactory("simpleRest", SimpleRestGyre);
 
 export {
   createGyre,

@@ -5,12 +5,15 @@
     "mocha": true,
     "node": true
   },
+  "globals": {
+    "React": true
+  },
   "rules": {
     "valid-jsdoc": 1,
 
     "react/jsx-uses-react": 2,
     "react/jsx-uses-vars": 2,
-    "react/react-in-jsx-scope": 2,
+    "react/react-in-jsx-scope": 1,
     "quotes": [
       2,
       "double"

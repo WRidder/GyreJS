@@ -1,14 +1,17 @@
 var test = require("tape");
 var Immutable = require("immutable");
+var dom = require("cheerio");
+var reactDom = require("react-dom/server");
+var render = reactDom.renderToStaticMarkup;
 var Store = require("../src/store");
-var LocalGyreFactory = require("../src/gyres/local/localFactory");
+var LocalGyreFactory = require("../src/gyres/local/factory");
 
-test("LocalGyreFactory: factory should return a function", function (t) {
+test("LocalGyre: factory should return a function", function (t) {
   t.plan(1);
   t.equal(typeof LocalGyreFactory, "function");
 });
 
-test.skip("LocalGyreFactory: should expose an API", function (t) {
+test.skip("LocalGyre: should expose an API", function (t) {
   t.plan(2);
 
   const store = Store();
@@ -18,7 +21,7 @@ test.skip("LocalGyreFactory: should expose an API", function (t) {
   t.equal(localGyreKeys.toString(), "addAction,dispatch,getReducer,getStateHistory,setState", "Names the methods.");
 });
 
-test("LocalGyreFactory: should be able to set its own state", function (t) {
+test("LocalGyre: should be able to set its own state", function (t) {
   t.plan(1);
 
   const store = Store();

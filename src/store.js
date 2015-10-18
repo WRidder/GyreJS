@@ -76,9 +76,9 @@ const store = () => {
   /**
    * setState()
    *
-   * @param {Immutable.Map|Object} nState State
-   * @param {String} [nameSpace] Namespace
-   * @returns {Immutable.Map} New state
+   * @param {Immutable.Map|Object} nState State.
+   * @param {String} [nameSpace] Namespace.
+   * @returns {Immutable.Map} New state.
    */
   const setState = (nState, nameSpace) => setNewState(nState, nameSpace);
 
@@ -86,13 +86,18 @@ const store = () => {
    * updateState() applies a given reducer function to the state, which
    * is supposed to return a new Immutable state.
    *
-   * @param {String} nameSpace Namespace
-   * @param {Function} func Reducer function
-   * @param {Array} args Reducer function arguments
-   * @returns {Immutable.Map} state New state
+   * @param {String} nameSpace Namespace.
+   * @param {Function} func Reducer function.
+   * @param {Array} args Reducer function arguments.
+   * @param {Function} [dispatch] Dispatcher function.
+   * @returns {Immutable.Map} state New state.
    */
-  const updateState = (nameSpace, func, args) => {
-    setNewState(func(state.get(nameSpace) || IMap({}), ...args), nameSpace);
+  const updateState = (nameSpace, func, args, dispatch) => {
+    var farg = [state.get(nameSpace) || IMap({})];
+    if (dispatch) {
+      farg.concat(dispatch);
+    }
+    setNewState(func(...farg.concat(args)), nameSpace);
     return state;
   };
 
