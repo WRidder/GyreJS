@@ -4,13 +4,14 @@
  * @param {Function} reducer Reducer factory.
  * @returns {Function} HoC Factory.
  */
-const localHoCFactory = (reducer) => {
+const reactHoCFactory = (reducer) => {
   /**
-   * localHoC()
+   * reactHoC()
    *
    * @param {String} matcher Matcher.
    * @param {Object} DefaultComponent Default component.
-   * @param {*} initialData Initial state.
+   * @param {Object} LoadingComponent Loading component.
+   * @param {Object} ErrorComponent Error component.
    * @returns {Object} React class
    */
   return (matcher, DefaultComponent, LoadingComponent, ErrorComponent) => {
@@ -25,6 +26,7 @@ const localHoCFactory = (reducer) => {
         this.unRegisterReducer = reducer(matcher, this.handleNewData);
       },
       shouldComponentUpdate(nextState) {
+        // TODO: might need to use immutable.is() for this.
         return this.state.data !== nextState.data;
       },
       componentWillUnmount() {
@@ -63,4 +65,4 @@ const localHoCFactory = (reducer) => {
   };
 };
 
-export default localHoCFactory;
+export default reactHoCFactory;

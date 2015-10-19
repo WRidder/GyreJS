@@ -10,9 +10,13 @@ const STATUS_ERROR = "ERROR";
 
 // Actions
 const actions = {};
+
 const ADD_QUERY = "ADD_QUERY";
 const FETCH_QUERY = "FETCH_QUERY";
 const COMPLETE_QUERY = "COMPLETE_QUERY";
+const ADD = "ADD";
+const UPDATE = "UPDATE";
+const REMOVE = "REMOVE";
 
 actions[ADD_QUERY] = (state, query, queryHash, dispatch) => {
   let tState = state;
@@ -72,7 +76,7 @@ actions[COMPLETE_QUERY] = (state, resultArray, queryHash) => {
     idArray.push(result.idList);
   }
 
-  if (succeeded) {
+  if (succeeded && currentQuery) {
     let mergedIds = Object.assign({}, ...idArray);
     let mergedData = {};
     for (let dataEntry of dataArray) {

@@ -1,6 +1,4 @@
-/**
- * Import libs
- */
+// Import sub libraries
 import Store from "./store";
 import LocalGyre from "./gyres/local/factory";
 import SmartRestGyre from "./gyres/smartRest/factory";
@@ -16,7 +14,7 @@ const middleWare = {
 // Private variables
 const gyres = new Map();
 const store = Store();
-const usedNameSpaces = [];
+const usedNS = [];
 
 // Public functions
 /**
@@ -30,11 +28,13 @@ const createGyre = (id, nameSpace) => {
   if (!gyres.has(id)) {
     console.warn(`>> GyreJS: Gyre factory '${id}' not registered.`);
   }
-  if (usedNameSpaces.indexOf(nameSpace) !== -1) {
-    throw new Error(`>> GyreJS ('${id}'): A gyre using the namespace '${nameSpace}' not registered.`);
+
+  const newNS = id + "-" + (nameSpace || usedNS.length.toString());
+  if (usedNS.indexOf(newNS) !== -1) {
+    throw new Error(`>> GyreJS: A '${id}' gyre using the namespace '${nameSpace}' is already registered.`);
   }
-  usedNameSpaces.push(nameSpace);
-  return gyres.get(id)(store, nameSpace);
+  usedNS.push(newNS);
+  return gyres.get(id)(store, newNS);
 };
 
 /**

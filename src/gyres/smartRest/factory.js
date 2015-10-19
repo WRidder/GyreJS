@@ -3,4 +3,4 @@ import Reducer from "./reducer";
 import ReactHoC from "./reactHoC";
 import defaultActions from "./actions";
 import state from "./state";
-export default GyreFactory("smartRest", Reducer, ReactHoC, defaultActions, state);
+export default GyreFactory(Reducer, ReactHoC, defaultActions, state);

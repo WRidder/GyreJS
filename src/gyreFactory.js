@@ -3,16 +3,14 @@ import ActionHandler from "./actionHandler";
 /**
  * gyreFactory()
  *
- * @param {String} defaultNS Default namespace name.
  * @param {Function} Reducer Reducer factory.
  * @param {Function} ReactHoC React HoC factory.
  * @param {Object} [actions] Default actions object.
  * @param {Immutable.Map} [state] Initial state object.
  * @returns {Function} Gyre factory function.
  */
-const gyreFactory = (defaultNS, Reducer, ReactHoC, actions, state) => (store, NS) => {
+const gyreFactory = (Reducer, ReactHoC, actions, state) => (store, nameSpace) => {
   // Private variables
-  const nameSpace = NS || defaultNS;
   const AH = ActionHandler(store, nameSpace);
 
   // Public functions
