@@ -1,19 +1,15 @@
-'use strict';
-
-var webpack = require('webpack');
-
 module.exports = {
   module: {
     loaders: [
-      { test: /\.js$/, loaders: ['babel-loader'], exclude: /node_modules/ }
+      { test: /\.js$/, loaders: ["babel-loader"], exclude: /node_modules/ }
     ]
   },
   output: {
-    library: 'GyreJS',
-    libraryTarget: 'umd'
+    library: "GyreJS",
+    libraryTarget: "umd"
   },
   resolve: {
-    extensions: ['', '.js']
+    extensions: ["", ".js"]
   },
   externals: {
     immutable: "Immutable",

@@ -7,14 +7,13 @@ import ActionHandler from "./actionHandler";
  * @param {Function} Reducer Reducer factory.
  * @param {Function} ReactHoC React HoC factory.
  * @param {Object} [actions] Default actions object.
+ * @param {Immutable.Map} [state] Initial state object.
  * @returns {Function} Gyre factory function.
  */
-const gyreFactory = (defaultNS, Reducer, ReactHoC, actions) => (store, NS) => {
+const gyreFactory = (defaultNS, Reducer, ReactHoC, actions, state) => (store, NS) => {
+  // Private variables
   const nameSpace = NS || defaultNS;
   const AH = ActionHandler(store, nameSpace);
-  if (actions) {
-    AH.addActions(actions);
-  }
 
   // Public functions
   /**
@@ -25,7 +24,7 @@ const gyreFactory = (defaultNS, Reducer, ReactHoC, actions) => (store, NS) => {
    * @returns {Function} Reducer factory
    */
   const getReducer = (matcher, cb) =>
-    Reducer(store, matcher, cb, nameSpace);
+    Reducer(store, AH.dispatch, matcher, cb, nameSpace);
 
   /**
    * setState()
@@ -43,6 +42,15 @@ const gyreFactory = (defaultNS, Reducer, ReactHoC, actions) => (store, NS) => {
    * @return {Function} HoC factory function.
    */
   const reactHoC = ReactHoC(getReducer);
+
+  // Setup
+  if (actions) {
+    console.log("add actions", actions);
+    AH.addActions(actions);
+  }
+  if (state) {
+    setState(state);
+  }
 
   // API
   return {

@@ -13,7 +13,7 @@ const localHoCFactory = (reducer) => {
    * @param {*} initialData Initial state.
    * @returns {Object} React class
    */
-  return (matcher, DefaultComponent) => {
+  return (matcher, DefaultComponent, LoadingComponent, ErrorComponent) => {
     return React.createClass({
       displayName: "GyreJS-localHoC",
       getInitialState() {
@@ -30,15 +30,34 @@ const localHoCFactory = (reducer) => {
       componentWillUnmount() {
         this.unRegisterReducer();
       },
-      handleNewData(data) {
+      handleNewData(status, data) {
         this.setState({
-          data
+          data,
+          status
         });
       },
       render() {
-        return typeof this.state.data !== "undefined"
-          ? <DefaultComponent {...this.props} {...this.state}/>
-          : false;
+        // Render wrapped component with current props and state as props.
+        if (!this.state || !this.state.status) {
+          return false;
+        }
+        console.log("rending", this.state);
+
+        let Component;
+        switch (this.state.status) {
+          case "LOADING": {
+            Component = LoadingComponent;
+            break;
+          }
+          case "ERROR": {
+            Component = ErrorComponent;
+            break;
+          }
+          default: {
+            Component = DefaultComponent;
+          }
+        }
+        return Component ? <Component {...this.props} {...this.state}/> : false;
       }
     });
   };

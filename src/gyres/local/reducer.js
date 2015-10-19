@@ -2,12 +2,13 @@
  * reducer()
  *
  * @param {Object} store Store instance
+ * @param {Function} dispatch Dispatch
  * @param {Array|String} matcher Matcher
  * @param {Function} cb Callback
  * @param {String} nameSpace Namespace
  * @returns {Function} Un-register function
  */
-const reducer = (store, matcher, cb, nameSpace) => {
+const reducer = (store, dispatch, matcher, cb, nameSpace) => {
   // Private functions
   const update = (stateVar) => {
     const state = stateVar.get(nameSpace);

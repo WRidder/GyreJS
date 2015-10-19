@@ -3,7 +3,7 @@
  */
 import Store from "./store";
 import LocalGyre from "./gyres/local/factory";
-import SimpleRestGyre from "./gyres/simpleRest/factory";
+import SmartRestGyre from "./gyres/smartRest/factory";
 
 // Middleware
 import dispatchLogger from "./middleWare/dispatchLogger";
@@ -50,7 +50,7 @@ const registerGyreFactory = (id, factory) => {
 
 // Register standard gyres
 registerGyreFactory("local", LocalGyre);
-registerGyreFactory("simpleRest", SimpleRestGyre);
+registerGyreFactory("smartRest", SmartRestGyre);
 
 export {
   createGyre,

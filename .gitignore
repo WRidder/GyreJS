@@ -8,4 +8,4 @@ lib
 dist
 test_reports
 index.html
-example.js
+example*.js
