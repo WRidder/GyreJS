@@ -1,11 +1,11 @@
 /**
- * localAH()
+ * actionHandler()
  *
  * @param {Object} store instance.
- * @param {String} nameSpace state key.
+ * @param {Object} options Options object.
  * @returns {{addAction: Function, dispatch: Function}} API.
  */
-const localAH = (store, nameSpace) => {
+const actionHandler = (store, options) => {
   // Private variables
   const actionMap = new Map();
   const middleWare = [];
@@ -22,11 +22,11 @@ const localAH = (store, nameSpace) => {
     if (actionMap.has(id)) {
       // Invoke all registered middleWare before running the final action.
       middleWare.reduce((prev, next) =>
-          () => next(nameSpace, id, args, prev, dispatch),
+          () => next(options.NS, id, args, prev, dispatch),
         () => actionMap.get(id)(args))();
     }
     else {
-      console.warn(`>> GyreJS-'${nameSpace}'-gyre: Unregistered action dispatched: '${id}' with arguments:`,
+      console.warn(`>> GyreJS-'${options.NS}'-gyre: Unregistered action dispatched: '${id}' with arguments:`,
         args, ". (This is a no-op)");
     }
   };
@@ -42,7 +42,7 @@ const localAH = (store, nameSpace) => {
    */
   const addAction = (id, func, passDispatch) =>
     actionMap.set(id, (args) => {
-      store.updateState(nameSpace, func, args, passDispatch ? dispatch : null);
+      store.updateState(options.NS, func, args, passDispatch ? dispatch : null);
     });
 
   /**
@@ -78,4 +78,4 @@ const localAH = (store, nameSpace) => {
   };
 };
 
-export default localAH;
+export default actionHandler;

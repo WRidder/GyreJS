@@ -15,12 +15,14 @@ const extractEndpoints = (query) => {
         id: val.id ? val.id : null,
         fields: val.fields ? val.fields : null
       };
-      if (rV.fields) {
+
+      // If it has fields, OR an id and no children, return as endpoint.
+      if (rV.fields || rV.id && !val.children) {
         yield rV;
       }
 
       if (val.children) {
-        for (let idVal of (Array.isArray(val.id) ? val.id : [val.id])) {
+        for (const idVal of (Array.isArray(val.id) ? val.id : [val.id])) {
           yield *processQuery(val.children, idVal ? i + "/" + idVal : i, tBranch);
         }
       }
@@ -55,6 +57,7 @@ const createUrls = (query) => {
     if (Array.isArray(urlDef.fields) && urlDef.fields.length > 0) {
       urlString = urlString + "?fields=" + urlDef.fields.toString();
     }
+
     return {
       path: urlString,
       type: urlDef.branch[urlDef.branch.length - 1],
@@ -81,7 +84,8 @@ const checkStatusAndParse = (response) => {
   return new Promise((resolve) =>
     resolve({
       success: false,
-      msg: response
+      msg: response,
+      code: response.status
     })
   );
 };
@@ -113,21 +117,24 @@ const transform = (endpoint) => (response) => {
       idList
     };
   }
-  return {
-    success: false,
-    msg: response
-  };
+  return response;
 };
 
 /**
  * fetchUrl()
  *
- * @param {String} endpoint Url
+ * @param {String} host Endpoint host.
+ * @param {Immutable.Map} endpoint Endpoint options.
  * @returns {Promise} Promise of fetch.
  */
-const fetchUrl = (endpoint) => {
+const fetchUrl = (host, endpoint) => {
+  const hostName = host || location.protocol + "//"
+    + location.hostname
+    + (location.port ? ":"
+    + location.port : "");
+
   // Fetch data
-  return fetch("https://localhost:8080/" + endpoint.get("path"))
+  return fetch(`${hostName}/${endpoint.get("path")}`)
     .then(checkStatusAndParse)
     .then(transform(endpoint));
 };

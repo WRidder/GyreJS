@@ -14,33 +14,21 @@ const middleWare = {
 // Private variables
 const gyres = new Map();
 const store = Store();
-const usedNS = [];
 
 // Public functions
 /**
  * createGyre()
  *
  * @param {String} id Id of a registered gyre factory.
- * @param {String} [nameSpace] Namespace of new gyre.
+ * @param {Object} [options] Options object for gyre.
  * @returns {Object} Gyre instance.
  */
-const createGyre = (id, nameSpace) => {
+const createGyre = (id, options) => {
   if (!gyres.has(id)) {
     console.warn(`>> GyreJS: Gyre factory '${id}' not registered.`);
   }
 
-  const newNS = id + "-" + (nameSpace || usedNS.length.toString());
-  if (usedNS.indexOf(newNS) !== -1) {
-    const errorMsg = `>> GyreJS: A '${id}' gyre using the namespace '${nameSpace}' is already registered.`;
-    if (typeof console !== "undefined") {
-      console.error(errorMsg);
-    }
-    else {
-      throw new Error(errorMsg);
-    }
-  }
-  usedNS.push(newNS);
-  return gyres.get(id)(store, newNS);
+  return gyres.get(id)(store, Object.assign({}, {NS: `${id}-${Date.now()}`}, options));
 };
 
 /**

@@ -9,15 +9,15 @@ const IMap = Immutable.Map;
  * @param {Function} dispatch Dispatch
  * @param {Array|String} matcher Matcher
  * @param {Function} cb Callback
- * @param {String} nameSpace Namespace
+ * @param {Object} options Options object.
  * @returns {Function} Un-register function
  */
-const reducer = (store, dispatch, matcher, cb, nameSpace) => {
+const reducer = (store, dispatch, matcher, cb, options) => {
   const queryHash = hashQueryObject(matcher);
 
   const update = (state) => {
-    const queryResult = state.getIn([nameSpace, "queries", queryHash, "idList"]);
-    const queryInfo = state.getIn([nameSpace, "queries", queryHash]);
+    const queryResult = state.getIn([options.NS, "queries", queryHash, "idList"]);
+    const queryInfo = state.getIn([options.NS, "queries", queryHash]);
 
     if (queryResult) {
       cb(queryInfo.get("status"),
@@ -37,7 +37,7 @@ const reducer = (store, dispatch, matcher, cb, nameSpace) => {
           type = type[type.length - 1];
           value.forEach(
             val => {
-                memo = memo.mergeDeepIn(path.concat(val), state.getIn([nameSpace, "data", type, val]));
+                memo = memo.mergeDeepIn(path.concat(val), state.getIn([options.NS, "data", type, val]));
             }
           );
 

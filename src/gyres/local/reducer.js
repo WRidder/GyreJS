@@ -5,13 +5,13 @@
  * @param {Function} dispatch Dispatch
  * @param {Array|String} matcher Matcher
  * @param {Function} cb Callback
- * @param {String} nameSpace Namespace
+ * @param {Object} options Options object.
  * @returns {Function} Un-register function
  */
-const reducer = (store, dispatch, matcher, cb, nameSpace) => {
+const reducer = (store, dispatch, matcher, cb, options) => {
   // Private functions
   const update = (stateVar) => {
-    const state = stateVar.get(nameSpace);
+    const state = stateVar.get(options.NS);
     const matchValue = Array.isArray(matcher) ? matcher : [matcher];
 
     if (state) {
