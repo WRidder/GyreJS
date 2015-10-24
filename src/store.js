@@ -40,8 +40,10 @@ const store = () => {
    * @returns {Immutable.Map} state Current state
    */
   const setNewState = (newState, nameSpace) => {
-    state = state.set(nameSpace, newState);
-    sendUpdate();
+    if (state.get(nameSpace) !== newState) {
+      state = state.set(nameSpace, newState);
+      sendUpdate();
+    }
     return state;
   };
 

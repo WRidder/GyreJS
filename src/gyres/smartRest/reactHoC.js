@@ -1,3 +1,5 @@
+import Immutable from "immutable";
+
 /**
  * Higher order Component factory for local gyre.
  *
@@ -25,9 +27,15 @@ const reactHoCFactory = (reducer) => {
       componentWillMount() {
         this.unRegisterReducer = reducer(matcher, this.handleNewData);
       },
-      shouldComponentUpdate(nextState) {
-        // TODO: might need to use immutable.is() for this.
-        return this.state.data !== nextState.data;
+      shouldComponentUpdate(nextProps, nextState) {
+        if (this.state.status !== nextState.status) {
+          return true;
+        }
+
+        if (nextState.data) {
+          return !Immutable.is(nextState.data, this.state.data);
+        }
+        return true;
       },
       componentWillUnmount() {
         this.unRegisterReducer();
@@ -43,7 +51,7 @@ const reactHoCFactory = (reducer) => {
         if (!this.state || !this.state.status) {
           return false;
         }
-        console.log("rending", this.state);
+
 
         let Component;
         switch (this.state.status) {

@@ -31,7 +31,13 @@ const createGyre = (id, nameSpace) => {
 
   const newNS = id + "-" + (nameSpace || usedNS.length.toString());
   if (usedNS.indexOf(newNS) !== -1) {
-    throw new Error(`>> GyreJS: A '${id}' gyre using the namespace '${nameSpace}' is already registered.`);
+    const errorMsg = `>> GyreJS: A '${id}' gyre using the namespace '${nameSpace}' is already registered.`;
+    if (typeof console !== "undefined") {
+      console.error(errorMsg);
+    }
+    else {
+      throw new Error(errorMsg);
+    }
   }
   usedNS.push(newNS);
   return gyres.get(id)(store, newNS);

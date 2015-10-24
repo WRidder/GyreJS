@@ -89,7 +89,7 @@ const checkStatusAndParse = (response) => {
 /**
  * parse()
  *
- * @param endpoint
+ * @param {Immutable.Map} endpoint
  * @returns {*}
  */
 const transform = (endpoint) => (response) => {
@@ -99,20 +99,22 @@ const transform = (endpoint) => (response) => {
     // Get idList and map data
     const idList = {};
     const data = {};
-    idList[endpoint.root] = [];
-    data[endpoint.type] = {};
+    idList[endpoint.get("root")] = [];
+    data[endpoint.get("type")] = {};
 
     rData.forEach(entry => {
-      idList[endpoint.root].push(entry.id);
-      data[endpoint.type][entry.id.toString()] = entry;
+      idList[endpoint.get("root")].push(entry.id.toString());
+      data[endpoint.get("type")][entry.id.toString()] = entry;
     });
 
     return {
+      success: true,
       data,
       idList
     };
   }
   return {
+    success: false,
     msg: response
   };
 };
@@ -125,14 +127,46 @@ const transform = (endpoint) => (response) => {
  */
 const fetchUrl = (endpoint) => {
   // Fetch data
-  return fetch("https://localhost:8080/" + endpoint.path)
+  return fetch("https://localhost:8080/" + endpoint.get("path"))
     .then(checkStatusAndParse)
     .then(transform(endpoint));
 };
 
+/**
+ * hash()
+ * Simple hash from string
+ *
+ * @param {String} str string
+ * @returns {Number} hash Hash of string.
+ */
+const hash = (str) => {
+  const len = str.length;
+  let hash = 0;
+
+  if (str.length === 0) {
+    return hash;
+  }
+  for (let i = 0; i < len; i++) {
+    const chr = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0;
+  }
+  return hash;
+};
+
+/**
+ * hashQueryObject()
+ * Simple query hash from object
+ *
+ * @param {Object} obj Query object
+ * @returns {Number} hash Hash of query.
+ */
+const hashQueryObject = (obj) => hash(JSON.stringify(obj));
+
 // Helper functions
 const helpers = {
   createUrls,
-  fetchUrl
+  fetchUrl,
+  hashQueryObject
 };
 export default helpers;

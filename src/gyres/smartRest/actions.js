@@ -1,6 +1,7 @@
 import {createUrls, fetchUrl, hashQuery} from "./helpers";
 import Immutable from "immutable";
 const IMap = Immutable.Map;
+const IList = Immutable.List;
 
 // Status constants
 const STATUS_COMPLETED = "COMPLETED";
@@ -10,98 +11,153 @@ const STATUS_ERROR = "ERROR";
 
 // Actions
 const actions = {};
-
 const ADD_QUERY = "ADD_QUERY";
 const FETCH_QUERY = "FETCH_QUERY";
 const COMPLETE_QUERY = "COMPLETE_QUERY";
+const FAIL_QUERY = "FAIL_QUERY";
 const ADD = "ADD";
 const UPDATE = "UPDATE";
 const REMOVE = "REMOVE";
 
-actions[ADD_QUERY] = (state, query, queryHash, dispatch) => {
-  let tState = state;
-  const currentQuery = state.getIn(["queries", queryHash]);
+// Misc
+const newQuery = IMap({
+  status: null,
+  count: 0
+});
 
-  if (currentQuery) {
-    tState = state.setIn(["queries", queryHash],
-      currentQuery.set("count", currentQuery.get("count") + 1));
-
-    if (currentQuery.get("status") === STATUS_COMPLETED) {
-      tState = state.setIn(["queries", queryHash],
-          currentQuery.set("status", STATUS_UPDATING));
-      dispatch(FETCH_QUERY, queryHash);
+/**
+ * Action: ADD_QUERY
+ *
+ * @param state
+ * @param query
+ * @param hash
+ * @param dispatch
+ */
+actions[ADD_QUERY] = (state, query, hash, dispatch) =>
+  state.reduce((memo, value, key) => {
+    if (key === "queries") {
+      memo = memo.set("queries",
+        value.set(hash, newQuery
+          .merge(value.get(hash))
+          .merge({
+            hash: hash,
+            urls: createUrls(query)
+          })
+          .map((qvVal, qvKey) => {
+            switch (qvKey) {
+              case "count": {
+                return qvVal + 1;
+              }
+              case "status": {
+                return qvVal === STATUS_COMPLETED ? STATUS_UPDATING : qvVal;
+              }
+              default:
+                return qvVal;
+            }
+          })
+        )
+        .map((qVal, qKey) => {
+          if (qKey === hash) {
+            if ([STATUS_LOADING, STATUS_UPDATING].indexOf(qVal.get("status")) === -1) {
+              dispatch(FETCH_QUERY, qVal);
+            }
+          }
+          return qVal.set("status", qVal.get("status") || STATUS_LOADING);
+        })
+      );
     }
-  }
-  else {
-    tState = state.setIn(["queries", queryHash],
-      IMap({
-        status: STATUS_LOADING,
-        count: 1,
-        urls: createUrls(query),
-        hash: queryHash,
-        idList: []
-      })
-    );
-    dispatch(FETCH_QUERY, tState.getIn(["queries", queryHash]));
-  }
-  return tState;
-};
+    return memo;
+  }, state);
 
+/**
+ * Action: FETCH_QUERY
+ *
+ * @param state
+ * @param query
+ * @param dispatch
+ */
 actions[FETCH_QUERY] = (state, query, dispatch) => {
   // Fetch urls
-  const promiseArray = [];
-  for (const endpoint of query.get("urls")) {
-    promiseArray.push(fetchUrl(endpoint));
-  }
+  const promiseArray = query.get("urls").map(endpoint =>
+    fetchUrl(endpoint));
 
-  Promise.all(promiseArray).then(function(result) {
-    dispatch(COMPLETE_QUERY, result, query.get("hash"));
-  });
-};
-
-actions[COMPLETE_QUERY] = (state, resultArray, queryHash) => {
-  let tState = state;
-  const currentQuery = state.getIn(["queries", queryHash]);
-  let succeeded = true;
-  const dataArray = [];
-  const idArray = [];
-  let errorMsg;
-  for (let result of resultArray) {
-    if (!result.data) {
-      errorMsg = result.msg;
-      succeeded = false;
-      break;
-    }
-    dataArray.push(result.data);
-    idArray.push(result.idList);
-  }
-
-  if (succeeded && currentQuery) {
-    let mergedIds = Object.assign({}, ...idArray);
-    let mergedData = {};
-    for (let dataEntry of dataArray) {
-      for (let dataKey of Object.keys(dataEntry)) {
-        if (mergedData.hasOwnProperty(dataKey)) {
-          mergedData[dataKey] = Object.assign({},
-            mergedData[dataKey], dataEntry[dataKey]);
+  Promise.all(promiseArray)
+    .then(resultArray => {
+      const fetchResult = resultArray.reduce((memo, result) => {
+        if (!result.success) {
+          memo.success = false;
+          memo.msgList = memo.msgList.push(result.msg);
         }
-        else {
-          mergedData[dataKey] = dataEntry[dataKey];
-        }
+        return memo;
+      }, {success: true, msgList: IList([])});
+
+      if (fetchResult.success) {
+        dispatch(COMPLETE_QUERY, resultArray, query);
       }
+      else {
+        dispatch(FAIL_QUERY, fetchResult.msgList, query);
+      }
+    })
+    .catch(error => {
+      dispatch(FAIL_QUERY, [error], query);
+    });
+};
+
+/**
+ * Action: COMPLETE_QUERY
+ *
+ * @param state
+ * @param resultArray
+ * @param query
+ */
+actions[COMPLETE_QUERY] = (state, resultArray, query) => state.reduce((memo, value, key) => {
+    if (key === "queries") {
+      memo = memo.set("queries",
+        value.map((q, k) => {
+          if (k === query.get("hash")) {
+            q = q.merge({
+              "status": STATUS_COMPLETED,
+              "idList": resultArray.reduce((prev, next) => prev.merge(next.idList), IMap({}))
+            });
+          }
+          return q;
+        })
+      );
     }
-    tState = tState.setIn(["queries", queryHash],
-      currentQuery.merge({
-        "status": STATUS_COMPLETED,
-        "idList": mergedIds
-      }));
-    tState = tState.mergeDeepIn(["data"], Immutable.fromJS(mergedData));
-    return tState;
+
+    if (key === "data") {
+      memo = memo.set("data",
+        resultArray.reduce((prev, result) =>
+          prev.mergeDeep(result.data), memo.get("data"))
+      );
+    }
+
+    return memo;
+  }, state);
+
+/**
+ * Action: FAIL_QUERY
+ *
+ * @param state
+ * @param msgList
+ * @param query
+ */
+actions[FAIL_QUERY] = (state, msgList, query) => state.reduce((memo, value, key) => {
+  if (key === "queries") {
+    memo = memo.set("queries",
+      value.map((q, k) => {
+        if (k === query.get("hash")) {
+          q = q.merge({
+            "status": STATUS_ERROR,
+            "msg": msgList
+          });
+        }
+        return q;
+      })
+    );
   }
 
-  tState = state.setIn(["queries", queryHash],
-    currentQuery.set("status", STATUS_ERROR));
-  return tState;
-};
+  return memo;
+}, state);
 
 export default actions;

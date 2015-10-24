@@ -37,7 +37,7 @@ const localHoCFactory = (reducer) => {
       },
       render() {
         return typeof this.state.data !== "undefined"
-          ? <DefaultComponent {...this.props} {...this.state}/>
+          ? <DefaultComponent {...this.props} {...this.state.data}/>
           : false;
       }
     });

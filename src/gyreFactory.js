@@ -1,4 +1,5 @@
 import ActionHandler from "./actionHandler";
+import Immutable from "immutable";
 
 /**
  * gyreFactory()
@@ -43,10 +44,9 @@ const gyreFactory = (Reducer, ReactHoC, actions, state) => (store, nameSpace) =>
 
   // Setup
   if (actions) {
-    console.log("add actions", actions);
     AH.addActions(actions);
   }
-  if (state) {
+  if (Immutable.Map.isMap(state)) {
     setState(state);
   }
 
