@@ -9,20 +9,22 @@ const IMap = Immutable.Map;
  * @param {Function} dispatch Dispatch
  * @param {Array|String} matcher Matcher
  * @param {Function} cb Callback
- * @param {Object} options Options object.
+ * @param {Object} NS NameSpace from Options object.
  * @returns {Function} Un-register function
  */
-const reducer = (store, dispatch, matcher, cb, options) => {
+const reducer = (store, dispatch, matcher, cb, {NS}) => {
   const queryHash = hashQueryObject(matcher);
 
   const update = (state) => {
-    const queryResult = state.getIn([options.NS, "queries", queryHash, "idList"]);
-    const queryInfo = state.getIn([options.NS, "queries", queryHash]);
+    const queryResult = state.getIn([NS, "queries", queryHash, "idList"]);
+    const queryInfo = state.getIn([NS, "queries", queryHash]);
 
     if (queryResult) {
       cb(queryInfo.get("status"),
         queryResult
-        .reduce((memo, value, key) => {
+        .reduce((mm, value, key) => {
+          let memo = mm;
+
           // Create path
           const path = key.split("/").reduce((mem, val, index) => {
             if (index % 2 === 0 && index) {
@@ -37,7 +39,7 @@ const reducer = (store, dispatch, matcher, cb, options) => {
           type = type[type.length - 1];
           value.forEach(
             val => {
-                memo = memo.mergeDeepIn(path.concat(val), state.getIn([options.NS, "data", type, val]));
+              memo = memo.mergeDeepIn(path.concat(val), state.getIn([NS, "data", type, val]));
             }
           );
 

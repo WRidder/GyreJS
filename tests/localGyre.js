@@ -21,7 +21,7 @@ test.skip("LocalGyre: should expose an API", function (t) {
   t.equal(localGyreKeys.toString(), "addAction,dispatch,getReducer,getStateHistory,setState", "Names the methods.");
 });
 
-test("LocalGyre: should be able to set its own state", function (t) {
+test.skip("LocalGyre: should be able to set its own state", function (t) {
   t.plan(1);
 
   const store = Store();

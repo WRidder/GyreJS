@@ -148,17 +148,17 @@ const fetchUrl = (host, endpoint) => {
  */
 const hash = (str) => {
   const len = str.length;
-  let hash = 0;
+  let h = 0;
 
   if (str.length === 0) {
-    return hash;
+    return h;
   }
   for (let i = 0; i < len; i++) {
     const chr = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + chr;
-    hash |= 0;
+    h = ((h << 5) - h) + chr;
+    h |= 0;
   }
-  return hash;
+  return h;
 };
 
 /**

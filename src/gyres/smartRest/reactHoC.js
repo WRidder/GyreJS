@@ -55,17 +55,17 @@ const reactHoCFactory = (reducer) => {
 
         let Component;
         switch (this.state.status) {
-          case "LOADING": {
-            Component = LoadingComponent;
-            break;
-          }
-          case "ERROR": {
-            Component = ErrorComponent;
-            break;
-          }
-          default: {
-            Component = DefaultComponent;
-          }
+        case "LOADING": {
+          Component = LoadingComponent;
+          break;
+        }
+        case "ERROR": {
+          Component = ErrorComponent;
+          break;
+        }
+        default: {
+          Component = DefaultComponent;
+        }
         }
         return Component ? <Component {...this.props} {...this.state}/> : false;
       }

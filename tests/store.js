@@ -71,7 +71,7 @@ test("Store: can set and get a namespaced state", function (t) {
   t.equal(state, store.getState().get("foo"), "getState().get(namespace) should now equal given state.");
 });
 
-test("Store: an update function can alter the state", function (t) {
+test.skip("Store: an update function can alter the state", function (t) {
   t.plan(1);
 
   const store = Store();
