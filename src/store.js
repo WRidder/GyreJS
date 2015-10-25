@@ -89,15 +89,10 @@ const store = () => {
    * @param {String} nameSpace Namespace.
    * @param {Function} func Reducer function.
    * @param {Array} args Reducer function arguments.
-   * @param {Function} [dispatch] Dispatcher function.
    * @returns {Immutable.Map} state New state.
    */
-  const updateState = (nameSpace, func, args, dispatch) => {
-    var farg = [state.get(nameSpace) || IMap({})];
-    if (dispatch) {
-      farg.concat(dispatch);
-    }
-    setNewState(func(...farg.concat(args)) || state.get(nameSpace), nameSpace);
+  const updateState = (nameSpace, func, args) => {
+    setNewState(func(...[state.get(nameSpace)].concat(args)) || state.get(nameSpace), nameSpace);
     return state;
   };
 

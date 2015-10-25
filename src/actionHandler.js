@@ -36,26 +36,24 @@ const actionHandler = (store, options) => {
    *
    * @param {String} id Action ID.
    * @param {Function} func Reducer function.
-   * @param {Boolean} passDispatch Whether to pass the dispatch method to
    * the actions.
    * @returns {void}
    */
-  const addAction = (id, func, passDispatch) =>
+  const addAction = (id, func) =>
     actionMap.set(id, (args) => {
-      store.updateState(options.NS, func, args, passDispatch ? dispatch : null);
+      store.updateState(options.NS, func, args);
     });
 
   /**
    * addActions()
    *
    * @param {Object} actions Key/func object of actions.
-   * @param {Boolean} passDispatch Whether to pass the dispatch method to
    * the actions.
    * @returns {void}
    */
-  const addActions = (actions, passDispatch) => {
+  const addActions = (actions) => {
     Object.keys(actions).forEach(action => {
-      addAction(action, actions[action], passDispatch);
+      addAction(action, actions[action]);
     });
   };
 

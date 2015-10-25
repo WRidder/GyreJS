@@ -35,6 +35,14 @@ const gyreFactory = (Reducer, ReactHoC, actions = () => {}, state = {}) =>
       store.setState(tState, options.NS);
 
     /**
+     * getState()
+     *
+     * @returns {Immutable.Map} Current store state.
+     */
+    const getState = () =>
+      store.getState.get(options.NS);
+
+    /**
      * reactHoC()
      *
      * @param {Object} react React instance.
@@ -51,6 +59,7 @@ const gyreFactory = (Reducer, ReactHoC, actions = () => {}, state = {}) =>
       addAction: AH.addAction,
       addActions: AH.addActions,
       dispatch: AH.dispatch,
+      getState,
       getReducer,
       reactHoC,
       setState,
