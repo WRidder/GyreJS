@@ -1,5 +1,6 @@
 // Import sub libraries
 import Store from "./store";
+import GyreFactory from "./gyreFactory";
 
 // Private variables
 const gyres = new Map();
@@ -50,7 +51,8 @@ const registerGyreFactory = (id, factory) => {
   gyres.set(id, factory);
 };
 
-export {
+export {GyreFactory};
+export default {
   createGyre,
   destroyGyre,
   registerGyreFactory
