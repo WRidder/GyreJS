@@ -1,6 +1,6 @@
 # GyreJS
 [![Build Status](https://travis-ci.org/WRidder/gyrejs.svg)](https://travis-ci.org/WRidder/gyrejs)  
-Data fetching and state library geared towards ReactJS. This is an experimental project.
+Data fetching and state library. This is an experimental project.
 
 ## Vision
 ### Flow
@@ -28,9 +28,7 @@ Data fetching and state library geared towards ReactJS. This is an experimental 
 
 ## Intended features
 - Minimal surface API
-- HoC for ReactJS (data wrapper) 
 - Isomorphic
-- Snapshots / rollback
 - Immutable data
 
 ## Inspiration

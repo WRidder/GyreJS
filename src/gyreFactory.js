@@ -3,27 +3,32 @@ import ActionHandler from "./actionHandler";
 /**
  * gyreFactory()
  *
- * @param {Function} Reducer Reducer factory.
- * @param {Function} ReactHoC React HoC factory.
  * @param {Function} [actions] Default actions object.
+ * @param {Function} filters Reducer factory.
  * @param {Immutable.Map|Object} [state] Initial state object.
  * @returns {Function} Gyre factory function.
  */
-const gyreFactory = (Reducer, ReactHoC, actions = () => {}, state = {}) =>
+const gyreFactory = ({actions = () => {}, filters = {}, state = {}}) =>
   (store, options) => {
     // Private variables
     const AH = ActionHandler(store, options);
 
     // Public functions
     /**
-     * getReducer() Getter for reducer
+     * getFilter() Getter for reducer
      *
-     * @param {String} matcher Matcher
+     * @param {*} id Id
      * @param {Function} cb Callback
-     * @returns {Function} Reducer factory
+     * @param {Array} [args] Remaining arguments.
+     * @returns {Function|void} Filter factory
      */
-    const getReducer = (matcher, cb) =>
-      Reducer(store, AH.dispatch, matcher, cb, options);
+    const getFilter = (id, cb, ...args) => {
+      if (Object.prototype.hasOwnProperty.call(filters, id)) {
+        return filters[id](store, AH.dispatch, cb, options, ...args);
+      }
+      console.warn(`>> GyreJS-'${options.NS}'-gyre: Unregistered filter requested: '${id}' with arguments:`, args, "."); // eslint-disable-line no-console
+    };
+
 
     /**
      * setState()
@@ -40,15 +45,7 @@ const gyreFactory = (Reducer, ReactHoC, actions = () => {}, state = {}) =>
      * @returns {Immutable.Map} Current store state.
      */
     const getState = () =>
-      store.getState.get(options.NS);
-
-    /**
-     * reactHoC()
-     *
-     * @param {Object} react React instance.
-     * @return {Function} HoC factory function.
-     */
-    const reactHoC = ReactHoC(getReducer);
+      store.getState().get(options.NS);
 
     // Setup
     AH.addActions(actions(options));
@@ -60,8 +57,8 @@ const gyreFactory = (Reducer, ReactHoC, actions = () => {}, state = {}) =>
       addActions: AH.addActions,
       dispatch: AH.dispatch,
       getState,
-      getReducer,
-      reactHoC,
+      getFilter,
+      nameSpace: options.NS,
       setState,
       use: AH.use
     };

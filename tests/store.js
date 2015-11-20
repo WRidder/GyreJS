@@ -2,40 +2,32 @@ var test = require("tape");
 var Immutable = require("immutable");
 var Store = require("../src/store");
 
-test("Store: factory should return a function", function (t) {
+test("Store: factory should return a function", function(t) {
   t.plan(1);
   t.equal(typeof Store, "function");
 });
 
-test("Store: when initialized should be an object", function (t) {
+test("Store: when initialized should be an object", function(t) {
   t.plan(1);
 
   const store = Store();
   t.equal(typeof store, "object", "Store() returns an object.");
 });
 
-test.skip("Store: should expose an API", function (t) {
-  t.plan(2);
-
-  const store = Store();
-  t.assert(Object.keys(store).length === 4);
-  t.equal(Object.keys(store).toString(), "addReducer,getState,setState,updateState");
-});
-
-test("Store: can add and remove a reducer", function (t) {
+test("Store: can add and remove a filter", function(t) {
   t.plan(1);
 
   const store = Store();
-  const reducer = {
+  const filter = {
     update: () => {}
   };
 
-  const removeReducer = store.addReducer(reducer.update);
-  t.equal(typeof removeReducer, "function");
-  removeReducer();
+  const removeFilter = store.addFilter(filter.update);
+  t.equal(typeof removeFilter, "function");
+  removeFilter();
 });
 
-test("Store: can set and get a state", function (t) {
+test("Store: can set and get a state", function(t) {
   t.plan(2);
 
   const store = Store();
@@ -47,7 +39,7 @@ test("Store: can set and get a state", function (t) {
   t.equal(state, store.getState().get("foo"), "getState() should now equal given state.");
 });
 
-test("Store: can set and get a state using plain JSON", function (t) {
+test("Store: can set and get a state using plain JSON", function(t) {
   t.plan(2);
 
   const store = Store();
@@ -59,19 +51,7 @@ test("Store: can set and get a state using plain JSON", function (t) {
   t.equal(JSON.stringify(state), JSON.stringify(store.getState().get("foo").toJSON()), "getState() should now equal given state.");
 });
 
-test("Store: can set and get a namespaced state", function (t) {
-  t.plan(2);
-
-  const store = Store();
-  const state = Immutable.Map({test: "foo"});
-
-  // Set state and verify return value
-  const returnState = store.setState(state, "foo");
-  t.equal(returnState, store.getState(), "return state should equal getState().");
-  t.equal(state, store.getState().get("foo"), "getState().get(namespace) should now equal given state.");
-});
-
-test.skip("Store: an update function can alter the state", function (t) {
+test.skip("Store: an update function can alter the state", function(t) {
   t.plan(1);
 
   const store = Store();

@@ -12,7 +12,7 @@ const actionHandler = (store, options) => {
 
   // Public functions
   /**
-   * dispatch()
+   * dispatch() Dispatch a registered action by ID.
    *
    * @param {String} id Id
    * @param {Array} args Function arguments.
@@ -23,29 +23,29 @@ const actionHandler = (store, options) => {
       // Invoke all registered middleWare before running the final action.
       middleWare.reduce((prev, next) =>
           () => next(options.NS, id, args, prev, dispatch),
-        () => actionMap.get(id)(args))();
+        () => actionMap.get(id)(args.push(dispatch) && args))();
     }
     else {
-      console.warn(`>> GyreJS-'${options.NS}'-gyre: Unregistered action dispatched: '${id}' with arguments:`,
-        args, ". (This is a no-op)");
+      console.warn(`>> GyreJS-'${options.NS}'-gyre: Unregistered action dispatched: '${id}' with arguments:`, args, ". (This is a no-op)"); // eslint-disable-line no-console
     }
   };
 
   /**
-   * addAction()
+   * addAction() Add a single action.
    *
    * @param {String} id Action ID.
    * @param {Function} func Reducer function.
    * the actions.
    * @returns {void}
    */
-  const addAction = (id, func) =>
-    actionMap.set(id, (args) => {
-      store.updateState(options.NS, func, args);
-    });
+  const addAction = (id, func) => {
+    actionMap.set(id, (args) =>
+        store.updateState(options.NS, func, args)
+    );
+  };
 
   /**
-   * addActions()
+   * addActions() Add multiple actions.
    *
    * @param {Object} actions Key/func object of actions.
    * the actions.
@@ -58,7 +58,7 @@ const actionHandler = (store, options) => {
   };
 
   /**
-   * use()
+   * use() Apply middleware.
    *
    * @param {Function} mware Middleware function.
    * @returns {void}
