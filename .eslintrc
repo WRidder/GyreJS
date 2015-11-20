@@ -8,6 +8,10 @@
   "globals": {
     "React": true
   },
+  "ecmaFeatures": {
+    "restParams": true,
+    "spread": true
+  },
   "rules": {
     "valid-jsdoc": 1,
 
