@@ -16,7 +16,7 @@ const store = Store();
  */
 const createGyre = (id, options) => {
   if (!gyres.has(id)) {
-    console.warn(`>> GyreJS: Gyre factory '${id}' not registered.`); // eslint-disable-line no-console
+    console.warn(`>> GyreJS: Error on create - Gyre factory '${id}' not registered.`); // eslint-disable-line no-console
   }
   const newNameSpace = `${id}-${Date.now()}`;
   store.setState({
@@ -24,20 +24,6 @@ const createGyre = (id, options) => {
   }, newNameSpace);
 
   return gyres.get(id)(store, Object.assign({}, {NS: newNameSpace}, options));
-};
-
-/**
- * destroyGyre()
- *
- * @param {String} id Id of a registered gyre factory.
- * @returns {Object|boolean} Gyre instance.
- */
-const destroyGyre = (id) => {
-  if (!gyres.has(id)) {
-    console.warn(`>> GyreJS: Gyre factory '${id}' not registered.`); // eslint-disable-line no-console
-    return false;
-  }
-  return gyres.delete(id) && true;
 };
 
 /**
@@ -51,9 +37,23 @@ const registerGyreFactory = (id, factory) => {
   gyres.set(id, factory);
 };
 
+/**
+ * unRegisterGyreFactory()
+ *
+ * @param {String} id Id of a registered gyre factory.
+ * @returns {boolean} Whether the factory has been un-registered.
+ */
+const unRegisterGyreFactory = (id) => {
+  if (!gyres.has(id)) {
+    console.warn(`>> GyreJS: Error on unregister - Gyre factory '${id}' not registered.`); // eslint-disable-line no-console
+    return false;
+  }
+  return gyres.delete(id) && true;
+};
+
 export default {
   createGyre,
-  destroyGyre,
   registerGyreFactory,
+  unRegisterGyreFactory,
   GyreFactoryFactory
 };
