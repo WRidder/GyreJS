@@ -1,5 +1,5 @@
 import ActionHandler from "./actionHandler";
-
+const defaultActions = () => ({});
 /**
  * gyreFactory()
  *
@@ -8,7 +8,7 @@ import ActionHandler from "./actionHandler";
  * @param {Immutable.Map|Object} [state] Initial state object.
  * @returns {Function} Gyre factory function.
  */
-const gyreFactory = ({actions = () => {}, filters = {}, state = {}}) =>
+const gyreFactory = ({actions = defaultActions, filters = {}, state = {}}) =>
   (store, options) => {
     // Private variables
     const AH = ActionHandler(store, options);
