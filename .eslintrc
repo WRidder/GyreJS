@@ -2,22 +2,14 @@
   "extends": "airbnb",
   "env": {
     "browser": true,
-    "mocha": true,
-    "node": true
+    "node": true,
+    "es6": true
   },
   "globals": {
     "React": true
   },
-  "ecmaFeatures": {
-    "restParams": true,
-    "spread": true
-  },
   "rules": {
     "valid-jsdoc": 1,
-
-    "react/jsx-uses-react": 2,
-    "react/jsx-uses-vars": 2,
-    "react/react-in-jsx-scope": 1,
     "quotes": [
       2,
       "double"
@@ -34,7 +26,5 @@
     // Disable comma-dangle unless need to support it
     "comma-dangle": 0
   },
-  "plugins": [
-    "react"
-  ]
+  "root": true
 }
