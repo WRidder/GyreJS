@@ -1,6 +1,6 @@
 // Import sub libraries
 import Store from "./store";
-import GyreFactoryFactory from "./gyreFactory";
+import createGyreFactory from "./gyreFactory";
 
 // Private variables
 const gyres = new Map();
@@ -8,7 +8,7 @@ const store = Store();
 
 // Public functions
 /**
- * createGyre()
+ * Create a new gyre instance. Based on a factory function by id.
  *
  * @param {String} id Id of a registered gyre factory.
  * @param {Object} [options] Options object for gyre.
@@ -18,16 +18,17 @@ const createGyre = (id, options) => {
   if (!gyres.has(id)) {
     console.warn(`>> GyreJS: Error on create - Gyre factory '${id}' not registered.`); // eslint-disable-line no-console
   }
-  const newNameSpace = `${id}-${Date.now()}`;
-  store.setState({
-    data: {}
-  }, newNameSpace);
 
-  return gyres.get(id)(store, Object.assign({}, {NS: newNameSpace}, options));
+  // Generate a unique namespace.
+  const NS = `${id}-${Date.now()}`;
+  store.setState({}, NS);
+
+  // Return gyre instance object.
+  return gyres.get(id)(store, Object.assign({}, options, {NS: NS}));
 };
 
 /**
- * registerGyreFactory()
+ * Register a gyre factory function.
  *
  * @param {String} id Id of to register gyre.
  * @param {Function} factory Gyre factory function.
@@ -38,7 +39,7 @@ const registerGyreFactory = (id, factory) => {
 };
 
 /**
- * unRegisterGyreFactory()
+ * Un-register a gyre factory function.
  *
  * @param {String} id Id of a registered gyre factory.
  * @returns {boolean} Whether the factory has been un-registered.
@@ -55,5 +56,5 @@ export default {
   createGyre,
   registerGyreFactory,
   unRegisterGyreFactory,
-  GyreFactoryFactory
+  createGyreFactory
 };

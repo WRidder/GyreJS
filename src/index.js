@@ -1,2 +1,2 @@
-import GyreJS from "./gyrejs";
+import GyreJS from "./main";
 module.exports = GyreJS;

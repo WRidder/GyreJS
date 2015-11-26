@@ -1,5 +1,5 @@
 /**
- * actionHandler()
+ * Action creator and dispatcher.
  *
  * @param {Object} store instance.
  * @param {Object} options Options object.
@@ -12,7 +12,7 @@ const actionHandler = (store, options) => {
 
   // Public functions
   /**
-   * dispatch() Dispatch a registered action by ID.
+   * Dispatch a registered action by ID.
    *
    * @param {String} id Id
    * @param {Array} args Function arguments.
@@ -21,8 +21,9 @@ const actionHandler = (store, options) => {
   const dispatch = (id, ...args) => {
     if (actionMap.has(id)) {
       // Invoke all registered middleWare before running the final action.
-      middleWare.reduce((prev, next) =>
-          () => next(options.NS, id, args, prev, dispatch),
+      // First call functions which have been added first.
+      middleWare.reduce((nextToCall, firstToCall) =>
+          () => firstToCall(options.NS, id, args, nextToCall, dispatch),
         () => actionMap.get(id)(args.push(dispatch) && args))();
     }
     else {
@@ -31,7 +32,7 @@ const actionHandler = (store, options) => {
   };
 
   /**
-   * addAction() Add a single action.
+   * Add a single action.
    *
    * @param {String} id Action ID.
    * @param {Function} func Reducer function.
@@ -40,12 +41,12 @@ const actionHandler = (store, options) => {
    */
   const addAction = (id, func) => {
     actionMap.set(id, (args) =>
-        store.updateState(options.NS, func, args)
+        store.update(options.NS, func, args)
     );
   };
 
   /**
-   * addActions() Add multiple actions.
+   * Add multiple actions.
    *
    * @param {Object} actions Key/func object of actions.
    * the actions.
@@ -58,7 +59,7 @@ const actionHandler = (store, options) => {
   };
 
   /**
-   * use() Apply middleware.
+   * Apply middleware. Middleware is called in the order in which it's added.
    *
    * @param {Function} mware Middleware function.
    * @returns {void}

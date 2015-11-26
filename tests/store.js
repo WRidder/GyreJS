@@ -14,17 +14,15 @@ test("Store: when initialized should be an object", function(t) {
   t.equal(typeof store, "object", "Store() returns an object.");
 });
 
-test("Store: can add and remove a filter", function(t) {
+test("Store: can add and remove a selector", function(t) {
   t.plan(1);
 
   const store = Store();
-  const filter = {
-    update: () => {}
-  };
+  const selector = () => {};
 
-  const removeFilter = store.addFilter(filter.update);
-  t.equal(typeof removeFilter, "function");
-  removeFilter();
+  const removeSelector = store.addSelector(selector);
+  t.equal(typeof removeSelector, "function");
+  removeSelector();
 });
 
 test("Store: can set and get a state", function(t) {
@@ -51,14 +49,20 @@ test("Store: can set and get a state using plain JSON", function(t) {
   t.equal(JSON.stringify(state), JSON.stringify(store.getState().get("foo").toJSON()), "getState() should now equal given state.");
 });
 
-test.skip("Store: an update function can alter the state", function(t) {
+test("Store: an update function can alter the state", function(t) {
   t.plan(1);
 
+  // Init store
   const store = Store();
+  store.setState({
+    testValue: 0
+  }, "testNS");
+
+  // Update store
   const updateFunction = (state, value) => {
     return state.set("testValue", value);
   };
-  store.updateState("testNS", updateFunction, [99]);
+  store.update("testNS", updateFunction, [99]);
 
   // Set state and verify return value
   t.equal(store.getState().get("testNS").get("testValue"), 99,
