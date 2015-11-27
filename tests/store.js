@@ -21,8 +21,10 @@ test("Store: can add and remove a selector", function(t) {
   store.setTicker("test", (cb) => cb());
   const selector = () => {};
 
-  const removeSelector = store.addSelector("test", selector);
+  let removeSelector = store.addSelector("test", selector);
   t.equal(typeof removeSelector, "function");
+  removeSelector();
+  removeSelector = store.addSelector("test", selector);
   removeSelector();
 });
 

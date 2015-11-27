@@ -53,8 +53,8 @@ const store = () => {
    */
   const removeSelector = (ns, cb) =>
     () =>
-      selectorList[ns] = selectorList[ns]
-        .filter(selector => selector !== cb);
+      selectorList[ns]
+        .splice(selectorList[ns].indexOf(cb), 1);
 
   /**
    * Overwrite the current state in the store.
