@@ -58,7 +58,7 @@ test("Full: Can add and dispatch actions.", function(t) {
 });
 
 test("Full: Can add and use selectors and use dispatcher middleware", function(t) {
-  t.plan(2);
+  t.plan(3);
   const simpleGyre = registerSimpleGyreFactory(createSimpleGyreFactory());
 
   // Set initial state and create actions (chained)
@@ -84,14 +84,23 @@ test("Full: Can add and use selectors and use dispatcher middleware", function(t
 
   // Create middleware
   let logCount = 0;
-  const mw = (nameSpace, id, args, next, dispatch) => {
+  const mw1 = (nameSpace, id, args, next, dispatch) => {
     logCount++;
+    next();
+  };
+
+  let correctOrder = true;
+  let logCount2 = 0;
+  const mw2 = (nameSpace, id, args, next, dispatch) => {
+    correctOrder = correctOrder && logCount2 < logCount;
+    logCount2++;
     next();
   };
 
   // Register selector and create it
   simpleGyre
-    .use(mw)
+    .use(mw1)
+    .use(mw2)
     .addSelector("simple", () => (state, cb) => {
       cb(state.get("counter"));
     })
@@ -107,4 +116,5 @@ test("Full: Can add and use selectors and use dispatcher middleware", function(t
   // Test result
   t.deepLooseEqual(selCountArray, [0, 0, 1, 1, 0, 0, -1, -1], "Selector callback result compare.");
   t.equal(logCount, 3, "Middleware should be called once on every action.");
+  t.equal(correctOrder, true, "Middleware should be called in order of addition.");
 });
