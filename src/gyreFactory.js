@@ -1,7 +1,7 @@
 import ActionHandler from "./actionHandler";
 import SelectorFactory from "./selectorFactory";
 const defaultActions = () => ({});
-const defaultTicker = (cb) => cb();
+const defaultTicker = cb => cb();
 
 /**
  * Gyre Factory
