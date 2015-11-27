@@ -11,16 +11,37 @@ const store = () => {
   const selectorList = {};
 
   // Private methods
+  const getSelectorList = (ns) =>
+    selectorList[ns] || (selectorList[ns] = []);
+
   /**
    * Send update to all registered selectors.
    *
+   * @param {String} ns Namespace.
+   * @param {Function} [scb] Specific callback to solely invoke.
+   * @returns {Function} sendUpdate function for a namespace.
+   */
+  const sendUpdate = (ns, scb) => () => {
+    const list = getSelectorList(ns);
+    list.updateRequested = false;
+    return scb
+      ? scb(state.get(ns))
+      : list.forEach(selector => selector(state.get(ns)));
+  };
+
+  /**
+   * Request to issue update to filters of a given namespace.
+   *
+   * @param {String} ns Namespace.
+   * @param {Function} [scb] Specific callback to solely invoke.
    * @returns {void}
    */
-  const sendUpdate = () => {
-    Object.keys(selectorList).forEach(ns =>
-      (selectorList[ns] || []).forEach(selector =>
-        selector(ns === "all" ? state : state.get(ns)))
-    );
+  const requestUpdate = (ns, scb) => {
+    const nsList = getSelectorList(ns);
+    if (!nsList.updateRequested) {
+      nsList.updateRequested = true;
+      nsList.ticker(sendUpdate(ns, scb));
+    }
   };
 
   /**
@@ -46,7 +67,7 @@ const store = () => {
   const setNewState = (newState, ns) => {
     if (state.get(ns) !== newState) {
       state = state.set(ns, newState);
-      sendUpdate(ns);
+      requestUpdate(ns);
     }
     return state;
   };
@@ -55,31 +76,28 @@ const store = () => {
   /**
    * addSelector() Register a selector with the store and send initial data.
    *
+   * @param {String} ns Namespace.
    * @param {Function} cb callback.
-   * @param {String} [ns] Namespace.
    * @returns {Function} un-register function.
    */
-  const addSelector = (cb, ns = "all") => {
-    if (!selectorList[ns]) {
-      selectorList[ns] = [];
-    }
-
+  const addSelector = (ns, cb) => {
     // Save to local register
-    selectorList[ns].push(cb);
+    getSelectorList(ns).push(cb);
 
     // Request update to make sure the new filter gets data asap.
-    cb(ns === "all" ? state : state.get(ns));
+    requestUpdate(ns, cb);
 
-    // Return remover
+    // Return function to remove selector from store.
     return removeSelector(ns, cb);
   };
 
   /**
    * getState() returns the current state.
    *
+   * @param {String} ns Namespace.
    * @returns {Immutable.Map} Current state
    */
-  const getState = () => state;
+  const getState = (ns) => state.has(ns) ? state.get(ns) : state;
 
   /**
    * setState()
@@ -89,10 +107,19 @@ const store = () => {
    * @returns {Immutable.Map} New state.
    */
   const setState = (newState, ns) =>
-    setNewState(Immutable.Map.isMap(newState) ?
-        newState :
-        Immutable.Map(newState),
-      ns);
+    setNewState(Immutable.Map.isMap(newState) ? newState : Immutable.Map(newState), ns);
+
+  /**
+   * Set tick function for a given namespace.
+   *
+   * The tick function is added as a property to the selector array for given namespace.
+   *
+   * @param {String} ns Namespace.
+   * @param {Function} ticker Store update tick function for given namespace.
+   * @returns {void}
+   */
+  const setTicker = (ns, ticker) =>
+    getSelectorList(ns).ticker = ticker;
 
   /**
    * Applies a given reducer function to the state, which
@@ -112,6 +139,7 @@ const store = () => {
     addSelector,
     getState,
     setState,
+    setTicker,
     update
   };
 };

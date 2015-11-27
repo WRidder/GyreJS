@@ -10,10 +10,10 @@ function registerSimpleGyreFactory(gf) {
 }
 
 test("Full: Can create and register a gyre factory", function(t) {
+  t.plan(2);
   const simpleGyreFactory = createSimpleGyreFactory();
   const simpleGyre = registerSimpleGyreFactory(simpleGyreFactory);
 
-  t.plan(2);
   t.equal(typeof simpleGyreFactory, "function", "Gyre factory should be of type function.");
   t.equal(typeof simpleGyre, "object", "Gyre instance should be of type object.");
 });
@@ -64,12 +64,12 @@ test("Full: Can add and use selectors.", function(t) {
     counter: 0
   });
 
-  // Create actions
-  simpleGyre.addAction("increment", (state) =>
-    state.set("counter", state.get("counter") + 1));
-
-  simpleGyre.addAction("decrement", (state) =>
-    state.set("counter", state.get("counter") - 1));
+  // Create actions (chained)
+  simpleGyre
+    .addAction("increment", (state) =>
+      state.set("counter", state.get("counter") + 1))
+    .addAction("decrement", (state) =>
+      state.set("counter", state.get("counter") - 1));
 
   // Create selector callback
   const selCountArray = [];
@@ -83,10 +83,11 @@ test("Full: Can add and use selectors.", function(t) {
   }, selectorCb);
 
   // Register selector and create it
-  simpleGyre.addSelector("simple", () => (state, cb) => {
-    cb(state.get("counter"));
-  });
-  simpleGyre.createSelector("simple", selectorCb);
+  simpleGyre
+    .addSelector("simple", () => (state, cb) => {
+      cb(state.get("counter"));
+    })
+    .createSelector("simple", selectorCb);
 
   // Initial state
   // Single increment

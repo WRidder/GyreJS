@@ -2,7 +2,7 @@
  * Selector factory function
  *
  * @param {Object} store Store instance.
- * @param {String} nameSpace Gyre namespace.
+ * @param {String} NS Gyre namespace.
  * @param {Function} dispatch Gyre action dispatch function.
  * @returns {Function} Selector un-register function.
  */
@@ -24,10 +24,7 @@ const selectorFactory = (store, {NS}, dispatch) =>
 
     // Register callback (update) function with the store.
     const update = typeof selector === "object" ? selector.onUpdate : selector;
-    const storeCallback = (state) => {
-      update(state, cb);
-    };
-    const unRegister = store.addSelector(storeCallback, NS);
+    const unRegister = store.addSelector(NS, (state) => update(state, cb));
 
     // Return selector un-register function.
     // Invoke onUnsubscribe method if present.

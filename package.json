@@ -19,7 +19,7 @@
     "prepublish": "npm run clean && npm run build",
     "watch": "watch 'npm run check' src tests",
     "watch:build": "watch 'npm run build:umd' src",
-    "watch:test": "watch 'npm run test' tests"
+    "watch:test": "watch 'npm run test' src tests"
   },
   "repository": {
     "type": "git",

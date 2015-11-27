@@ -18,9 +18,10 @@ test("Store: can add and remove a selector", function(t) {
   t.plan(1);
 
   const store = Store();
+  store.setTicker("test", (cb) => cb());
   const selector = () => {};
 
-  const removeSelector = store.addSelector(selector);
+  const removeSelector = store.addSelector("test", selector);
   t.equal(typeof removeSelector, "function");
   removeSelector();
 });
@@ -29,6 +30,7 @@ test("Store: can set and get a state", function(t) {
   t.plan(2);
 
   const store = Store();
+  store.setTicker("foo", (cb) => cb());
   const state = Immutable.Map({test: "foo"});
 
   // Set state and verify return value
@@ -41,6 +43,7 @@ test("Store: can set and get a state using plain JSON", function(t) {
   t.plan(2);
 
   const store = Store();
+  store.setTicker("foo", (cb) => cb());
   const state = {test: "foo"};
 
   // Set state and verify return value
@@ -54,6 +57,7 @@ test("Store: an update function can alter the state", function(t) {
 
   // Init store
   const store = Store();
+  store.setTicker("testNS", (cb) => cb());
   store.setState({
     testValue: 0
   }, "testNS");

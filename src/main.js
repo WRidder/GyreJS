@@ -12,19 +12,14 @@ const store = Store();
  *
  * @param {String} id Id of a registered gyre factory.
  * @param {Object} [options] Options object for gyre.
- * @returns {Object} Gyre instance.
+ * @returns {Object|void} Gyre instance.
  */
 const createGyre = (id, options) => {
-  if (!gyres.has(id)) {
-    console.warn(`>> GyreJS: Error on create - Gyre factory '${id}' not registered.`); // eslint-disable-line no-console
+  if (gyres.has(id)) {
+    // Return gyre instance object with a unique namespace.
+    return gyres.get(id)(store, Object.assign({}, options, {NS: `${id}-${Date.now()}`}));
   }
-
-  // Generate a unique namespace.
-  const NS = `${id}-${Date.now()}`;
-  store.setState({}, NS);
-
-  // Return gyre instance object.
-  return gyres.get(id)(store, Object.assign({}, options, {NS: NS}));
+  console.warn(`>> GyreJS: Error on create - Gyre factory '${id}' not registered.`); // eslint-disable-line no-console
 };
 
 /**
