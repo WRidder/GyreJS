@@ -28,11 +28,12 @@ test("Full: Can add and dispatch actions.", function(t) {
   });
 
   // Create actions
-  simpleGyre.addAction("increment", (state) =>
-    state.set("counter", state.get("counter") + 1));
-
-  simpleGyre.addAction("decrement", (state) =>
-    state.set("counter", state.get("counter") - 1));
+  simpleGyre.addActions({
+    "increment": (state) =>
+      state.set("counter", state.get("counter") + 1),
+    "decrement": (state) =>
+      state.set("counter", state.get("counter") - 1)
+  });
 
   // Initial state
   t.deepLooseEqual(simpleGyre.getState().toJSON(), {
@@ -47,8 +48,9 @@ test("Full: Can add and dispatch actions.", function(t) {
   }, "State after single increment");
 
   // Double decrement
-  simpleGyre.dispatch("decrement");
-  simpleGyre.dispatch("decrement");
+  simpleGyre
+    .dispatch("decrement")
+    .dispatch("decrement");
 
   t.deepLooseEqual(simpleGyre.getState().toJSON(), {
     counter: -1
@@ -59,13 +61,11 @@ test("Full: Can add and use selectors.", function(t) {
   t.plan(1);
   const simpleGyre = registerSimpleGyreFactory(createSimpleGyreFactory());
 
-  // Set initial state
-  simpleGyre.setState({
-    counter: 0
-  });
-
-  // Create actions (chained)
+  // Set initial state and create actions (chained)
   simpleGyre
+    .setState({
+      counter: 0
+    })
     .addAction("increment", (state) =>
       state.set("counter", state.get("counter") + 1))
     .addAction("decrement", (state) =>
@@ -91,9 +91,10 @@ test("Full: Can add and use selectors.", function(t) {
 
   // Initial state
   // Single increment
-  simpleGyre.dispatch("increment");
-  simpleGyre.dispatch("decrement");
-  simpleGyre.dispatch("decrement");
+  simpleGyre
+    .dispatch("increment")
+    .dispatch("decrement")
+    .dispatch("decrement");
 
   // Test result
   t.deepLooseEqual(selCountArray, [0, 0, 1, 1, 0, 0, -1, -1], "Selector callback result compare.");
