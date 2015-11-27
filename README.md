@@ -1,5 +1,5 @@
 # GyreJS
-[![Build Status](https://travis-ci.org/WRidder/gyrejs.svg)](https://travis-ci.org/WRidder/gyrejs)  
+[![Build Status](https://travis-ci.org/WRidder/GyreJS.svg)](https://travis-ci.org/WRidder/GyreJS)  
 Data fetching and state library. This is an experimental project.
 
 ## Vision
