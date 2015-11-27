@@ -1,6 +1,6 @@
 {
   "name": "gyrejs",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "Experimental data fetching and state library geared towards ReactJS",
   "main": "lib/index.js",
   "jsnext:main": "src/index.js",
