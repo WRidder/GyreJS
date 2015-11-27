@@ -10,9 +10,27 @@ const actionHandler = (store, options) => {
   const actionMap = new Map();
   const middleWare = [];
 
-  // Public functions
+  // Private methods
+  /**
+   * Creates a higher order function to wrap the final action with any present middleware.
+   * Adds a custom method 'dispatch' to the middleWare array.
+   *
+   * @param {Function} dp Dispatch function.
+   * @returns {void}
+   */
+  const parseMiddleware = (dp) => {
+    // Invoke all registered middleWare before running the final action.
+    // First call functions which have been added first.
+    middleWare.dispatch = (id, args) =>
+      middleWare.reduce((nextToCall, firstToCall) =>
+          () => firstToCall(options.NS, id, args, nextToCall, dp),
+        () => actionMap.get(id)(args.push(dp) && args))();
+  };
+
+  // Public methods
   /**
    * Dispatch a registered action by ID.
+   * Uses a custom method 'dispatch' in the middleWare array created by parseMiddleware().
    *
    * @param {String} id Id
    * @param {Array} args Function arguments.
@@ -20,11 +38,7 @@ const actionHandler = (store, options) => {
    */
   const dispatch = (id, ...args) => {
     if (actionMap.has(id)) {
-      // Invoke all registered middleWare before running the final action.
-      // First call functions which have been added first.
-      middleWare.reduce((nextToCall, firstToCall) =>
-          () => firstToCall(options.NS, id, args, nextToCall, dispatch),
-        () => actionMap.get(id)(args.push(dispatch) && args))();
+      middleWare.dispatch(id, args);
     }
     else {
       console.warn(`>> GyreJS-'${options.NS}'-gyre: Unregistered action dispatched: '${id}' with arguments:`, args, ". (This is a no-op)"); // eslint-disable-line no-console
@@ -66,7 +80,11 @@ const actionHandler = (store, options) => {
    */
   const use = (mware) => {
     middleWare.unshift(mware);
+    parseMiddleware(dispatch);
   };
+
+  // Setup
+  parseMiddleware(dispatch);
 
   // API
   return {
