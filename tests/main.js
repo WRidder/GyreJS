@@ -1,4 +1,4 @@
-var test = require("tape");
+const test = require("tape");
 import GyreJS from "../src/index";
 
 test("Main: Default export should return an object", function(t) {

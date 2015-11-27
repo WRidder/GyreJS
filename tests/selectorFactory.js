@@ -1,6 +1,6 @@
-var test = require("tape");
-var SelectorFactory = require("../src/selectorFactory").default;
-var Store = require("../src/store").default;
+const test = require("tape");
+const SelectorFactory = require("../src/selectorFactory").default;
+const Store = require("../src/store").default;
 
 test("SelectorFactory: factory should return a function", function(t) {
   t.plan(1);

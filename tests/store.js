@@ -1,6 +1,6 @@
-var test = require("tape");
-var Immutable = require("immutable");
-var Store = require("../src/store").default;
+const test = require("tape");
+const Immutable = require("immutable");
+const Store = require("../src/store").default;
 
 test("Store: factory should return a function", function(t) {
   t.plan(1);

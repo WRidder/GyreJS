@@ -1,6 +1,5 @@
-var test = require("tape");
-var ActionHandler = require("../src/actionHandler").default;
-var Store = require("../src/store").default;
+const test = require("tape");
+const ActionHandler = require("../src/actionHandler").default;
 
 function storeMock(updateCb) {
   return {

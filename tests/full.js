@@ -1,4 +1,4 @@
-var test = require("tape");
+const test = require("tape");
 import GyreJS from "../src/index";
 
 function createSimpleGyreFactory() {

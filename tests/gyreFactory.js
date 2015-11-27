@@ -1,5 +1,5 @@
-var test = require("tape");
-var GyreFactory = require("../src/gyreFactory").default;
+const test = require("tape");
+const GyreFactory = require("../src/gyreFactory").default;
 
 test("GyreFactory: factory should return a function", function(t) {
   t.plan(1);
