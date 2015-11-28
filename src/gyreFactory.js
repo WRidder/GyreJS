@@ -52,6 +52,16 @@ const gyreFactory = ({actions = defaultActions, selectors = {}, state = {}, tick
      * @returns {Object} API Chainable gyre instance.
      */
     const addSelector = (id, selector, replace) => {
+      if (typeof id !== "string") {
+        throw new Error("GyreJS (addSelector): first argument (id) should be a string.");
+      }
+      if (typeof selector !== "function") {
+        throw new Error("GyreJS (addSelector): second argument (selector) should be a function.");
+      }
+      if (typeof replace !== "boolean" && typeof replace !== "undefined" && replace !== null) {
+        throw new Error("GyreJS (addSelector(s)): last argument (replace) should either be a boolean or undefined/null.");
+      }
+
       if (!Object.prototype.hasOwnProperty.call(selObj, id) || replace) {
         selObj[id] = selector;
       }
@@ -65,10 +75,14 @@ const gyreFactory = ({actions = defaultActions, selectors = {}, state = {}, tick
      * Add multiple selectors.
      *
      * @param {Object} selectorsObj Key/func object of selector factory functions.
-     * @param {boolean} [replace] Whether to overwrite any existing selector registered by the id.
+     * @param {boolean|void|null} [replace] Whether to overwrite any existing selector registered by the id.
      * @returns {Object} API Chainable gyre instance.
      */
     const addSelectors = (selectorsObj, replace) => {
+      if (typeof selectorsObj !== "object") {
+        throw new Error("GyreJS (addSelectors): first argument (selectors) should be an object.");
+      }
+
       Object.keys(selectorsObj).forEach(selector => {
         addSelector(selector, selectorsObj[selector], replace);
       });
@@ -96,7 +110,7 @@ const gyreFactory = ({actions = defaultActions, selectors = {}, state = {}, tick
     /**
      * Dispatch a registered action.
      *
-     * @param {Array} args Arguments
+     * @param {Array} args Arguments.
      * @returns {Object} API Chainable gyre instance.
      */
     const dispatch = (...args) => {
@@ -115,29 +129,29 @@ const gyreFactory = ({actions = defaultActions, selectors = {}, state = {}, tick
     /**
      * Set the gyre state. Overwrites the current state.
      *
-     * @param {Object|Immutable.Map} tState The state to set to this gyre.
+     * @param {Array} args Arguments.
      * @returns {Object} API Chainable gyre instance.
      */
-    const setState = (tState) => {
-      store.setState(tState, options.NS);
+    const setState = (...args) => {
+      store.setState(...args, options.NS);
       return API;
     };
 
     /**
      * Set store tick function for this gyre.
      *
-     * @param {Function} tickFunc Tick function. E.g. (cb) => setTimeout(() => cb(), 0).
+     * @param {Array} args Arguments.
      * @returns {Object} API Chainable gyre instance.
      */
-    const setTicker = (tickFunc) => {
-      store.setTicker(options.NS, tickFunc);
+    const setTicker = (...args) => {
+      store.setTicker(options.NS, ...args);
       return API;
     };
 
     /**
      * Add middleware to dispatcher
      *
-     * @param {Array} args Arguments
+     * @param {Array} args Arguments.
      * @returns {Object} API Chainable gyre instance.
      */
     const use = (...args) => {

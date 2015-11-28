@@ -3,8 +3,23 @@ import Store from "./store";
 import createGyreFactory from "./gyreFactory";
 
 // Private variables
-const gyres = new Map();
-const store = Store();
+let gyres;
+let store;
+
+// Private methods
+/**
+ * Get store singleton
+ *
+ * @returns {Store} Store singleton.
+ */
+const getStore = () => store || (store = Store());
+
+/**
+ * Get gyre map
+ *
+ * @returns {Map} Gyre map.
+ */
+const getGyres = () => gyres || (gyres = new Map());
 
 // Public functions
 /**
@@ -15,9 +30,9 @@ const store = Store();
  * @returns {Object|void} Gyre instance.
  */
 const createGyre = (id, options) => {
-  if (gyres.has(id)) {
+  if (getGyres().has(id)) {
     // Return gyre instance object with a unique namespace.
-    return gyres.get(id)(store, Object.assign({}, options, {NS: `${id}-${Date.now()}`}));
+    return getGyres().get(id)(getStore(), Object.assign({}, options, {NS: `${id}-${Date.now()}`}));
   }
   console.warn(`>> GyreJS: Error on create - Gyre factory '${id}' not registered.`); // eslint-disable-line no-console
 };
@@ -30,7 +45,7 @@ const createGyre = (id, options) => {
  * @returns {void}
  */
 const registerGyreFactory = (id, factory) => {
-  gyres.set(id, factory);
+  getGyres().set(id, factory);
 };
 
 /**
@@ -40,11 +55,11 @@ const registerGyreFactory = (id, factory) => {
  * @returns {boolean} Whether the factory has been un-registered.
  */
 const unRegisterGyreFactory = (id) => {
-  if (!gyres.has(id)) {
+  if (!getGyres().has(id)) {
     console.warn(`>> GyreJS: Error on unregister - Gyre factory '${id}' not registered.`); // eslint-disable-line no-console
     return false;
   }
-  return gyres.delete(id) && true;
+  return getGyres().delete(id) && true;
 };
 
 export default {

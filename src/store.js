@@ -106,8 +106,13 @@ const store = () => {
    * @param {String} ns Namespace.
    * @returns {Immutable.Map} New state.
    */
-  const setState = (newState, ns) =>
-    setNewState(Immutable.Map.isMap(newState) ? newState : Immutable.Map(newState), ns);
+  const setState = (newState, ns) => {
+    if (typeof newState !== "object") {
+      throw new Error("GyreJS (setState): New state should either be an object or an instance of Immutable.Map.");
+    }
+
+    return setNewState(Immutable.Map.isMap(newState) ? newState : Immutable.Map(newState), ns);
+  };
 
   /**
    * Set tick function for a given namespace.
@@ -118,8 +123,13 @@ const store = () => {
    * @param {Function} ticker Store update tick function for given namespace.
    * @returns {void}
    */
-  const setTicker = (ns, ticker) =>
+  const setTicker = (ns, ticker) => {
+    if (typeof ticker !== "function") {
+      throw new Error("GyreJS (setTicker): Ticker should be a function.");
+    }
+
     getSelectorList(ns).ticker = ticker;
+  };
 
   /**
    * Applies a given reducer function to the state, which

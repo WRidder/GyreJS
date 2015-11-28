@@ -44,3 +44,24 @@ test("ActionHandler: manages and dispatches actions.", function(t) {
 
   t.equal(storeUpdateCalled, 4, "Store update function should be called once after every dispatch.");
 });
+
+test("ActionHandler: supports FSA actions", function(t) {
+  t.plan(1);
+
+  let storeUpdateCalled = 0;
+  const store = storeMock(() => {
+    storeUpdateCalled++;
+  });
+  const actionHandler = ActionHandler(store, {NS: "test"});
+
+  // Add actions
+  actionHandler.addAction("action1", () => {});
+
+  // Dispatch actions; normal and FSA style.
+  actionHandler.dispatch("action1");
+  actionHandler.dispatch({
+    type: "action1"
+  });
+
+  t.equal(storeUpdateCalled, 2, "Store update function should be called once after every dispatch.");
+});

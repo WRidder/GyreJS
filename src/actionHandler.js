@@ -18,7 +18,7 @@ const actionHandler = (store, options) => {
    * @param {Function} dp Dispatch function.
    * @returns {void}
    */
-  const parseMiddleware = (dp) => {
+  const wrapDispatchMiddleware = (dp) => {
     // Invoke all registered middleWare before running the final action.
     // First call functions which have been added first.
     middleWare.dispatch = (id, args) =>
@@ -32,16 +32,26 @@ const actionHandler = (store, options) => {
    * Dispatch a registered action by ID.
    * Uses a custom method 'dispatch' in the middleWare array created by parseMiddleware().
    *
-   * @param {String} id Id
-   * @param {Array} args Function arguments.
+   * @param {String|Object} action Id or FSA (Flux standard action). See: https://github.com/acdlite/flux-standard-action.
+   * @param {Array} [args] Function arguments.
    * @returns {void}
    */
-  const dispatch = (id, ...args) => {
-    if (actionMap.has(id)) {
-      middleWare.dispatch(id, args);
+  const dispatch = (action, ...args) => {
+    let payload = args;
+
+    // Support FSA type actions. Use basic ducktyping to detect if the
+    // provided action may be a FSA.
+    if (typeof action === "object" && Object.prototype.hasOwnProperty.call(action, "type")) {
+      payload = [action.payload];
+      action = action.type;
+    }
+
+    // Dispatch action if the id is present in the action map.
+    if (actionMap.has(action)) {
+      middleWare.dispatch(action, payload);
     }
     else {
-      console.warn(`>> GyreJS-'${options.NS}'-gyre: Unregistered action dispatched: '${id}' with arguments:`, args, ". (This is a no-op)"); // eslint-disable-line no-console
+      console.warn(`>> GyreJS-'${options.NS}'-gyre: Unregistered action dispatched: '${action}' with arguments:`, payload, ". (This is a no-op)"); // eslint-disable-line no-console
     }
   };
 
@@ -54,6 +64,13 @@ const actionHandler = (store, options) => {
    * @returns {void}
    */
   const addAction = (id, func) => {
+    if (typeof id !== "string") {
+      throw new Error("GyreJS (addAction): first argument (id) should be a string.");
+    }
+    if (typeof func !== "function") {
+      throw new Error("GyreJS (addAction): second argument (reducer) should be a function.");
+    }
+
     actionMap.set(id, (args) =>
         store.update(options.NS, func, args)
     );
@@ -67,6 +84,10 @@ const actionHandler = (store, options) => {
    * @returns {void}
    */
   const addActions = (actions) => {
+    if (typeof actions !== "object") {
+      throw new Error("GyreJS (addActions): first argument (actions object) should be an object.");
+    }
+
     Object.keys(actions).forEach(action => {
       addAction(action, actions[action]);
     });
@@ -79,12 +100,16 @@ const actionHandler = (store, options) => {
    * @returns {void}
    */
   const use = (mware) => {
+    if (typeof mware !== "function") {
+      throw new Error("GyreJS (use): first argument should be a function.");
+    }
+
     middleWare.unshift(mware);
-    parseMiddleware(dispatch);
+    wrapDispatchMiddleware(dispatch);
   };
 
   // Setup
-  parseMiddleware(dispatch);
+  wrapDispatchMiddleware(dispatch);
 
   // API
   return {
