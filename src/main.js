@@ -1,10 +1,8 @@
-// Import sub libraries
 import Store from "./store";
 import createGyreFactory from "./gyreFactory";
 
 // Private variables
-let gyres;
-let store;
+const API = {};
 
 // Private methods
 /**
@@ -12,14 +10,20 @@ let store;
  *
  * @returns {Store} Store singleton.
  */
-const getStore = () => store || (store = Store());
+const getStore = (() => {
+  let store;
+  return () => store || (store = Store());
+})();
 
 /**
- * Get gyre map
+ * Get gyre map singleton
  *
- * @returns {Map} Gyre map.
+ * @returns {Map} Gyre map singleton.
  */
-const getGyres = () => gyres || (gyres = new Map());
+const getGyres = (() => {
+  let gyreMap;
+  return () => gyreMap || (gyreMap = new Map());
+})();
 
 // Public functions
 /**
@@ -38,14 +42,15 @@ const createGyre = (id, options) => {
 };
 
 /**
- * Register a gyre factory function.
+ * Register a gyre factory function. Overides any gyre factory which is already present at that ID.
  *
  * @param {String} id Id of to register gyre.
  * @param {Function} factory Gyre factory function.
- * @returns {void}
+ * @returns {Object} API Chainable GyreJS object.
  */
 const registerGyreFactory = (id, factory) => {
   getGyres().set(id, factory);
+  return API;
 };
 
 /**
@@ -62,9 +67,10 @@ const unRegisterGyreFactory = (id) => {
   return getGyres().delete(id) && true;
 };
 
-export default {
+// GyreJS API
+export default Object.assign(API, {
   createGyre,
   registerGyreFactory,
   unRegisterGyreFactory,
   createGyreFactory
-};
+});

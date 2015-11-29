@@ -18,6 +18,17 @@ test("Full: Can create and register a gyre factory", function(t) {
   t.equal(typeof simpleGyre, "object", "Gyre instance should be of type object.");
 });
 
+test("Full: Can overide a previous registered factory at a given ID", function(t) {
+  t.plan(3);
+  const gf = createSimpleGyreFactory();
+  const simpleGyre1 = GyreJS.registerGyreFactory("simple2", gf);
+  const simpleGyre2 = GyreJS.registerGyreFactory("simple2", gf);
+
+  t.equal(typeof gf, "function", "Gyre factory should be of type function.");
+  t.equal(typeof simpleGyre1, "object", "Gyre instance should be of type object.");
+  t.equal(typeof simpleGyre2, "object", "Gyre instance should be of type object.");
+});
+
 test("Full: Can add and dispatch actions.", function(t) {
   t.plan(3);
   const simpleGyre = registerSimpleGyreFactory(createSimpleGyreFactory());
@@ -27,7 +38,7 @@ test("Full: Can add and dispatch actions.", function(t) {
     counter: 0
   });
 
-  // Create actions
+  // Create actions using an object
   simpleGyre.addActions({
     "increment": (state) =>
       state.set("counter", state.get("counter") + 1),
