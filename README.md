@@ -15,7 +15,54 @@ The community can create new presets which can be used by anyone else for their 
 uni-directional data flow (flux like) approaches.
 
 ## Examples
-W.I.P.
+### Create and use an empty gyre (Counter)
+```javascript  
+import GyreJS from "gyrejs";
+
+// Create a gyre factory function. It can be seen as a template from which actual
+// gyres can be instantiated.
+const emptyGyreFactory = GyreJS.createGyreFactory();
+
+// Register our gyre factory (template) using "simple" as ID.
+GyreJS.registerGyreFactory("simple", emptyGyreFactory);
+
+// Create a new gyre from provided template.
+const simpleGyre = GyreJS.createGyre("simple");
+
+// Set initial state and create actions (chained)
+simpleGyre
+  .setState({
+    counter: 0
+  })
+  .addAction("increment",
+    (state) =>
+      state.set("counter", state.get("counter") + 1))
+  .addAction("decrement",
+    (state) =>
+      state.set("counter", state.get("counter") - 1))
+
+// Create selector callback
+const selectorCb = (count) => {
+  console.log(`Update! New count: ${count}`);
+};
+
+// Create selectors
+simpleGyre.createSelector((state, cb) => {
+  cb(state.get("counter"));
+}, selectorCb);
+
+// Dispatch actions
+simpleGyre
+  .dispatch("increment")
+  .dispatch("decrement")
+  .dispatch("decrement");
+  
+// Output: 
+// > Update! New count: 0
+// > Update! New count: 1
+// > Update! New count: 0
+// > Update! New count: -1  
+```
 
 ## Features
 - Enforces uni-directional data flow using actions, reduces, store and selectors.
@@ -29,7 +76,7 @@ W.I.P.
 - [Local - Simple key/value](https://github.com/WRidder/gyrejs-localgyre)
 
 ### Middleware
-- [Acion dispatch logger](https://github.com/WRidder/gyrejs-dispatchlogger) (Logs any actions dispatched)
+- [Action dispatch logger](https://github.com/WRidder/gyrejs-dispatchlogger) (Logs any actions dispatched)
 
 ## Alternatives
 - [Redux](http://redux.org)
@@ -54,4 +101,5 @@ As long as the library is in exploratory/beta phase versioning will be < 1.0. Af
 - [ImmutableJS](https://facebook.github.io/immutable-js/)
  
 ## Gyre?
-[Gyre](https://en.wikipedia.org/wiki/Ocean_gyre) = vortex. A wink to unidirectional data flow.
+[Gyre](https://en.wikipedia.org/wiki/Ocean_gyre) = vortex. A wink to unidirectional data flow.  
+![Oceanic Gyre](https://upload.wikimedia.org/wikipedia/commons/8/8a/Oceanic_gyres.png)
