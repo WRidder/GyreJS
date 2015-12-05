@@ -6,20 +6,26 @@ const API = {};
 
 // Private methods
 /**
- * Get store singleton
+ * Get store singleton.
+ * Store is instantiated on first use instead of on library load.
  *
  * @returns {Store} Store singleton.
  */
-const getStore = ((store = Store()) =>
-  () => store)();
+const getStore = (() => {
+  let store;
+  return () => store || (store = Store());
+})();
 
 /**
- * Get gyre map singleton
+ * Get registered gyres object singleton.
+ * Gyres object is created on first use instead of on library load.
  *
- * @returns {Object} Gyre map singleton.
+ * @returns {Object} Gyres object.
  */
-const getGyres = ((gyreMap = { "empty": createGyreFactory()}) =>
-  () => gyreMap)();
+const getGyres = (() => {
+  let gyres;
+  return () => gyres || (gyres = { "empty": createGyreFactory() });
+})();
 
 // Public functions
 /**

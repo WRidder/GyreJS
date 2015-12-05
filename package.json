@@ -77,5 +77,6 @@
         "*.js"
       ]
     }
-  ]
+  ],
+  "tonicExample": "var GyreJS = require('gyrejs');"
 }
