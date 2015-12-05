@@ -10,33 +10,30 @@ const API = {};
  *
  * @returns {Store} Store singleton.
  */
-const getStore = (() => {
-  let store;
-  return () => store || (store = Store());
-})();
+const getStore = ((store = Store()) =>
+  () => store)();
 
 /**
  * Get gyre map singleton
  *
- * @returns {Map} Gyre map singleton.
+ * @returns {Object} Gyre map singleton.
  */
-const getGyres = (() => {
-  let gyreMap;
-  return () => gyreMap || (gyreMap = new Map());
-})();
+const getGyres = ((gyreMap = { "empty": createGyreFactory()}) =>
+  () => gyreMap)();
 
 // Public functions
 /**
  * Create a new gyre instance. Based on a factory function by id.
+ * If no id is provided, an empty gyre instance will be returned.
  *
- * @param {String} id Id of a registered gyre factory.
+ * @param {String} [id] Id of a registered gyre factory.
  * @param {Object} [options] Options object for gyre.
  * @returns {Object|void} Gyre instance.
  */
-const createGyre = (id, options) => {
-  if (getGyres().has(id)) {
+const createGyre = (id = "empty", options = {}) => {
+  if (!getGyres.hasOwnProperty(id)) {
     // Return gyre instance object with a unique namespace.
-    return getGyres().get(id)(getStore(), Object.assign({}, options, {NS: `${id}-${Date.now()}`}));
+    return getGyres()[id](getStore(), Object.assign({}, options, {NS: `${id}-${Date.now()}`}));
   }
   console.warn(`>> GyreJS: Error on create - Gyre factory '${id}' not registered.`); // eslint-disable-line no-console
 };
@@ -49,7 +46,11 @@ const createGyre = (id, options) => {
  * @returns {Object} API Chainable GyreJS object.
  */
 const registerGyreFactory = (id, factory) => {
-  getGyres().set(id, factory);
+  if (id === "empty") {
+    throw new Error("GyreJS (registerGyreFactory): cannot use 'empty, it is a reserved id.");
+  }
+
+  getGyres()[id] = factory;
   return API;
 };
 
@@ -60,11 +61,11 @@ const registerGyreFactory = (id, factory) => {
  * @returns {boolean} Whether the factory has been un-registered.
  */
 const unRegisterGyreFactory = (id) => {
-  if (!getGyres().has(id)) {
-    console.warn(`>> GyreJS: Error on unregister - Gyre factory '${id}' not registered.`); // eslint-disable-line no-console
+  if (!getGyres.hasOwnProperty(id)) {
+    console.warn(`>> GyreJS: (unRegisterGyreFactory) Cannot un-register - Gyre factory '${id}' not registered.`); // eslint-disable-line no-console
     return false;
   }
-  return getGyres().delete(id) && true;
+  return (delete getGyres()[id]) && true;
 };
 
 // GyreJS API

@@ -14,20 +14,19 @@ This projects introduces the concept of gyres which are basically a preset of ac
 The community can create new presets which can be used by anyone else for their projects creating a low barrier of entry for using 
 uni-directional data flow (flux like) approaches.
 
+## Features
+- Enforces uni-directional data flow using actions, reduces, store and selectors.
+- Minimal surface API
+- Isomorphic
+- Immutable data
+
 ## Examples
 ### Create and use an empty gyre (Counter)
 ```javascript  
 import GyreJS from "gyrejs";
 
-// Create a gyre factory function. It can be seen as a template from which actual
-// gyres can be instantiated.
-const emptyGyreFactory = GyreJS.createGyreFactory();
-
-// Register our gyre factory (template) using "simple" as ID.
-GyreJS.registerGyreFactory("simple", emptyGyreFactory);
-
-// Create a new gyre from provided template.
-const simpleGyre = GyreJS.createGyre("simple");
+// Create a new empty gyre instance
+const simpleGyre = GyreJS.createGyre();
 
 // Set initial state and create actions (chained)
 simpleGyre
@@ -64,12 +63,6 @@ simpleGyre
 // > Update! New count: -1  
 ```
 
-## Features
-- Enforces uni-directional data flow using actions, reduces, store and selectors.
-- Minimal surface API
-- Isomorphic
-- Immutable data
-
 ## Ecosystem
 ### Gyres
 - [Smart REST](https://github.com/WRidder/gyrejs-smartrestgyre) (Relay inspired gyre)
@@ -85,7 +78,8 @@ simpleGyre
 - [Relay](https://facebook.github.io/relay/)
 
 ## Versioning
-As long as the library is in exploratory/beta phase versioning will be < 1.0. After that phase we'll adhere to semantic versioning.
+As long as the library is in exploratory/beta phase versions will be < 1.0 and breaking changes may occur on minor or patch version updates.
+Once 1.0 hits the project will adhere to semantic versioning.
 
 ## Inspiration
 ### Articles

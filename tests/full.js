@@ -69,8 +69,10 @@ test("Full: Can add and dispatch actions.", function(t) {
 });
 
 test("Full: Can add and use selectors and use dispatcher middleware", function(t) {
-  t.plan(11);
-  const simpleGyre = registerSimpleGyreFactory(createSimpleGyreFactory());
+  t.plan(12);
+  // Use shorthand to create an empty gyre
+  const simpleGyre = GyreJS.createGyre();
+  t.equal(simpleGyre.nameSpace.split("-")[0], "empty", "Short-hand created gyres use the 'empty' nameSpace");
 
   // Set initial state and create actions (chained)
   simpleGyre
