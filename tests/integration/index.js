@@ -120,7 +120,9 @@ describe("GyreJS", function() {
       "decrementCounter": function(value) {
         this.getAggregate("counter")
           .decrement(value);
-      }
+      },
+      increment: "counter",
+      decrement: ["counter", {foo: "bar"}]
     };
 
     // Events (as obj or array?)
@@ -248,8 +250,8 @@ describe("GyreJS", function() {
     simpleGyre
       .issue("incrementCounter", 2) // 2
       .issue("decrementCounter", 1) // 1
-      .issue("decrementCounter", 1) // 0
-      .issue("incrementCounter", 1) // 1
+      .issue("decrement", 1) // 0
+      .issue("increment", 1) // 1
       .issue("decrementCounter", 7) // omitted; does not adhere to business rules
       .issue("incrementCounter", 3) // 4
       .issue("wrong-event", 3)      // omitted; does not exist
@@ -294,7 +296,7 @@ describe("GyreJS", function() {
     const gyreCallList = debugInstance.getLogs(simpleGyreId).calls.map(call => {
       return call[0];
     });
-    expect(gyreCallList.length).to.deep.equal(25);
+    expect(gyreCallList.length).to.deep.equal(27);
 
     console.log(gyreCallListFull);
     console.log(debugInstance.getLogs(simpleGyreId).calls);

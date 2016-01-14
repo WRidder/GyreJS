@@ -38,7 +38,7 @@ const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggreg
      */
     const addCommand = API.addCommand = (id, cFunction, replace) => {
       if (!Object.prototype.hasOwnProperty.call(_commands, id) || replace) {
-        _commands[id] = commandFactory(cFunction);
+        _commands[id] = commandFactory(cFunction, id);
       }
       else {
         console.warn(`>> GyreJS-gyre: AddCommand -> Selector with id: '${id}' already exists.`); // eslint-disable-line no-console

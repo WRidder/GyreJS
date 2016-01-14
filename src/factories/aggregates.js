@@ -48,12 +48,12 @@ const aggregateFactory = (_internal, {reducer, eventFilter, methods = {}}) => {
     /*
      Setup
      */
-    return Object.keys(methods).reduce((prev, key) => {
+    return Object.freeze(Object.keys(methods).reduce((prev, key) => {
       prev[key] = (...args) => {
         methods[key].apply(null, [state, trigger, ...args, options]);
       };
       return prev;
-    }, {});
+    }, {}));
   };
 };
 
