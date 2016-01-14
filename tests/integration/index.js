@@ -129,7 +129,7 @@ describe("GyreJS", function() {
     // Events (as obj or array?)
     const events = {
       "incremented": (oldValue, newValue, by) => ({oldValue, newValue, by}),
-      "decremented": (oldValue, newValue, by) => ({oldValue, newValue, by})
+      "decremented": ["oldValue", "newValue", "by"]
     };
 
     // projection 1: count
