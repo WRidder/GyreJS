@@ -4,10 +4,10 @@ const aggregates = {
   "counter": {
     eventFilter: (event) => event.type === "incremented" || event.type === "decremented",
     methods: {
-      "increment": function(state, trigger, byValue) {
-        trigger("incremented", state.count, state.count + byValue, byValue);
+      "increment": function(state, gyre, byValue) {
+        gyre.trigger("incremented", state.count, state.count + byValue, byValue);
       },
-      "decrement": function(state, trigger, byValue) {
+      "decrement": function(state, {trigger}, byValue) {
         trigger("decremented", state.count, state.count - byValue, -1 * byValue);
       }
     },
@@ -27,12 +27,12 @@ const aggregates = {
 
 // Commands
 const commands = {
-  "incrementCounter": function(value) {
-    this.getAggregate("counter")
+  "incrementCounter": function({getAggregate}, value) {
+    getAggregate("counter")
       .increment(value);
   },
-  "decrementCounter": function(value) {
-    this.getAggregate("counter")
+  "decrementCounter": function({getAggregate}, value) {
+    getAggregate("counter")
       .decrement(value);
   }
 };
@@ -40,7 +40,7 @@ const commands = {
 // Events (as obj or array?)
 const events = {
   "incremented": (oldValue, newValue, by) => ({oldValue, newValue, by}),
-  "decremented": (oldValue, newValue, by) => ({oldValue, newValue, by})
+  "decremented": ["oldValue", "newValue", "by"]
 };
 
 const projections = {
