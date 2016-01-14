@@ -31,11 +31,13 @@ const commandFactory = (aggregates, {dispatcher}) => {
       };
     }
 
-    return func.bind({
-      getAggregate: (gId, options) => aggregates[gId](options),
-      issue: dispatcher.issueCommand,
-      trigger: dispatcher.triggerEvent
-    });
+    return (...args) => {
+      return func.apply(null, [{
+        getAggregate: (gId, options) => aggregates[gId](options),
+        issue: dispatcher.issueCommand,
+        trigger: dispatcher.triggerEvent
+      }, ...args]);
+    };
   };
 };
 

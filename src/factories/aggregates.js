@@ -56,7 +56,7 @@ const aggregateFactory = (_internal, {reducer, eventFilter, methods = {}}) => {
      */
     return Object.freeze(Object.keys(methods).reduce((prev, key) => {
       prev[key] = (...args) => {
-        methods[key].apply(null, [state, trigger, ...args, options]);
+        methods[key].apply(null, [state, {trigger, issue: _internal.dispatcher.issue}, ...args, options]);
       };
       return prev;
     }, {}));

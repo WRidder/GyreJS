@@ -77,20 +77,20 @@ describe("GyreJS", function() {
         eventFilter: (event) => ["incremented", "decremented"].indexOf(event.type) !== -1,
         // eventFilter: ["incremented", "decremented"],
         methods: {
-          "increment": function(state, trigger, byValue) {
+          "increment": function(state, gyre, byValue) {
             aggMethodCalls.push(["i", byValue, state]);
             aggStates.push(state);
             if (
               state.count + byValue >= 0 &&
               state.count + byValue <= 5) {
-              trigger("incremented", state.count, state.count + byValue, byValue);
+              gyre.trigger("incremented", state.count, state.count + byValue, byValue);
             }
           },
-          "decrement": function(state, trigger, byValue) {
+          "decrement": function(state, gyre, byValue) {
             aggMethodCalls.push(["d", byValue, state]);
             aggStates.push(state);
             if (state.count - byValue >= 0) {
-              trigger("decremented", state.count, state.count - byValue, -1 * byValue);
+              gyre.trigger("decremented", state.count, state.count - byValue, -1 * byValue);
             }
           }
         },
@@ -110,16 +110,15 @@ describe("GyreJS", function() {
 
     // Commands
     const commands = {
-      "incrementCounter": function(value) {
-        // this = gyre scoped; but only:
-        // this.getAggregate
-        // this.issue
-        // this.trigger0
-        this.getAggregate("counter")
+      "incrementCounter": function(gyre, value) {
+        // gyre.getAggregate
+        // gyre.issue
+        // gyre.trigger
+        gyre.getAggregate("counter")
           .increment(value);
       },
-      "decrementCounter": function(value) {
-        this.getAggregate("counter")
+      "decrementCounter": function(gyre, value) {
+        gyre.getAggregate("counter")
           .decrement(value);
       },
       increment: "counter",
