@@ -74,7 +74,8 @@ describe("GyreJS", function() {
     const aggStates = [];
     const aggregates = {
       "counter": {
-        eventFilter: (event) => event.type === "incremented" || event.type === "decremented",
+        eventFilter: (event) => ["incremented", "decremented"].indexOf(event.type) !== -1,
+        // eventFilter: ["incremented", "decremented"],
         methods: {
           "increment": function(state, trigger, byValue) {
             aggMethodCalls.push(["i", byValue, state]);

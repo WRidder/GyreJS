@@ -32,11 +32,17 @@ const aggregateFactory = (_internal, {reducer, eventFilter, methods = {}}) => {
     };
 
     const getEventsFromBus = () => {
-      return eventFilter ?
-        _internal.bus.getEvents().filter((event) => {
+      if (typeof eventFilter === "function") {
+        return _internal.bus.getEvents().filter((event) => {
           return (event.type === "__RESET__") ? true : eventFilter(event);
-        }) :
-        _internal.bus.getEvents();
+        });
+      }
+      if (Array.isArray(eventFilter)) {
+        return _internal.bus.getEvents().filter((event) => {
+          return (event.type === "__RESET__") ? true : eventFilter.indexOf(event.type) !== -1;
+        });
+      }
+      return _internal.bus.getEvents();
     };
 
     /*
