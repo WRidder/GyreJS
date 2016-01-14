@@ -2,6 +2,7 @@ import Gyre from "./factories/gyres";
 
 // Private variables
 const API = {};
+let gCounter = 0;
 
 // Private methods
 /**
@@ -27,7 +28,6 @@ const attachDebugger = gDebugger => gyrejsDebugger = gDebugger;
  * @param {Object} [options] Options object for gyre.
  * @returns {Object|void} Gyre instance.
  */
-let gCounter = 0;
 const instantiateGyre = (id = "empty", options = {}) => {
   if (getGyres().hasOwnProperty(id)) {
     // Return gyre instance object with a unique namespace.
@@ -72,8 +72,12 @@ const unRegisterGyre = (id) => {
  *
  * @type {Object}
  */
-const createGyre = (...args) =>
-  args.length === 1 ? Gyre(...args) : registerGyre(args[0], Gyre(args[1]));
+const createGyre = (...args) => {
+  console.log(args.length);
+  return args.length === 1 ?
+    Gyre(args[0])(gCounter++) :
+    registerGyre(args[0], Gyre(args[1]));
+};
 
 // GyreJS API
 export default Object.assign(API, {
