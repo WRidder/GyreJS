@@ -73,7 +73,6 @@ const unRegisterGyre = (id) => {
  * @type {Object}
  */
 const createGyre = (...args) => {
-  console.log(args.length);
   return args.length === 1 ?
     Gyre(args[0])(gCounter++) :
     registerGyre(args[0], Gyre(args[1]));
