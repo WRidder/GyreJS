@@ -23,6 +23,8 @@ uni-directional data flow (flux like) approaches.
 ## Examples
 See `examples/*` for now. You can run `npm run start` to see the example in action on **http://localhost:9000**.
 
+[TodoMVC Example](https://github.com/WRidder/todomvc-gyrejs)
+
 ## Ecosystem
 ### Gyres
 - [Smart REST](https://github.com/WRidder/gyrejs-smartrestgyre) (Relay inspired gyre)
