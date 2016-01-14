@@ -64,7 +64,7 @@ const projectionFactory = (_internal, reducer = (state) => state) => {
    */
   const setNewState = (newState) => {
     if (state !== newState) {
-      state = Object.freeze(newState);
+      state = newState;
       requestUpdate();
     }
     return state;
@@ -115,7 +115,7 @@ const projectionFactory = (_internal, reducer = (state) => state) => {
     if (evt.type === "__RESET__") {
       return setNewState(reducer(void(0), evt));
     }
-    return setNewState(reducer(state, evt));
+    return setNewState(reducer(Object.assign({}, state), evt));
   };
 
   /**
