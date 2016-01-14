@@ -215,6 +215,14 @@ describe("GyreJS", function() {
 
     const stateArray = [];
     const test1L = simpleGyre.addListener("test1", (state) => {
+      // Make sure the returned state is immutable.
+      try {
+        // Alter a prop
+        state.count = "notrighttype";
+      }
+      catch(e) {
+        expect(e.message).to.equal("Cannot assign to read only property \'count\' of #<Object>");
+      }
       stateArray.push(state);
     });
 

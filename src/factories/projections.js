@@ -13,7 +13,7 @@ const projectionFactory = (_internal, reducer = (state) => state) => {
   listeners.updateRequested = false;
 
   const setInitialState = () => {
-    state = reducer(void(0), {type: null});
+    state = Object.freeze(reducer(void(0), {type: null}));
     return state;
   };
   setInitialState();
@@ -64,7 +64,7 @@ const projectionFactory = (_internal, reducer = (state) => state) => {
    */
   const setNewState = (newState) => {
     if (state !== newState) {
-      state = newState;
+      state = Object.freeze(newState);
       requestUpdate();
     }
     return state;

@@ -5,17 +5,9 @@ const aggregates = {
     eventFilter: (event) => event.type === "incremented" || event.type === "decremented",
     methods: {
       "increment": function(state, trigger, byValue) {
-        /*if (
-          state.count + byValue >= 0 &&
-          state.count + byValue <= 5) {
-          trigger("incremented", state.count, state.count + byValue, byValue);
-        }*/
         trigger("incremented", state.count, state.count + byValue, byValue);
       },
       "decrement": function(state, trigger, byValue) {
-        /*if (state.count - byValue >= 0) {
-          trigger("decremented", state.count, state.count - byValue, -1 * byValue);
-        }*/
         trigger("decremented", state.count, state.count - byValue, -1 * byValue);
       }
     },
