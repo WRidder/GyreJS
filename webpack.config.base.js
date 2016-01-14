@@ -10,8 +10,5 @@ module.exports = {
   },
   resolve: {
     extensions: ["", ".js"]
-  },
-  externals: {
-    immutable: "Immutable"
   }
 };

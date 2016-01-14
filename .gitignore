@@ -7,6 +7,4 @@ node_modules
 lib
 dist
 test_reports
-index.html
-example*.js
 _book

@@ -1,6 +1,7 @@
 # GyreJS
 [![Build Status](https://travis-ci.org/WRidder/GyreJS.svg)](https://travis-ci.org/WRidder/GyreJS)  
-Uni-directional data flow library. This is an experimental project.
+Uni-directional data flow library. Based on CQRS (Command and Query Responsibility Segregation) and Event sourcing principles. 
+This is an experimental project.
 
 ## Vision / Motivation
 With projects like ReactJS emerging there is a lot of attention lately to uni-drectional data flow concepts.
@@ -82,6 +83,7 @@ As long as the library is in exploratory/beta phase versions will be < 1.0 and b
 Once 1.0 hits the project will adhere to semantic versioning.
 
 ## Inspiration
+DDD, CQRS, event sourcing, RX, Redux, GraphQL/Relay, Falcor, materialized views.
 ### Articles
 - [Turning the database inside out](http://blog.confluent.io/2015/03/04/turning-the-database-inside-out-with-apache-samza/)
 - [The two pillars of Javascript FRP](https://medium.com/javascript-scene/the-two-pillars-of-javascript-pt-2-functional-programming-a63aa53a41a4)
