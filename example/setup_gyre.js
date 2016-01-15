@@ -1,4 +1,5 @@
-let GyreJS = require("../src/");
+const GyreJS = require("../src/");
+import GyreDebugger from "./debugger";
 
 const aggregates = {
   "counter": {
@@ -93,4 +94,10 @@ GyreJS.createGyre("simple", {
   ticker: "synchronous"
 });
 
-module.exports = () => GyreJS.instantiateGyre("simple");
+module.exports = () => {
+  // Add debugger
+  GyreJS.attachDebugger(GyreDebugger());
+
+  // Create gyre instance
+  return GyreJS.instantiateGyre("simple");
+};

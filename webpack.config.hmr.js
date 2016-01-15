@@ -7,9 +7,15 @@ module.exports = {
     filename: "bundle.js",
     publicPath: "/static/"
   },
+  devtool: "source-map",
   module: {
     loaders: [
-      { test: /\.js$/, loaders: ["babel-loader"], exclude: /node_modules/ }
+      { test: /\.js$/, loaders: ["babel-loader"], exclude: /node_modules/ },
+      { test: /\.css$/, loader: "style-loader!css-loader" },
+      {
+        test: /\.scss$/,
+        loaders: ["style", "css", "sass"]
+      }
     ]
   }
 };
