@@ -1,25 +1,13 @@
 const aggregateFactory = (_internal, {reducer, eventFilter, methods = {}}) => {
   return (options) => {
-    let state;
-
-    /*
-      Private methods
-     */
-    const setInitialState = () => {
-      state = reducer(void(0), {type: null});
-    };
+    let state = reducer.initialValue();
 
     /**
      *
      * @param evt
      */
     const applyEvent = (evt) => {
-      if (evt.type === "__RESET__") {
-        setInitialState();
-      }
-      else {
-        state = Object.assign({}, reducer(state, evt));
-      }
+      state = reducer.applyEvent(state, evt);
     };
 
     /**
@@ -48,18 +36,17 @@ const aggregateFactory = (_internal, {reducer, eventFilter, methods = {}}) => {
     /*
      Setup
      */
-    setInitialState();
     getEventsFromBus().forEach(evt => applyEvent(evt));
 
     /*
      Setup
      */
-    return Object.freeze(Object.keys(methods).reduce((prev, key) => {
+    return Object.keys(methods).reduce((prev, key) => {
       prev[key] = (...args) => {
         methods[key].apply(null, [state, {trigger, issue: _internal.dispatcher.issue}, ...args, options]);
       };
       return prev;
-    }, {}));
+    }, {});
   };
 };
 

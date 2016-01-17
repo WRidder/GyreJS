@@ -144,10 +144,7 @@ describe("GyreJS", function() {
       test1_obj: {
         initialState: {count: 0},
         events: {
-          "incremented": (state, event) => Object.assign({}, state, {
-            count: state.count + event.by
-          }),
-          "decremented": (state, event) => Object.assign({}, state, {
+          "^(in|de)cremented$": (state, event) => Object.assign({}, state, {
             count: state.count + event.by
           })
         }

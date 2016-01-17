@@ -3,8 +3,8 @@ import Dispatcher from "./dispatcher";
 import Command from "./commands";
 import Event from "./events";
 import Aggregate from "./aggregates";
-import Projection from "./projections";
 import ListenerInterface from "./listenerInterface";
+import Reducer from "./reducers";
 import tickers from "./tickers";
 
 /**
@@ -24,14 +24,13 @@ const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggreg
     const _aggregates = {};
     const _commands = {};
     const _events = {};
-    const _projections = {};
     const {gId, gyrejsDebugger, showInDebugger = true} = options;
 
     // Gyre internal instances
     const _internal = {};
     _internal.bus = Bus();
     _internal.dispatcher = Dispatcher(_internal, _commands, _events);
-    _internal.listenerInterface = ListenerInterface(_projections);
+    _internal.listenerInterface = ListenerInterface(_internal);
     const commandFactory = Command(_aggregates, _internal);
 
     // Public methods
@@ -97,9 +96,12 @@ const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggreg
      *
      * @type {Function}
      */
-    const addAggregate = API.addAggregate = (id, aFunction, replace) => {
+    const addAggregate = API.addAggregate = (id, aggregateDefinition, replace) => {
+      // TODO: check fro aggregate properties (methods, reducer, events etc)
+
       if (!Object.prototype.hasOwnProperty.call(_aggregates, id) || replace) {
-        _aggregates[id] = Aggregate(_internal, aFunction);
+        aggregateDefinition.reducer = Reducer(aggregateDefinition.reducer);
+        _aggregates[id] = Aggregate(_internal, aggregateDefinition);
       }
       else {
         console.warn(`>> GyreJS-gyre: addEvent -> Selector with id: '${id}' already exists.`); // eslint-disable-line no-console
@@ -126,30 +128,19 @@ const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggreg
      *
      * @type {Function}
      */
-    const addProjection = API.addProjection = (id, pFunction, replace) => {
-      // TODO: check for function or object. If object, should have initial state and events properties.
-      if (!Object.prototype.hasOwnProperty.call(_projections, id) || replace) {
-        _projections[id] = Projection(_internal, pFunction, () => {
-          _internal.listenerInterface.sendUpdate(id);
-        });
-      }
-      else {
-        console.warn(`>> GyreJS-gyre: addProjection -> Projection with id: '${id}' already exists.`); // eslint-disable-line no-console
-      }
-      return API;
-    };
+    const addProjection = API.addProjection = (...args) => _internal.listenerInterface.addProjection(...args) && API;
 
     /**
      *
      * @type {Function}
      */
-    const addProjections = API.addProjections = (prjctsObj, replace) => {
-      if (typeof prjctsObj !== "object") {
+    const addProjections = API.addProjections = (projectionsObj, replace) => {
+      if (typeof projectionsObj !== "object") {
         throw new Error("GyreJS (addProjections): first argument should be an object.");
       }
 
-      Object.keys(prjctsObj).forEach(id => {
-        API.addProjection(id, prjctsObj[id], replace);
+      Object.keys(projectionsObj).forEach(id => {
+        API.addProjection(id, projectionsObj[id], replace);
       });
       return API;
     };
@@ -159,16 +150,7 @@ const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggreg
      * @type {Function}
      */
     const removeProjection = API.removeProjection = (id) => {
-      if (!_projections.hasOwnProperty(id)) {
-        console.warn(`>> GyreJS: (removeProjection) A projection with id:'${id}' is not registered.`); // eslint-disable-line no-console
-        return false;
-      }
-
-      if (_projections[id].destroy(id)) {
-        delete _projections[id];
-        return true;
-      }
-      return false;
+      return _internal.listenerInterface.removeProjection(id);
     };
 
     /**
@@ -177,17 +159,7 @@ const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggreg
      * @param callback
      * @returns {*}
      */
-    const addListener = (id, callback) => {
-      if (!_projections.hasOwnProperty(id)) {
-        console.warn(`>> GyreJS: (addListener) A projection with id:'${id}' is not registered.`); // eslint-disable-line no-console
-        return false;
-      }
-      if (typeof callback !== "function") {
-        throw new Error("GyreJS (addListener): The second argument, callback, should be a function.");
-      }
-
-      return _internal.listenerInterface.addListener(id, callback);
-    };
+    const addListener = (id, callback) => _internal.listenerInterface.addListener(id, callback);
 
     /**
      * Issue a registered command.

@@ -8,7 +8,7 @@
  */
 const projectionFactory = (_internal, reducer, notifyStateUpdate) => {
   // Private variables
-  let state = typeof reducer === "function" ? reducer(void(0), {type: null}) : reducer.initialState;
+  let state = reducer.initialValue();
 
   /**
    * Overwrite the current state in the store.
@@ -33,12 +33,7 @@ const projectionFactory = (_internal, reducer, notifyStateUpdate) => {
    * @param {String} evt Event name.
    * @returns {Object} state New state.
    */
-  const update = (() =>
-    (typeof reducer === "function") ?
-      (evt) => setNewState(reducer(evt.type === "__RESET__" ? void(0) : state, evt)) :
-      (evt) => (evt.type === "__RESET__") ?
-        setNewState(reducer.initialState) :
-        setNewState(typeof reducer.events[evt.type] === "function" ? reducer.events[evt.type](state, evt) : state))();
+  const update = (evt) => setNewState(reducer.applyEvent(state, evt));
 
   /**
    *
@@ -48,11 +43,11 @@ const projectionFactory = (_internal, reducer, notifyStateUpdate) => {
     return removeProjectionFromBus() && true;
   })(_internal.bus.addProjection(update));
 
-  return Object.freeze({
+  return {
     destroy,
     update,
     getState: () => state
-  });
+  };
 };
 
 export default projectionFactory;

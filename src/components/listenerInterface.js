@@ -1,4 +1,7 @@
-module.exports = (projections) => {
+import Reducer from "./reducers";
+import Projection from "./projections";
+
+module.exports = (_internal) => {
   const listeners = (() => {
     const list = {};
 
@@ -6,6 +9,7 @@ module.exports = (projections) => {
       get: id => (!list.hasOwnProperty(id)) ? (list[id] = []) && list[id] : list[id]
     };
   })();
+  const projections = {};
 
   /**
    * Send update to all registered selectors.
@@ -18,6 +22,39 @@ module.exports = (projections) => {
     return cb
       ? cb(projections[id].getState())
       : listeners.get(id).forEach(listener => listener(projections[id].getState()));
+  };
+
+  /**
+   *
+   * @type {Function}
+   */
+  const addProjection = (id, reducer, replace) => {
+    // TODO: check for function or object. If object, should have initial state and events properties.
+    if (!Object.prototype.hasOwnProperty.call(projections, id) || replace) {
+      projections[id] = Projection(_internal, Reducer(reducer), () => {
+        sendUpdate(id);
+      });
+    }
+    else {
+      console.warn(`>> GyreJS-gyre: addProjection -> Projection with id: '${id}' already exists.`); // eslint-disable-line no-console
+    }
+  };
+
+  /**
+   *
+   * @type {Function}
+   */
+  const removeProjection = (id) => {
+    if (!projections.hasOwnProperty(id)) {
+      console.warn(`>> GyreJS: (removeProjection) A projection with id:'${id}' is not registered.`); // eslint-disable-line no-console
+      return false;
+    }
+
+    if (projections[id].destroy(id)) {
+      delete projections[id];
+      return true;
+    }
+    return false;
   };
 
   /**
@@ -40,6 +77,13 @@ module.exports = (projections) => {
    * @returns {Function} un-register function.
    */
   const addListener = (id, cb) => {
+    if (!projections.hasOwnProperty(id)) {
+      console.warn(`>> GyreJS: (addListener) A projection with id:'${id}' is not registered.`); // eslint-disable-line no-conso     return false;
+    }
+    if (typeof cb !== "function") {
+      throw new Error("GyreJS (addListener): The second argument, callback, should be a function.");
+    }
+
     // Save to local register
     listeners.get(id).push(cb);
 
@@ -52,6 +96,8 @@ module.exports = (projections) => {
 
   return {
     addListener,
+    addProjection,
+    removeProjection,
     sendUpdate
   };
 };
