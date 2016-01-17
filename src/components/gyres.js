@@ -20,17 +20,17 @@ import tickers from "./tickers";
 const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggregates = {}, projections = {}} = {}) =>
   (options) => {
     // Private variables
-    let API = {};
+    const API = {};
     const _aggregates = {};
     const _commands = {};
     const _events = {};
-    const {gId, gyrejsDebugger, showInDebugger = true} = options;
 
     // Gyre internal instances
     const _internal = {};
     _internal.bus = Bus();
     _internal.dispatcher = Dispatcher(_internal, _commands, _events);
     _internal.listenerInterface = ListenerInterface(_internal);
+    _internal.id = options.gId;
     const commandFactory = Command(_aggregates, _internal);
 
     // Public methods
@@ -206,11 +206,14 @@ const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggreg
       trigger
     });
 
-    if (gyrejsDebugger && showInDebugger) {
-      API = gyrejsDebugger.addGyre(gId, API);
-      _internal.bus = gyrejsDebugger.addBus(gId, _internal.bus);
-      _internal.dispatcher = gyrejsDebugger.addDispatcher(gId, _internal.dispatcher);
-    }
+    // being explicit
+    Object.defineProperty(API, "_internal", {
+      enumerable: false,
+      configurable: false,
+      writable: false,
+      value: _internal
+    });
+
     return Object.freeze(API);
   };
 

@@ -16,10 +16,6 @@ const getGyres = (() => {
   return () => gyres || (gyres = { "empty": Gyre() });
 })();
 
-// Public functions
-let gyrejsDebugger;
-const attachDebugger = gDebugger => gyrejsDebugger = gDebugger;
-
 /**
  * Creates a new gyre instance. Based on a factory function by registered id.
  * If no id is provided, an empty gyre instance will be returned.
@@ -28,11 +24,11 @@ const attachDebugger = gDebugger => gyrejsDebugger = gDebugger;
  * @param {Object} [options] Options object for gyre.
  * @returns {Object|void} Gyre instance.
  */
-const instantiateGyre = (id = "empty", options = {}) => {
+const instantiateGyre = API.instantiateGyre = (id = "empty", options = {}) => {
   if (getGyres().hasOwnProperty(id)) {
     // Return gyre instance object with a unique namespace.
     const gId = `${id}-${gCounter++}`;
-    return getGyres()[id](Object.assign({}, options, {gId, gyrejsDebugger}));
+    return getGyres()[id](Object.assign({}, options, {gId}));
   }
   throw new Error(`GyreJS (instantiateGyre): Error on create - Gyre factory '${id}' not registered.`); // eslint-disable-line no-console
 };
@@ -44,13 +40,13 @@ const instantiateGyre = (id = "empty", options = {}) => {
  * @param {Function} factory Gyre factory function.
  * @returns {Object} API Chainable GyreJS object.
  */
-const registerGyre = (id, factory) => {
+const registerGyre = API.registerGyre = (id, factory) => {
   if (id === "empty") {
     throw new Error("GyreJS (registerGyre): cannot use 'empty, it is a reserved id.");
   }
 
   getGyres()[id] = factory;
-  return (options) => instantiateGyre(id, options);
+  return (options) => API.instantiateGyre(id, options);
 };
 
 /**
@@ -72,12 +68,15 @@ const unRegisterGyre = (id) => {
  *
  * @type {Object}
  */
-const createGyre = (...args) => {
+const createGyre = API.createGyre = (...args) => {
   // TODO: Check for unnamed
   return args.length === 1 ?
-    registerGyre("unnamed", Gyre(args[1])) :
-    registerGyre(args[0], Gyre(args[1]));
+    API.registerGyre("unnamed", Gyre(args[1])) :
+    API.registerGyre(args[0], Gyre(args[1]));
 };
+
+// Public functions
+const attachDebugger = gDebugger => new gDebugger(API);
 
 // GyreJS API
 export default Object.assign(API, {

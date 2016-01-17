@@ -1,71 +1,8 @@
 import GyreJS from "../../src/index";
 const expect = require("chai").expect;
 import Immutable from "immutable";
-
-const DebugInstance = function() {
-  this.gyres = {};
-};
-
-DebugInstance.prototype.addGyre = function(id, gyre) {
-  const self = this;
-  self.gyres[id] = {
-    gyre: {},
-    log: {
-      calls: [],
-      dispatcherCalls: [],
-      busCalls: [],
-      events: [],
-      commands: []
-    },
-    bus: {},
-    dispatcher: {}
-  };
-
-  return Object.keys(gyre).reduce((methods, gyreMethod) => {
-    methods[gyreMethod] = (...args) => {
-      self.gyres[id].log.calls.push([gyreMethod, Date.now(), ...args]);
-      return gyre[gyreMethod](...args);
-    };
-    return methods;
-  }, self.gyres[id].gyre);
-};
-
-DebugInstance.prototype.addBus = function(id, bus) {
-  const self = this;
-  return Object.keys(bus).reduce((methods, busMethod) => {
-    methods[busMethod] = (...args) => {
-      self.gyres[id].log.busCalls.push([busMethod, Date.now(), ...args]);
-      return bus[busMethod](...args);
-    };
-    return methods;
-  }, self.gyres[id].bus);
-};
-
-DebugInstance.prototype.addDispatcher = function(id, dispatcher) {
-  const self = this;
-  return Object.keys(dispatcher).reduce((methods, dpMethod) => {
-    methods[dpMethod] = (...args) => {
-      self.gyres[id].log.dispatcherCalls.push([dpMethod, Date.now(), ...args]);
-      return dispatcher[dpMethod](...args);
-    };
-    return methods;
-  }, self.gyres[id].dispatcher);
-};
-
-DebugInstance.prototype.getGyres = function() {
-  return this.gyres;
-};
-
-DebugInstance.prototype.getLogs = function(id) {
-  return this.gyres[id].log;
-};
-
-DebugInstance.prototype.resetGyre = function(id) {
-  return this.gyres[id].bus.trigger(Object.freeze({type: "__RESET__"}));
-};
-
-let debugInstance = new DebugInstance();
-GyreJS.attachDebugger(debugInstance);
+import GDebugger from "../../src/debugger";
+const debugInstance = GyreJS.attachDebugger(GDebugger);
 
 describe("GyreJS", function() {
   it("can create a new gyre", function() {
@@ -345,7 +282,7 @@ describe("GyreJS", function() {
     // Test reset functionality
     debugInstance.resetGyre(simpleGyreId);
     console.log(debugInstance.getLogs(simpleGyreId).busCalls.length);
-    console.log(debugInstance.getLogs(simpleGyreId).busCalls[15]);
+    console.log(debugInstance.getLogs(simpleGyreId).busCalls[debugInstance.getLogs(simpleGyreId).busCalls.length - 1]);
     expect(test2state).to.deep.equal({ evtCount: 0, dCount: 0, iCount: 0 });
     expect(test3state).to.deep.equal({ absDistance: 0});
     expect(test3state_2).to.deep.equal({ absDistance: 0});

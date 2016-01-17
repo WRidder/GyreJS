@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 const debugCss = require("!css!sass!./css/debugger_stylesheet.scss");
 const debugFontsCss = require("!css!./css/foundation-icons.css");
 const foundationJs = require("raw!./popup/foundation.js");
-import JSONTree from 'react-json-tree';
+import JSONTree from "react-json-tree";
 
 module.exports = () => {
   const gyres = [];
