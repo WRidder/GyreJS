@@ -78,7 +78,8 @@ module.exports = (_internal) => {
    */
   const addListener = (id, cb) => {
     if (!projections.hasOwnProperty(id)) {
-      console.warn(`>> GyreJS: (addListener) A projection with id:'${id}' is not registered.`); // eslint-disable-line no-conso     return false;
+      console.warn(`>> GyreJS: (addListener) A projection with id:'${id}' is not registered.`); // eslint-disable-line no-console
+      return false;
     }
     if (typeof cb !== "function") {
       throw new Error("GyreJS (addListener): The second argument, callback, should be a function.");
