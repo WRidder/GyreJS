@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 const debugCss = require("!css!sass!./css/debugger_stylesheet.scss");
 const debugFontsCss = require("!css!./css/foundation-icons.css");
+const foundationJs = require("raw!./popup/foundation.js");
 import JSONTree from 'react-json-tree';
 
 module.exports = () => {
@@ -187,14 +188,13 @@ module.exports = () => {
     // Attach popWindow specific javascript
     const popupJs = popupDoc.createElement("script");
     popupJs.type = "text/javascript";
-    popupJs.text = `
-    setTimeout(function() {
-      $(document).foundation();
-    }, 0);
-    `;
+    popupJs.text = foundationJs;
+
+    // Attach gyreJs to window
+    window.GyreJSDebugger = gyres;
 
     const filesToLoadSynchronously = [jqueryJs, zurbStyleJS];
-    const filesToLoadWhenDone = [popupJs];
+    const filesToLoadInline = [popupJs];
     let fileToLoadIndex = 0;
     const filesDone = [];
     const loadAsyncFiles = setInterval(() => {
@@ -203,7 +203,7 @@ module.exports = () => {
         clearInterval(loadAsyncFiles);
 
         // Add inline javascript
-        filesToLoadWhenDone.forEach(script => popupHead.appendChild(script));
+        filesToLoadInline.forEach(script => popupHead.appendChild(script));
         return;
       }
 

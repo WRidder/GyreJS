@@ -4,6 +4,7 @@ import Command from "./commands";
 import Event from "./events";
 import Aggregate from "./aggregates";
 import Projection from "./projections";
+import ListenerInterface from "./listenerInterface";
 import tickers from "./tickers";
 
 /**
@@ -17,18 +18,20 @@ import tickers from "./tickers";
  * @returns {Function} Gyre factory function.
  */
 const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggregates = {}, projections = {}} = {}) =>
-  ({gId, gyrejsDebugger}) => {
+  (options) => {
     // Private variables
     let API = {};
     const _aggregates = {};
     const _commands = {};
     const _events = {};
     const _projections = {};
+    const {gId, gyrejsDebugger, showInDebugger = true} = options;
 
     // Gyre internal instances
     const _internal = {};
     _internal.bus = Bus();
     _internal.dispatcher = Dispatcher(_internal, _commands, _events);
+    _internal.listenerInterface = ListenerInterface(_projections);
     const commandFactory = Command(_aggregates, _internal);
 
     // Public methods
@@ -124,8 +127,11 @@ const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggreg
      * @type {Function}
      */
     const addProjection = API.addProjection = (id, pFunction, replace) => {
+      // TODO: check for function or object. If object, should have initial state and events properties.
       if (!Object.prototype.hasOwnProperty.call(_projections, id) || replace) {
-        _projections[id] = Projection(_internal, pFunction);
+        _projections[id] = Projection(_internal, pFunction, () => {
+          _internal.listenerInterface.sendUpdate(id);
+        });
       }
       else {
         console.warn(`>> GyreJS-gyre: addProjection -> Projection with id: '${id}' already exists.`); // eslint-disable-line no-console
@@ -180,7 +186,7 @@ const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggreg
         throw new Error("GyreJS (addListener): The second argument, callback, should be a function.");
       }
 
-      return _projections[id].addListener(callback);
+      return _internal.listenerInterface.addListener(id, callback);
     };
 
     /**
@@ -228,7 +234,7 @@ const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggreg
       trigger
     });
 
-    if (gyrejsDebugger) {
+    if (gyrejsDebugger && showInDebugger) {
       API = gyrejsDebugger.addGyre(gId, API);
       _internal.bus = gyrejsDebugger.addBus(gId, _internal.bus);
       _internal.dispatcher = gyrejsDebugger.addDispatcher(gId, _internal.dispatcher);

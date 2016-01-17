@@ -1,4 +1,4 @@
-import Gyre from "./factories/gyres";
+import Gyre from "./components/gyres";
 
 // Private variables
 const API = {};
@@ -50,7 +50,7 @@ const registerGyre = (id, factory) => {
   }
 
   getGyres()[id] = factory;
-  return API;
+  return (options) => instantiateGyre(id, options);
 };
 
 /**
@@ -73,8 +73,9 @@ const unRegisterGyre = (id) => {
  * @type {Object}
  */
 const createGyre = (...args) => {
+  // TODO: Check for unnamed
   return args.length === 1 ?
-    Gyre(args[0])(gCounter++) :
+    registerGyre("unnamed", Gyre(args[1])) :
     registerGyre(args[0], Gyre(args[1]));
 };
 

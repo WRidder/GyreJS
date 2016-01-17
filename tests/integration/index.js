@@ -1,5 +1,6 @@
 import GyreJS from "../../src/index";
-var expect = require("chai").expect;
+const expect = require("chai").expect;
+import Immutable from "immutable";
 
 const DebugInstance = function() {
   this.gyres = {};
@@ -128,7 +129,8 @@ describe("GyreJS", function() {
     // Events (as obj or array?)
     const events = {
       "incremented": (oldValue, newValue, by) => ({oldValue, newValue, by}),
-      "decremented": ["oldValue", "newValue", "by"]
+      "decremented": ["oldValue", "newValue", "by"],
+      "misc": ["misc"]
     };
 
     // projection 1: count
@@ -136,7 +138,20 @@ describe("GyreJS", function() {
     // projection 3: number distance (abs(value) + abs(value)
     const projectionEvents = [];
     const projectionStates = [];
+    const projectionIEvents = [];
+    const projectionIStates = [];
     const projections = {
+      test1_obj: {
+        initialState: {count: 0},
+        events: {
+          "incremented": (state, event) => Object.assign({}, state, {
+            count: state.count + event.by
+          }),
+          "decremented": (state, event) => Object.assign({}, state, {
+            count: state.count + event.by
+          })
+        }
+      },
       test1: (state = {count: 0}, event) => {
         projectionEvents.push(event);
         projectionStates.push(state);
@@ -147,6 +162,27 @@ describe("GyreJS", function() {
             return Object.assign({}, state, {
               count: state.count + event.by
             });
+          default:
+            return state;
+        }
+      },
+      test1_immutable: (state = Immutable.Map({count: 0}), event) => {
+        projectionIEvents.push(event);
+        projectionIStates.push(state.toJSON());
+
+        switch (event.type) {
+          case "incremented":
+          case "decremented":
+            return state.set("count", state.get("count") + event.by)
+          default:
+            return state;
+        }
+      },
+      test1_number: (state = 0, event) => {
+        switch (event.type) {
+          case "incremented":
+          case "decremented":
+            return state + event.by;
           default:
             return state;
         }
@@ -198,16 +234,16 @@ describe("GyreJS", function() {
     };
 
     // Create and register gyre factory
-    GyreJS.createGyre("simple", {
+    const simpleGyre = GyreJS.createGyre("simple", {
       commands,
       events,
       aggregates,
       projections,
       ticker: "synchronous"
-    });
+    })({testOption: "foo"});
 
     // Instantiate a gyre
-    const simpleGyre = GyreJS.instantiateGyre("simple");
+    const simpleGyre1 = GyreJS.instantiateGyre("simple");
 
     // Test double commands, events, aggregates and projections protection.
     simpleGyre.addCommands(commands);
@@ -217,15 +253,19 @@ describe("GyreJS", function() {
 
     const stateArray = [];
     const test1L = simpleGyre.addListener("test1", (state) => {
-      // Make sure the returned state is immutable.
-      try {
-        // Alter a prop
-        state.count = "notrighttype";
-      }
-      catch(e) {
-        expect(e.message).to.equal("Cannot assign to read only property \'count\' of #<Object>");
-      }
       stateArray.push(state);
+    });
+
+    let test1_immutable_state;
+    const test1_immutable = simpleGyre.addListener("test1_immutable", (state) => {
+      test1_immutable_state = state;
+    });
+
+    let test1_number_state;
+    let test1States = [];
+    const test1_number = simpleGyre.addListener("test1_number", (state) => {
+      test1_number_state = state;
+      test1States.push(state);
     });
 
     let test2state;
@@ -252,6 +292,9 @@ describe("GyreJS", function() {
       .issue("decrementCounter", 1) // 1
       .issue("decrement", 1) // 0
       .issue("increment", 1) // 1
+      .issue("misc", 1) // 1
+      .issue("misc", 1) // 1
+      .issue("misc", 1) // 1
       .issue("decrementCounter", 7) // omitted; does not adhere to business rules
       .issue("incrementCounter", 3) // 4
       .issue("wrong-event", 3)      // omitted; does not exist
@@ -260,12 +303,17 @@ describe("GyreJS", function() {
 
     console.log(aggMethodCalls);
     console.log(projectionEvents);
+    console.log(projectionIEvents);
     console.log(projectionStates);
+    console.log(projectionIStates);
     console.log(stateArray);
     console.log(aggStates);
+    console.log(test1States);
 
     // TODO: fix why aggregate does not see updated state?
     expect(stateArray.length).to.equal(8);
+    expect(Immutable.is(test1_immutable_state, Immutable.Map({count: 5}))).to.equal(true);
+    expect(test1_number_state).to.equal(5);
     expect(test2state).to.deep.equal({ evtCount: 7, dCount: 3, iCount: 4 });
     expect(test3state).to.deep.equal({ absDistance: 13});
     expect(test3state_2).to.deep.equal({ absDistance: 13});
@@ -277,7 +325,7 @@ describe("GyreJS", function() {
       { type: "decremented", oldValue: 4, newValue: 3, by: -1}
     ];
 
-    let projectionState = evts.reduce((prevState, evt) => {
+    const projectionState = evts.reduce((prevState, evt) => {
       return projections["test1"](prevState, evt);
     }, void(0));
     expect(projectionState).to.deep.equal({count: 3});
@@ -285,7 +333,7 @@ describe("GyreJS", function() {
     // Debug instance tests
     const gyreList = Object.keys(debugInstance.getGyres());
     const simpleGyreId = gyreList[0];
-    expect(gyreList).to.deep.equal(["simple-0"]);
+    expect(gyreList).to.deep.equal(["simple-0", "simple-1"]);
     const gyreCallListFull = debugInstance.getLogs(simpleGyreId).calls.map(call => {
       const m = new Date(call[1]);
       return {
@@ -296,13 +344,6 @@ describe("GyreJS", function() {
     const gyreCallList = debugInstance.getLogs(simpleGyreId).calls.map(call => {
       return call[0];
     });
-    expect(gyreCallList.length).to.deep.equal(27);
-
-    console.log(gyreCallListFull);
-    console.log(debugInstance.getLogs(simpleGyreId).calls);
-    console.log(debugInstance.getLogs(simpleGyreId).dispatcherCalls);
-    console.log(debugInstance.getLogs(simpleGyreId).busCalls);
-    console.log(debugInstance.getLogs(simpleGyreId).busCalls.length);
 
     // Test reset functionality
     debugInstance.resetGyre(simpleGyreId);
@@ -334,13 +375,6 @@ describe("GyreJS", function() {
 
     // Test cleanup
     debugInstance.resetGyre(simpleGyreId);
-
-    // Remove projection before removing listeners; should not work;
-    expect(simpleGyre.removeProjection("test1")).to.equal(false);
-
-    // Manually trigger an event to make sure everything still works.
-    simpleGyre.trigger("incremented", 1, 2, 1);
-    expect(test2state).to.deep.equal({ evtCount: 1, dCount: 0, iCount: 1 });
 
     // Reset again
     debugInstance.resetGyre(simpleGyreId);
