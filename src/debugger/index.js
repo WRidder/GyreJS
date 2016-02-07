@@ -44,7 +44,7 @@ const GDebugger = function(API) {
   helpers.wrapGyreJSLibrary(API, this);
 
   // Create internal gyre
-  self.debugGyre = API.createGyre("debugGyre", {})({
+  self.debugGyre = API.createGyre("debugGyre", DebugGyre)({
     noDebug: true
   });
 

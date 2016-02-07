@@ -1,6 +1,6 @@
 import Aggregate from "./aggregates";
 import Reducer from "./reducers";
-const isEqual = require('lodash.isequal');
+const isEqual = require("lodash.isequal");
 
 const AggregateCache = (_internal, {cacheSize = 0}) => {
   const _aggregates = {};
@@ -66,7 +66,7 @@ const AggregateCache = (_internal, {cacheSize = 0}) => {
   return {
     addAggregate,
     getAggregate
-  }
+  };
 };
 
 export default AggregateCache;

@@ -8,10 +8,6 @@ const events = {
   "eventTriggered": ["id"]
 };
 
-const projections = {
-
-}
-
 module.exports = {
   events
 };
