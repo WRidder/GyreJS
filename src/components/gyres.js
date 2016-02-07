@@ -2,9 +2,8 @@ import Bus from "./bus";
 import Dispatcher from "./dispatcher";
 import Command from "./commands";
 import Event from "./events";
-import Aggregate from "./aggregates";
 import ListenerInterface from "./listenerInterface";
-import Reducer from "./reducers";
+import AggregateCache from "./aggregateCache";
 import tickers from "./tickers";
 
 /**
@@ -21,7 +20,6 @@ const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggreg
   (options) => {
     // Private variables
     const API = {};
-    const _aggregates = {};
     const _commands = {};
     const _events = {};
 
@@ -30,8 +28,9 @@ const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggreg
     _internal.bus = Bus();
     _internal.dispatcher = Dispatcher(_internal, _commands, _events);
     _internal.listenerInterface = ListenerInterface(_internal);
+    _internal.aggregateCache = AggregateCache(_internal, options.aggregateCache || {});
     _internal.id = options.gId;
-    const commandFactory = Command(_aggregates, _internal);
+    const commandFactory = Command(_internal);
 
     // Public methods
     /**
@@ -96,16 +95,8 @@ const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggreg
      *
      * @type {Function}
      */
-    const addAggregate = API.addAggregate = (id, aggregateDefinition, replace) => {
-      // TODO: check fro aggregate properties (methods, reducer, events etc)
-
-      if (!Object.prototype.hasOwnProperty.call(_aggregates, id) || replace) {
-        aggregateDefinition.reducer = Reducer(aggregateDefinition.reducer);
-        _aggregates[id] = Aggregate(_internal, aggregateDefinition);
-      }
-      else {
-        console.warn(`>> GyreJS-gyre: addEvent -> Selector with id: '${id}' already exists.`); // eslint-disable-line no-console
-      }
+    const addAggregate = API.addAggregate = (...args) => {
+      _internal.aggregateCache.addAggregate(...args);
       return API;
     };
 

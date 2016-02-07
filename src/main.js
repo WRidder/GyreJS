@@ -27,8 +27,7 @@ const getGyres = (() => {
 const instantiateGyre = API.instantiateGyre = (id = "empty", options = {}) => {
   if (getGyres().hasOwnProperty(id)) {
     // Return gyre instance object with a unique namespace.
-    const gId = `${id}-${gCounter++}`;
-    return getGyres()[id](Object.assign({}, options, {gId}));
+    return getGyres()[id](Object.assign({}, options, {gId: `${id}-${gCounter++}`}));
   }
   throw new Error(`GyreJS (instantiateGyre): Error on create - Gyre factory '${id}' not registered.`); // eslint-disable-line no-console
 };
@@ -69,7 +68,10 @@ const unRegisterGyre = (id) => {
  * @type {Object}
  */
 const createGyre = API.createGyre = (...args) => {
-  // TODO: Check for unnamed
+  if (args.length > 1 && args[0] === "unnamed") {
+    throw new Error("GyreJS (createGyre): cannot use 'unnamed' as gyre ID, it is a reserved id.");
+  }
+
   return args.length === 1 ?
     API.registerGyre("unnamed", Gyre(args[1])) :
     API.registerGyre(args[0], Gyre(args[1]));

@@ -1,10 +1,12 @@
 /**
  * Create commands and events
- * @param {Object} aggregates Object containing the aggregates.
+ * @param {Object} aggregateCache Object containing the aggregates.
  * @param {Object} dispatcher Dispatcher instance.
  * @returns {Function} Command factory function.
  */
-const commandFactory = (aggregates, {dispatcher}) => {
+const commandFactory = ({dispatcher, aggregateCache}) => {
+  const {getAggregate} = aggregateCache;
+
   /**
    * @param {Function|String} func Command function or aggregate method name.
    * @param {String} [id] Aggregate method name.
@@ -20,20 +22,20 @@ const commandFactory = (aggregates, {dispatcher}) => {
         const aName = Array.isArray(func) ? func[0] : func;
         const options = (Array.isArray(func) && func.length > 1) ? func[1] : void(0);
 
-        if (!Object.prototype.hasOwnProperty.call(aggregates, aName)) {
+        const aggregate = getAggregate(aName, options);
+        if (!aggregate) {
           throw new Error(`GyreJS (Command): Cannot find aggregate ${aName}; needed for command ${id}`);
         }
-        const aggregate = aggregates[aName](options);
         if (Object.prototype.hasOwnProperty.call(aggregate, id) && typeof aggregate[id] === "function") {
           return aggregate[id](...args);
         }
-        throw new Error(`GyreJS (addCommand): Cannot find method ${func} on aggregate ${id}`);
+        throw new Error(`GyreJS (addCommand): Method ${func} does not exist on aggregate ${id}`);
       };
     }
 
     return (...args) => {
       return func.apply(null, [{
-        getAggregate: (gId, options) => aggregates[gId](options),
+        getAggregate,
         issue: dispatcher.issueCommand,
         trigger: dispatcher.triggerEvent
       }, ...args]);

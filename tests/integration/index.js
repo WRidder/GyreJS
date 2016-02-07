@@ -2,6 +2,7 @@ import GyreJS from "../../src/index";
 const expect = require("chai").expect;
 import Immutable from "immutable";
 import GDebugger from "../../src/debugger";
+import {observable} from "mobservable";
 const debugInstance = GyreJS.attachDebugger(GDebugger);
 
 describe("GyreJS", function() {
@@ -12,8 +13,8 @@ describe("GyreJS", function() {
     const aggStates = [];
     const aggregates = {
       "counter": {
-        eventFilter: (event) => ["incremented", "decremented"].indexOf(event.type) !== -1,
-        // eventFilter: ["incremented", "decremented"],
+        //eventFilter: (event) => ["incremented", "decremented"].indexOf(event.type) !== -1,
+        eventFilter: ["incremented", "decremented"],
         methods: {
           "increment": function(state, gyre, byValue) {
             aggMethodCalls.push(["i", byValue, state]);
@@ -107,7 +108,7 @@ describe("GyreJS", function() {
         switch (event.type) {
           case "incremented":
           case "decremented":
-            return state.set("count", state.get("count") + event.by)
+            return state.set("count", state.get("count") + event.by);
           default:
             return state;
         }
@@ -117,6 +118,17 @@ describe("GyreJS", function() {
           case "incremented":
           case "decremented":
             return state + event.by;
+          default:
+            return state;
+        }
+      },
+      test4_observable: (state = observable({observableCount: 0}), event) => {
+        switch (event.type) {
+          case "incremented":
+          case "decremented": {
+            state.observableCount += event.by;
+            return state;
+          }
           default:
             return state;
         }
@@ -220,6 +232,14 @@ describe("GyreJS", function() {
       test3state_2 = state;
     });
 
+    let test4observable;
+    const test4_observable = simpleGyre.addListener("test4_observable", (state) => {
+      if (!test4observable) {
+        test4observable = state;
+      }
+    });
+    console.log(test4observable.observableCount);
+
     // Issue commands
     simpleGyre
       .issue("incrementCounter", 2) // 2
@@ -235,6 +255,7 @@ describe("GyreJS", function() {
       .issue("decrementCounter", 2) // 2
       .issue("incrementCounter", 3);// 5
 
+    console.log(test4observable.observableCount);
     console.log(aggMethodCalls);
     console.log(projectionEvents);
     console.log(projectionIEvents);
@@ -267,51 +288,7 @@ describe("GyreJS", function() {
     // Debug instance tests
     const gyreList = Object.keys(debugInstance.getGyres());
     const simpleGyreId = gyreList[0];
-    expect(gyreList).to.deep.equal(["simple-0", "simple-1"]);
-    const gyreCallListFull = debugInstance.getLogs(simpleGyreId).calls.map(call => {
-      const m = new Date(call[1]);
-      return {
-        id: call[0],
-        timestamp: m.getUTCHours() + ":" + m.getUTCMinutes() + ":" + m.getUTCSeconds() + ":" + m.getUTCMilliseconds()
-      };
-    });
-    const gyreCallList = debugInstance.getLogs(simpleGyreId).calls.map(call => {
-      return call[0];
-    });
-
-    // Test reset functionality
-    debugInstance.resetGyre(simpleGyreId);
-    console.log(debugInstance.getLogs(simpleGyreId).busCalls.length);
-    console.log(debugInstance.getLogs(simpleGyreId).busCalls[debugInstance.getLogs(simpleGyreId).busCalls.length - 1]);
-    expect(test2state).to.deep.equal({ evtCount: 0, dCount: 0, iCount: 0 });
-    expect(test3state).to.deep.equal({ absDistance: 0});
-    expect(test3state_2).to.deep.equal({ absDistance: 0});
-
-    // Issue commands
-    simpleGyre
-      .issue("incrementCounter", 2) // 2
-      .issue("decrementCounter", 1) // 1
-      .issue("decrementCounter", 1) // 0
-      .issue("incrementCounter", 1) // 1
-      .issue("decrementCounter", 7) // omitted
-      .issue("incrementCounter", 3) // 4
-      .issue("wrong-event", 3)      // omitted
-      .issue("decrementCounter", 2) // 2
-      .issue("incrementCounter", 3);// 5
-
-    // Manually trigger an event
-    simpleGyre.trigger("incremented", 1, 2, 1);
-
-    // TODO: fix aggregates listening to reset
-    expect(test2state).to.deep.equal({ evtCount: 8, dCount: 3, iCount: 5 });
-    expect(test3state).to.deep.equal({ absDistance: 14});
-    expect(test3state_2).to.deep.equal({ absDistance: 14});
-
-    // Test cleanup
-    debugInstance.resetGyre(simpleGyreId);
-
-    // Reset again
-    debugInstance.resetGyre(simpleGyreId);
+    expect(gyreList).to.deep.equal(["simple-1", "simple-2"]);
 
     // Cleanup listeners
     test1L();
@@ -323,11 +300,6 @@ describe("GyreJS", function() {
     simpleGyre
       .issue("incrementCounter", 2);
     simpleGyre.trigger("incremented", 1, 2, 1);
-
-    // State should remain the same as before triggering the events after the reset.
-    expect(test2state).to.deep.equal({ evtCount: 0, dCount: 0, iCount: 0 });
-    expect(test3state).to.deep.equal({ absDistance: 0});
-    expect(test3state_2).to.deep.equal({ absDistance: 0});
 
     // Remove projections; should work now since listeners have been removed.
     expect(simpleGyre.removeProjection("test1")).to.equal(true);
