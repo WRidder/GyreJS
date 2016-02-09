@@ -42,9 +42,10 @@ const AggregateCache = (_internal, {cacheSize = 5}) => {
       }
     }
 
-    // Not in cache, instantiate, cache and return
+    // Not in cache, instantiate aggregate
     const aggregate = _aggregates[id](options);
 
+    // If no cache exists already for this type of aggregate, create it.
     if (!Object.prototype.hasOwnProperty.call(cache, id)) {
       cache[id] = {
         aggregatorOptions: [],
@@ -52,9 +53,11 @@ const AggregateCache = (_internal, {cacheSize = 5}) => {
       };
     }
 
+    // Add aggregate instance to the top.
     cache[id].aggregatorOptions.unshift(options);
     cache[id].aggregatorInstances.unshift(aggregate);
 
+    // If cache becomes too large, remove last entry.
     if (cache[id].aggregatorOptions.length > cacheSize && cacheSize >= 0) {
       cache[id].aggregatorOptions.pop();
       cache[id].aggregatorInstances.pop();

@@ -13,7 +13,7 @@ describe("GyreJS", function() {
     const aggStates = [];
     const aggregates = {
       "counter": {
-        //eventFilter: (event) => ["incremented", "decremented"].indexOf(event.type) !== -1,
+        // eventFilter: (event) => ["incremented", "decremented"].indexOf(event.type) !== -1,
         eventFilter: ["incremented", "decremented"],
         methods: {
           "increment": function(state, gyre, byValue) {
@@ -265,7 +265,6 @@ describe("GyreJS", function() {
     console.log(aggStates);
     console.log(test1States);
 
-    // TODO: fix why aggregate does not see updated state?
     expect(stateArray.length).to.equal(8);
     expect(Immutable.is(test1_immutable_state, Immutable.Map({count: 5}))).to.equal(true);
     expect(test1_number_state).to.equal(5);
