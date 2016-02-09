@@ -1,6 +1,8 @@
 const aggregateFactory = (_internal, {reducer, eventFilter, methods = {}}) => {
   return (options) => {
+    const API = {};
     let state = reducer.initialValue();
+    let evtOffset = 0;
 
     /**
      *
@@ -20,9 +22,11 @@ const aggregateFactory = (_internal, {reducer, eventFilter, methods = {}}) => {
     };
 
     const getEventsFromBus = () => {
-      let events;
+      let events = _internal.bus.getEvents(evtOffset);
+      evtOffset += events.length;
+
       if (eventFilter) {
-        events = _internal.bus.getEvents().filter((event) => {
+        events = events.filter((event) => {
           // Always allow reset event
           if (event.type === "__RESET__") {
             return true;
@@ -49,9 +53,6 @@ const aggregateFactory = (_internal, {reducer, eventFilter, methods = {}}) => {
           }
           return true;
         });
-      }
-      else {
-        events = _internal.bus.getEvents();
       }
 
       // Allow filtering by attribute. E.g.: Useful for aggregates for a single model.
@@ -85,20 +86,33 @@ const aggregateFactory = (_internal, {reducer, eventFilter, methods = {}}) => {
       return events;
     };
 
-    /*
-     Setup
-     */
-    getEventsFromBus().forEach(evt => applyEvent(evt));
+    const update = () => {
+      getEventsFromBus().forEach(evt => applyEvent(evt));
+      return API;
+    };
 
     /*
      Setup
      */
-    return Object.keys(methods).reduce((prev, key) => {
+    update();
+
+    // Methods for internal use
+    Object.defineProperty(API, "__update", {
+      enumerable: false,
+      configurable: false,
+      writable: false,
+      value: update
+    });
+
+    // Bind provided methods to aggregate
+    Object.keys(methods).reduce((prev, key) => {
       prev[key] = (...args) => {
         methods[key].apply(null, [state, {trigger, issue: _internal.dispatcher.issue}, ...args, options]);
       };
       return prev;
-    }, {});
+    }, API);
+
+    return API;
   };
 };
 

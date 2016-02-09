@@ -102,7 +102,7 @@ const busFactory = () => {
   /**
    * @returns {Array} Array of events.
    */
-  const getEvents = () => eventList.concat(newEvents);
+  const getEvents = (offset = 0) => (eventList.concat(newEvents)).slice(offset);
 
   return {
     addProjection,

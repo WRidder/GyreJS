@@ -2,7 +2,7 @@ import Aggregate from "./aggregates";
 import Reducer from "./reducers";
 const isEqual = require("lodash.isequal");
 
-const AggregateCache = (_internal, {cacheSize = 0}) => {
+const AggregateCache = (_internal, {cacheSize = 5}) => {
   const _aggregates = {};
   const cache = {};
 
@@ -37,8 +37,8 @@ const AggregateCache = (_internal, {cacheSize = 0}) => {
         cache[id].aggregatorOptions.splice(0, 0, cache[id].aggregatorOptions.splice(cacheIndex, 1)[0]);
         cache[id].aggregatorInstances.splice(0, 0, cache[id].aggregatorInstances.splice(cacheIndex, 1)[0]);
 
-        // Return instance
-        return cache[id].aggregatorInstances[0];
+        // Return instance but bring it up to date first
+        return cache[id].aggregatorInstances[0].__update();
       }
     }
 
