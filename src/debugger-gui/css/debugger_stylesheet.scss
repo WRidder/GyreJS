@@ -71,3 +71,39 @@ nav {
 .js-drilldown-back::before {
   border-color: transparent #fff transparent transparent;
 }
+
+// Event flash
+@keyframes event-flash {
+  0% {
+    background-color: rgba(109, 232, 97, 1);
+  }
+  22% {
+    background-color: rgba(109, 232, 97, 0.8);
+  }
+  44% {
+    background-color: rgba(109, 232, 97, 0.6);
+  }
+  66% {
+    background-color: rgba(109, 232, 97, 0.4);
+  }
+  88% {
+    background-color: rgba(109, 232, 97, 0.2);
+  }
+  100% {
+    background-color: inherit;
+  }
+}
+
+.event-flash {
+  animation-name: event-flash;
+  animation-duration: 500ms;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in-out;
+}
+
+// GyreJS Docs Iframe
+// TODO: use css flex to set container below header to fill height.
+iframe.iframe-docs {
+  width: 100%;
+  height:100%;
+}

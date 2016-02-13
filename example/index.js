@@ -3,10 +3,6 @@ import ReactDOM from "react-dom";
 import {ReactHoC, Counter} from "./react_components";
 const simpleGyre = require("./setup_gyre")();
 
-setInterval(() => {
-  simpleGyre.issue("incrementCounter", 2);
-}, 1000);
-
 const CounterView = ReactHoC({}, Counter);
 
 var Container = React.createClass({
@@ -24,8 +20,18 @@ var Container = React.createClass({
       show: !this.state.show
     });
   },
+  handleIncrement: function() {
+    simpleGyre.issue("incrementCounter", 2);
+  },
+  handleIncrementIfOdd: function() {
+    simpleGyre.issue("incrementCounterIfOdd", 1);
+  },
+  handleDecrement: function() {
+    simpleGyre.issue("decrementCounter", 1);
+  },
   render: function() {
     var Component;
+
     if (this.state.show) {
       Component = (
         <div>
@@ -33,14 +39,34 @@ var Container = React.createClass({
           <button onClick={this.handleButtonClick}>
             Click me
           </button>
+          <button onClick={this.handleIncrement}>
+            Increment +2
+          </button>
+          <button onClick={this.handleDecrement}>
+            Decrement -1
+          </button>
+          <button onClick={this.handleIncrementIfOdd}>
+            Increment + 1 if odd
+          </button>
         </div>
       );
     }
     else {
       Component = (
-        <button onClick={this.handleButtonClick}>
-          Click me
-        </button>
+        <div>
+          <button onClick={this.handleButtonClick}>
+            Click me
+          </button>
+          <button onClick={this.handleIncrement}>
+            Increment +2
+          </button>
+          <button onClick={this.handleDecrement}>
+            Decrement -1
+          </button>
+          <button onClick={this.handleIncrementIfOdd}>
+            Increment + 1 if odd
+          </button>
+        </div>
       );
     }
 

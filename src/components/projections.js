@@ -18,7 +18,7 @@ const projectionFactory = (_internal, reducer, notifyStateUpdate) => {
    * @returns {*} state Current state
    */
   const setNewState = (newState) => {
-    if (state !== newState) {
+    if (state !== newState && newState !== void(0)) {
       state = newState;
       notifyStateUpdate();
     }

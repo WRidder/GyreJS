@@ -2,7 +2,7 @@ import Bus from "./bus";
 import Dispatcher from "./dispatcher";
 import Command from "./commands";
 import Event from "./events";
-import ListenerInterface from "./listenerInterface";
+import ListenerHandler from "./listeners";
 import AggregateCache from "./aggregateCache";
 import tickers from "./tickers";
 
@@ -27,7 +27,7 @@ const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggreg
     const _internal = {};
     _internal.bus = Bus();
     _internal.dispatcher = Dispatcher(_internal, _commands, _events);
-    _internal.listenerInterface = ListenerInterface(_internal);
+    _internal.ListenerHandler = ListenerHandler(_internal);
     _internal.aggregateCache = AggregateCache(_internal, options.aggregateCache || {});
     _internal.id = options.gId;
     const commandFactory = Command(_internal);
@@ -119,7 +119,7 @@ const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggreg
      *
      * @type {Function}
      */
-    const addProjection = API.addProjection = (...args) => _internal.listenerInterface.addProjection(...args) && API;
+    const addProjection = API.addProjection = (...args) => _internal.ListenerHandler.addProjection(...args) && API;
 
     /**
      *
@@ -141,16 +141,16 @@ const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggreg
      * @type {Function}
      */
     const removeProjection = API.removeProjection = (id) => {
-      return _internal.listenerInterface.removeProjection(id);
+      return _internal.ListenerHandler.removeProjection(id);
     };
 
     /**
      *
      * @param id
      * @param callback
-     * @returns {*}
+     * @returns {Function}
      */
-    const addListener = (id, callback) => _internal.listenerInterface.addListener(id, callback);
+    const addListener = (id, callback) => _internal.ListenerHandler.addListener(id, callback);
 
     /**
      * Issue a registered command.

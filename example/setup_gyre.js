@@ -1,5 +1,6 @@
-const GyreJS = require("../src/");
-import GyreDebugger from "./debugger";
+const GyreJS = require("../src/").init();
+import GyreDebugger from "../src/debugger";
+import GyreDebuggerGUI from "../src/debugger-gui";
 
 const aggregates = {
   "counter": {
@@ -10,7 +11,12 @@ const aggregates = {
       },
       "decrement": function(state, {trigger}, byValue) {
         trigger("decremented", state.count, state.count - byValue, -1 * byValue);
-      }
+      },
+      "incrementIfOdd": function(state, gyre, byValue) {
+        if (state.count % 2 !== 0 && state.count !== 0) {
+          gyre.trigger("incremented", state.count, state.count + byValue, byValue);
+        }
+      },
     },
     reducer: (state = {count: 0}, event) => {
       switch (event.type) {
@@ -31,6 +37,10 @@ const commands = {
   "incrementCounter": function({getAggregate}, value) {
     getAggregate("counter")
       .increment(value);
+  },
+  "incrementCounterIfOdd": function({getAggregate}, value) {
+    getAggregate("counter")
+      .incrementIfOdd(value);
   },
   "decrementCounter": function({getAggregate}, value) {
     getAggregate("counter")
@@ -96,7 +106,12 @@ GyreJS.createGyre("simple", {
 
 module.exports = () => {
   // Add debugger
-  GyreJS.attachDebugger(GyreDebugger());
+  const debuggerInstance = GyreJS.attachDebugger(GyreDebugger);
+
+  // Debugger GUI
+  const debuggerGUI = GyreDebuggerGUI(debuggerInstance);
+  debuggerGUI.init();
+  console.log("hi!");
 
   // Create gyre instance
   return GyreJS.instantiateGyre("simple");

@@ -1,4 +1,5 @@
-import GyreJS from "../../src/index";
+import GyreJSLib from "../../src/index";
+const GyreJS = GyreJSLib.init();
 const expect = require("chai").expect;
 import Immutable from "immutable";
 import GDebugger from "../../src/debugger";
@@ -80,7 +81,7 @@ describe("GyreJS", function() {
     const projectionIStates = [];
     const projections = {
       test1_obj: {
-        initialState: {count: 0},
+        initialState: () => ({count: 0}),
         events: {
           "^(in|de)cremented$": (state, event) => Object.assign({}, state, {
             count: state.count + event.by

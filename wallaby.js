@@ -4,7 +4,9 @@ module.exports = function() {
       // PhantomJs Function.bind polyfill
       {pattern: "node_modules/phantomjs-polyfill/bind-polyfill.js", instrument: false},
       {pattern: "node_modules/chai/chai.js", instrument: false},
-      {pattern: "src/**/*.js*"}
+      {pattern: "src/*.js"},
+      {pattern: "src/components/*.js"},
+      {pattern: "src/debugger/**/*.js"}
     ],
 
     tests: [

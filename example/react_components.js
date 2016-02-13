@@ -37,7 +37,7 @@ var Counter = React.createClass({
   render: function() {
     return (
       <div>
-        <h2>The count is: {this.props.count}</h2>
+        <h2>The count is now: {this.props.count}</h2>
         <hr/>
       </div>
     );

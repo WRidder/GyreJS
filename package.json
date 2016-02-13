@@ -63,6 +63,7 @@
     "eslint-plugin-react": "3.9.0",
     "gitbook-cli": "^1.0.0",
     "immutable": "^3.7.6",
+    "mobservable-react": "2.1.4",
     "mocha": "^2.3.4",
     "node-sass": "^3.4.2",
     "raw-loader": "^0.5.1",
