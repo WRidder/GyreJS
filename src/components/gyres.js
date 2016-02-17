@@ -5,7 +5,7 @@ import Event from "./events";
 import ListenerHandler from "./listeners";
 import AggregateCache from "./aggregateCache";
 import tickers from "./tickers";
-
+import generateName from "sillyname";
 /**
  * Gyre Factory
  *
@@ -16,7 +16,7 @@ import tickers from "./tickers";
  * @param {Object} [projections] Projections object.
  * @returns {Function} Gyre factory function.
  */
-const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggregates = {}, projections = {}} = {}) =>
+const gyreFactory = ({id, ticker = "synchronous", commands = {}, events = {}, aggregates = {}, projections = {}} = {}) =>
   (options) => {
     // Private variables
     const API = {};
@@ -29,7 +29,7 @@ const gyreFactory = ({ticker = "synchronous", commands = {}, events = {}, aggreg
     _internal.dispatcher = Dispatcher(_internal, _commands, _events);
     _internal.ListenerHandler = ListenerHandler(_internal);
     _internal.aggregateCache = AggregateCache(_internal, options.aggregateCache || {});
-    _internal.id = options.gId;
+    _internal.id = id || generateName();
     const commandFactory = Command(_internal);
 
     // Public methods

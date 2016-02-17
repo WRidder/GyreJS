@@ -1,7 +1,8 @@
 import DebugGyre from "./gyre";
-import {methodWrapper, wrapGyreJSLibrary} from "./helpers";
+import GyreJS from "./../index";
+import {methodWrapper} from "./helpers";
 
-const GDebugger = function(API) {
+const GDebugger = function() {
   const self = this;
 
   Object.defineProperty(self, "_gyres", {
@@ -16,12 +17,10 @@ const GDebugger = function(API) {
     enumerable: false,
     configurable: false,
     writable: false,
-    value: API.createGyre("debugGyre", DebugGyre)({
+    value: GyreJS.createGyre(DebugGyre, {
       noDebug: true
     })
   });
-
-  wrapGyreJSLibrary(API, this);
 
   // Define method events
   self.methodEvents = {
@@ -46,7 +45,7 @@ const GDebugger = function(API) {
   };
 };
 
-GDebugger.prototype.addInstantiatedGyre = function(gyre) {
+GDebugger.prototype.watchGyre = function(gyre) {
   const self = this;
   const id = gyre._internal.id;
   gyre._internal.bus = methodWrapper(id, gyre._internal.bus, self.methodEvents.bus);

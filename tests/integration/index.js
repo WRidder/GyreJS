@@ -1,10 +1,8 @@
-import GyreJSLib from "../../src/index";
-const GyreJS = GyreJSLib.init();
+import GyreJS from "../../src/index";
 const expect = require("chai").expect;
 import Immutable from "immutable";
 import GDebugger from "../../src/debugger";
 import {observable} from "mobservable";
-const debugInstance = GyreJS.attachDebugger(GDebugger);
 
 describe("GyreJS", function() {
   it("can create a new gyre", function() {
@@ -181,16 +179,24 @@ describe("GyreJS", function() {
     };
 
     // Create and register gyre factory
-    const simpleGyre = GyreJS.createGyre("simple", {
+    const simpleGyre = GyreJS.createGyre({
+      id: "simple-1",
       commands,
       events,
       aggregates,
       projections,
       ticker: "synchronous"
-    })({testOption: "foo"});
+    }, {testOption: "foo"});
 
     // Instantiate a gyre
-    const simpleGyre1 = GyreJS.instantiateGyre("simple");
+    const simpleGyre1 = GyreJS.createGyre({
+      id: "simple-2"
+    });
+
+    // Add gyre to debugger
+    const gyreDebugger = new GDebugger();
+    gyreDebugger.watchGyre(simpleGyre);
+    gyreDebugger.watchGyre(simpleGyre1);
 
     // Test double commands, events, aggregates and projections protection.
     simpleGyre.addCommands(commands);
@@ -286,7 +292,7 @@ describe("GyreJS", function() {
     expect(projectionState).to.deep.equal({count: 3});
 
     // Debug instance tests
-    const gyreList = Object.keys(debugInstance.getGyres());
+    const gyreList = Object.keys(gyreDebugger.getGyres());
     const simpleGyreId = gyreList[0];
     expect(gyreList).to.deep.equal(["simple-1", "simple-2"]);
 
@@ -304,9 +310,5 @@ describe("GyreJS", function() {
     // Remove projections; should work now since listeners have been removed.
     expect(simpleGyre.removeProjection("test1")).to.equal(true);
     expect(simpleGyre.removeProjection("counter")).to.equal(false);
-
-    // Unregister existing and non-existing gyres.
-    expect(GyreJS.unRegisterGyre("simple")).to.equal(true);
-    expect(GyreJS.unRegisterGyre("simple1")).to.equal(false);
   });
 });

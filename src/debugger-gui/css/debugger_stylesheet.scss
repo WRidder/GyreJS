@@ -8,7 +8,7 @@ div.main {
 $menu-background: #333;
 
 nav {
-  padding: 5px 0px 0px 24px;
+  padding: 5px 0px 0px 1rem;
 }
 
 .title-bar {
@@ -105,5 +105,32 @@ nav {
 // TODO: use css flex to set container below header to fill height.
 iframe.iframe-docs {
   width: 100%;
-  height:100%;
+  flex: 1;
+}
+
+// Container
+div.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+// Container
+div.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+// Menu css
+.menu-text {
+  padding: 0;
+}
+
+.top-bar {
+  padding: 0;
+}
+
+div.route-view {
+  padding: 0 1rem;
 }

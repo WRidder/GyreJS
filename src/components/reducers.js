@@ -16,7 +16,7 @@ const applyEvent = (reducer) => {
   return (state, evt) => {
     // Reset returns the initial value of the reducer.
     if (evt.type === "__RESET__") {
-      return initialValue();
+      return initialValue(reducer);
     }
 
     // If there is a direct match between the event type and specified events; use that.

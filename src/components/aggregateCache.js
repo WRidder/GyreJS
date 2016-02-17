@@ -8,8 +8,9 @@ const AggregateCache = (_internal, {cacheSize = 5}) => {
 
   const addAggregate = (id, aggregateDefinition, replace) => {
     if (!Object.prototype.hasOwnProperty.call(_aggregates, id) || replace) {
-      aggregateDefinition.reducer = Reducer(aggregateDefinition.reducer);
-      _aggregates[id] = Aggregate(_internal, aggregateDefinition);
+      const aggDef = Object.assign({}, aggregateDefinition);
+      aggDef.reducer = Reducer(aggregateDefinition.reducer);
+      _aggregates[id] = Aggregate(_internal, aggDef);
     }
     else {
       console.warn(`>> GyreJS-gyre: addAggregate -> Aggregate with id: '${id}' already exists.`); // eslint-disable-line no-console

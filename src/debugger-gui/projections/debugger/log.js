@@ -1,14 +1,13 @@
-import {observable} from "mobservable";
-
 module.exports = {
-  initialState: () => observable({ log: []}),
+  initialState: () => ({log: []}),
   events: {
-    "gyreInstantiated": (state, event) => {
-      state.log.push({
+/*    "gyreInstantiated": (state, event) => {
+      state.log = [...state.log, {
         time: Date.now(),
         msg: event.type
-      });
-    },/*
+      }];
+      return state;
+    },*//*
     "commandAdded": (state, event) => {
       state.log.push({
         time: Date.now(),
@@ -16,13 +15,13 @@ module.exports = {
       });
     },*/
     "eventTriggered": (state, event) => {
-      console.log()
-      state.log.push({
+      state.log = [...state.log, {
         gId: event.gId,
-        time: Date.now(),
+        time: event._t,
         msg: event.type,
         payload: event.args
-      });
+      }];
+      return state;
     }
   }
 };

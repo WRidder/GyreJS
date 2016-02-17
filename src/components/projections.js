@@ -18,10 +18,8 @@ const projectionFactory = (_internal, reducer, notifyStateUpdate) => {
    * @returns {*} state Current state
    */
   const setNewState = (newState) => {
-    if (state !== newState && newState !== void(0)) {
-      state = newState;
-      notifyStateUpdate();
-    }
+    state = newState;
+    notifyStateUpdate();
   };
 
   // Public methods
@@ -41,7 +39,7 @@ const projectionFactory = (_internal, reducer, notifyStateUpdate) => {
    */
   const destroy = ((removeProjectionFromBus) => () => {
     return removeProjectionFromBus() && true;
-  })(_internal.bus.addProjection(update));
+  })(_internal.bus.addProjection(update, true));
 
   return {
     destroy,

@@ -1,4 +1,5 @@
 const path = require("path");
+const webpack = require("webpack");
 
 module.exports = {
   entry: path.join(__dirname, "./example/index.js"),
@@ -8,6 +9,11 @@ module.exports = {
     publicPath: "/static/"
   },
   devtool: "source-map",
+  plugins: [
+    new webpack.ProvidePlugin({
+      React: "react"
+    })
+  ],
   module: {
     loaders: [
       { test: /\.js$/, loaders: ["babel-loader"], exclude: /node_modules/ },

@@ -1,4 +1,4 @@
-const GyreJS = require("../src/").init();
+const GyreJS = require("../src/");
 import GyreDebugger from "../src/debugger";
 import GyreDebuggerGUI from "../src/debugger-gui";
 
@@ -95,24 +95,81 @@ const projections = {
   }
 };
 
-// Create and register gyre factory
-GyreJS.createGyre("simple", {
-  commands,
-  events,
-  aggregates,
-  projections,
-  ticker: "synchronous"
-});
-
 module.exports = () => {
   // Add debugger
-  const debuggerInstance = GyreJS.attachDebugger(GyreDebugger);
-
-  // Debugger GUI
-  const debuggerGUI = GyreDebuggerGUI(debuggerInstance);
-  debuggerGUI.init();
-  console.log("hi!");
+  const debuggerInstance = new GyreDebugger();
 
   // Create gyre instance
-  return GyreJS.instantiateGyre("simple");
+  const gyre = GyreJS.createGyre({
+    id: "simple",
+    commands,
+    events,
+    aggregates,
+    projections,
+    ticker: "synchronous"
+  });
+
+  const gyre1 = GyreJS.createGyre({
+    id: "simple-1",
+    commands,
+    events,
+    aggregates,
+    projections,
+    ticker: "synchronous"
+  });
+
+  const gyre2 = GyreJS.createGyre({
+    commands,
+    events,
+    aggregates,
+    projections,
+    ticker: "synchronous"
+  });
+
+  const gyre3 = GyreJS.createGyre({
+    commands,
+    events,
+    aggregates,
+    projections,
+    ticker: "synchronous"
+  });
+
+  const gyre4 = GyreJS.createGyre({
+    commands,
+    events,
+    aggregates,
+    projections,
+    ticker: "synchronous"
+  });
+
+  const gyre5 = GyreJS.createGyre({
+    commands,
+    events,
+    aggregates,
+    projections,
+    ticker: "synchronous"
+  });
+
+  const gyre6 = GyreJS.createGyre({
+    commands,
+    events,
+    aggregates,
+    projections,
+    ticker: "synchronous"
+  });
+
+  // Watch gyre
+  debuggerInstance.watchGyre(gyre);
+  debuggerInstance.watchGyre(gyre1);
+  debuggerInstance.watchGyre(gyre2);
+  debuggerInstance.watchGyre(gyre3);
+  debuggerInstance.watchGyre(gyre4);
+  debuggerInstance.watchGyre(gyre5);
+  debuggerInstance.watchGyre(gyre6);
+
+  // Debugger GUI
+  const debuggerGUI = new GyreDebuggerGUI(debuggerInstance);
+  debuggerGUI.show();
+
+  return gyre;
 };

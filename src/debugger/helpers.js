@@ -1,4 +1,4 @@
-const methodWrapper = (gyreId, api, mEvents) => {
+export const methodWrapper = (gyreId, api, mEvents) => {
   const originalAPI = api;
   return Object.keys(originalAPI).reduce((methods, apiMethod) => {
     methods[apiMethod] = (...args) => {
@@ -22,19 +22,4 @@ const methodWrapper = (gyreId, api, mEvents) => {
     };
     return methods;
   }, {});
-};
-
-const wrapGyreJSLibrary = (API, gDebugger) => {
-  const origInstantiateGyre = API.instantiateGyre;
-  API.instantiateGyre = (id, options = {}) => {
-    if (options.noDebug === true) {
-      return origInstantiateGyre(id, options);
-    }
-    return gDebugger.addInstantiatedGyre(origInstantiateGyre(id, options));
-  };
-};
-
-module.exports = {
-  methodWrapper,
-  wrapGyreJSLibrary
 };
