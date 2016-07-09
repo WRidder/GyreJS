@@ -58,3 +58,6 @@ DDD, CQRS, event sourcing, RX, Redux, GraphQL/Relay, Falcor, materialized views.
 ## Gyre?
 [Gyre](https://en.wikipedia.org/wiki/Ocean_gyre) = vortex. A wink to unidirectional data flow.  
 ![Oceanic Gyre](https://upload.wikimedia.org/wikipedia/commons/8/8a/Oceanic_gyres.png)
+
+## Crude roadmap
+- The debugger functionality will eventually be split up into a separate project
