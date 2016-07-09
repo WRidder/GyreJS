@@ -22,6 +22,15 @@ module.exports = {
         payload: event.args
       }];
       return state;
+    },
+    "commandIssued": (state, event) => {
+      state.log = [...state.log, {
+        gId: event.gId,
+        time: event._t,
+        msg: event.type,
+        payload: event.args
+      }];
+      return state;
     }
   }
 };

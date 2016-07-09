@@ -21,6 +21,11 @@ module.exports = function() {
       "**/*.js": file => require("babel-core").transform(file.content, {sourceMap: true, presets: ["es2015"]})
     },
 
-    testFramework: "mocha"
+    testFramework: "mocha",
+
+    setup: function (wallaby) {
+      var fetch = require("node-fetch");
+      global.fetch = fetch;
+    }
   };
 };

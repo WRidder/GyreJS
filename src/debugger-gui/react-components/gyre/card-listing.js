@@ -1,5 +1,5 @@
 import HoC from "../hoc";
-import {GyreLink} from "../common/link-gyre";
+import GyreLink from "../common/link-gyre";
 
 export default HoC("debugger", "gyreList", (props) => {
   const {gyreList, nrTriggered} = props.data;
@@ -9,7 +9,7 @@ export default HoC("debugger", "gyreList", (props) => {
         {gyreList.map((gyre) => (
           <div className="column small-4 medium-3 large-2" key={gyre.gId}>
             <div className="callout success">
-              <h5><GyreLink id={gyre.gId}/></h5>
+              <span className="gyre-header"><GyreLink id={gyre.gId} /></span>
               <div className="callout">
                 <strong>Details</strong>
                 <li>25 commands</li>

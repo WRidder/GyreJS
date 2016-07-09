@@ -1,15 +1,19 @@
 import Reducer from "./reducers";
 import Projection from "./projections";
 
-module.exports = (_internal) => {
+const ListenerHandler = (_internal) => {
   const listeners = (() => {
     const list = {};
 
     return {
-      get: id => (!list.hasOwnProperty(id)) ? (list[id] = []) && list[id] : list[id]
+      get: id => (!list.hasOwnProperty(id)) ? (list[id] = []) && list[id] : list[id],
+      getAll: () => list
     };
   })();
   const projections = {};
+
+  _internal.getProjections = () => projections;
+  _internal.getListeners = () => listeners.getAll();
 
   /**
    * Send update to all registered selectors.
@@ -18,11 +22,9 @@ module.exports = (_internal) => {
    * @param {Function} [cb] Specific callback to solely invoke.
    * @returns {Function} sendUpdate function for a namespace.
    */
-  const sendUpdate = (id, cb) => {
-    return cb
+  const sendUpdate = (id, cb) => cb
       ? cb(projections[id].getState())
       : listeners.get(id).forEach(listener => listener(projections[id].getState()));
-  };
 
   /**
    *
@@ -32,13 +34,15 @@ module.exports = (_internal) => {
     // TODO: check for function or object. If object, should have initial state and events properties.
     if (!Object.prototype.hasOwnProperty.call(projections, id) || replace) {
       projections[id] = Projection(_internal, Reducer(reducer), () => {
-        sendUpdate(id);
+        _internal.listenerHandler.sendUpdate(id);
       });
     }
     else {
       console.warn(`>> GyreJS-gyre: addProjection -> Projection with id: '${id}' already exists.`); // eslint-disable-line no-console
     }
   };
+
+  const getProjection = (id) => projections[id];
 
   /**
    *
@@ -98,7 +102,10 @@ module.exports = (_internal) => {
   return {
     addListener,
     addProjection,
+    getProjection,
     removeProjection,
     sendUpdate
   };
 };
+
+export default ListenerHandler;

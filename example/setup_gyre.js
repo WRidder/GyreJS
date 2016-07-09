@@ -6,17 +6,17 @@ const aggregates = {
   "counter": {
     eventFilter: (event) => event.type === "incremented" || event.type === "decremented",
     methods: {
-      "increment": function(state, gyre, byValue) {
+      "increment": (state, gyre, byValue) => {
         gyre.trigger("incremented", state.count, state.count + byValue, byValue);
       },
-      "decrement": function(state, {trigger}, byValue) {
+      "decrement": (state, {trigger}, byValue) => {
         trigger("decremented", state.count, state.count - byValue, -1 * byValue);
       },
-      "incrementIfOdd": function(state, gyre, byValue) {
+      "incrementIfOdd": (state, gyre, byValue) => {
         if (state.count % 2 !== 0 && state.count !== 0) {
           gyre.trigger("incremented", state.count, state.count + byValue, byValue);
         }
-      },
+      }
     },
     reducer: (state = {count: 0}, event) => {
       switch (event.type) {
@@ -34,24 +34,40 @@ const aggregates = {
 
 // Commands
 const commands = {
-  "incrementCounter": function({getAggregate}, value) {
+  "incrementCounter": ({getAggregate}, value) => {
     getAggregate("counter")
       .increment(value);
   },
-  "incrementCounterIfOdd": function({getAggregate}, value) {
+  "incrementCounterIfOdd": ({getAggregate}, value) => {
     getAggregate("counter")
       .incrementIfOdd(value);
   },
-  "decrementCounter": function({getAggregate}, value) {
+  "decrementCounter": ({getAggregate}, value) => {
     getAggregate("counter")
       .decrement(value);
+  },
+  loadUsers({fetch}) {
+    console.log(">>> cmd loadUsers called"); // eslint-disable-line no-console
+
+    fetch("http://jsonplaceholder.typicode.com/users")
+      .then((response) => {
+        console.log(">>> fetch response!", response); // eslint-disable-line no-console
+        if (response.ok) {
+          return response.json();
+        }
+        return false;
+      })
+      .then((data) => {
+        console.log(">>> fetch data!", data); // eslint-disable-line no-console
+      });
   }
 };
 
 // Events (as obj or array?)
 const events = {
   "incremented": (oldValue, newValue, by) => ({oldValue, newValue, by}),
-  "decremented": ["oldValue", "newValue", "by"]
+  "decremented": ["oldValue", "newValue", "by"],
+  "usersLoaded": ["users"]
 };
 
 const projections = {
@@ -134,42 +150,15 @@ module.exports = () => {
     ticker: "synchronous"
   });
 
-  const gyre4 = GyreJS.createGyre({
-    commands,
-    events,
-    aggregates,
-    projections,
-    ticker: "synchronous"
-  });
-
-  const gyre5 = GyreJS.createGyre({
-    commands,
-    events,
-    aggregates,
-    projections,
-    ticker: "synchronous"
-  });
-
-  const gyre6 = GyreJS.createGyre({
-    commands,
-    events,
-    aggregates,
-    projections,
-    ticker: "synchronous"
-  });
-
   // Watch gyre
-  debuggerInstance.watchGyre(gyre);
+  const watchedGyre = debuggerInstance.watchGyre(gyre);
   debuggerInstance.watchGyre(gyre1);
   debuggerInstance.watchGyre(gyre2);
   debuggerInstance.watchGyre(gyre3);
-  debuggerInstance.watchGyre(gyre4);
-  debuggerInstance.watchGyre(gyre5);
-  debuggerInstance.watchGyre(gyre6);
 
   // Debugger GUI
   const debuggerGUI = new GyreDebuggerGUI(debuggerInstance);
   debuggerGUI.show();
 
-  return gyre;
+  return watchedGyre;
 };

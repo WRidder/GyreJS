@@ -1,7 +1,3 @@
-export default React.createClass({
-  render: function() {
-    return (
-      <div>Gyre summary</div>
-    );
-  }
-});
+export default () => (
+  <div>Gyre summary</div>
+);

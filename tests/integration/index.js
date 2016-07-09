@@ -1,11 +1,12 @@
+/* eslint-disable no-console */
 import GyreJS from "../../src/index";
 const expect = require("chai").expect;
 import Immutable from "immutable";
 import GDebugger from "../../src/debugger";
 import {observable} from "mobservable";
 
-describe("GyreJS", function() {
-  it("can create a new gyre", function() {
+describe("GyreJS", () => {
+  it("can create a new gyre", () => {
     // Aggregate business rule:
     // can't count below 0 and above 5
     const aggMethodCalls = [];
@@ -15,7 +16,7 @@ describe("GyreJS", function() {
         // eventFilter: (event) => ["incremented", "decremented"].indexOf(event.type) !== -1,
         eventFilter: ["incremented", "decremented"],
         methods: {
-          "increment": function(state, gyre, byValue) {
+          "increment": (state, gyre, byValue) => {
             aggMethodCalls.push(["i", byValue, state]);
             aggStates.push(state);
             if (
@@ -24,7 +25,7 @@ describe("GyreJS", function() {
               gyre.trigger("incremented", state.count, state.count + byValue, byValue);
             }
           },
-          "decrement": function(state, gyre, byValue) {
+          "decrement": (state, gyre, byValue) => {
             aggMethodCalls.push(["d", byValue, state]);
             aggStates.push(state);
             if (state.count - byValue >= 0) {
@@ -48,14 +49,14 @@ describe("GyreJS", function() {
 
     // Commands
     const commands = {
-      "incrementCounter": function(gyre, value) {
+      "incrementCounter": (gyre, value) => {
         // gyre.getAggregate
         // gyre.issue
         // gyre.trigger
         gyre.getAggregate("counter")
           .increment(value);
       },
-      "decrementCounter": function(gyre, value) {
+      "decrementCounter": (gyre, value) => {
         gyre.getAggregate("counter")
           .decrement(value);
       },
@@ -154,7 +155,7 @@ describe("GyreJS", function() {
           // Add a prop
           event.someprop = 1;
         }
-        catch(e) {
+        catch (e) {
           expect(e.message).to.equal("Can't add property someprop, object is not extensible");
         }
 
@@ -162,8 +163,8 @@ describe("GyreJS", function() {
           // Alter a prop
           event.type = "notrighttype";
         }
-        catch(e) {
-          expect(e.message).to.equal("Cannot assign to read only property \'type\' of #<Object>");
+        catch (e) {
+          expect(e.message.indexOf("Cannot assign to read only property")).to.equal(0);
         }
 
         switch (event.type) {
@@ -209,15 +210,15 @@ describe("GyreJS", function() {
       stateArray.push(state);
     });
 
-    let test1_immutable_state;
-    const test1_immutable = simpleGyre.addListener("test1_immutable", (state) => {
-      test1_immutable_state = state;
+    let test1ImmutableState;
+    simpleGyre.addListener("test1_immutable", (state) => {
+      test1ImmutableState = state;
     });
 
-    let test1_number_state;
-    let test1States = [];
-    const test1_number = simpleGyre.addListener("test1_number", (state) => {
-      test1_number_state = state;
+    let test1NumberState;
+    const test1States = [];
+    simpleGyre.addListener("test1_number", (state) => {
+      test1NumberState = state;
       test1States.push(state);
     });
 
@@ -231,16 +232,16 @@ describe("GyreJS", function() {
       test3state = state;
 
       // test overriding state
-      state = { test: "foo"};
+      state = {test: "foo"};
     });
 
-    let test3state_2;
-    const test3L_2 = simpleGyre.addListener("test3", (state) => {
-      test3state_2 = state;
+    let test3state2;
+    const test3L2 = simpleGyre.addListener("test3", (state) => {
+      test3state2 = state;
     });
 
     let test4observable;
-    const test4_observable = simpleGyre.addListener("test4_observable", (state) => {
+    simpleGyre.addListener("test4_observable", (state) => {
       if (!test4observable) {
         test4observable = state;
       }
@@ -273,34 +274,32 @@ describe("GyreJS", function() {
     console.log(test1States);
 
     expect(stateArray.length).to.equal(8);
-    expect(Immutable.is(test1_immutable_state, Immutable.Map({count: 5}))).to.equal(true);
-    expect(test1_number_state).to.equal(5);
-    expect(test2state).to.deep.equal({ evtCount: 7, dCount: 3, iCount: 4 });
-    expect(test3state).to.deep.equal({ absDistance: 13});
-    expect(test3state_2).to.deep.equal({ absDistance: 13});
+    expect(Immutable.is(test1ImmutableState, Immutable.Map({count: 5}))).to.equal(true);
+    expect(test1NumberState).to.equal(5);
+    expect(test2state).to.deep.equal({evtCount: 7, dCount: 3, iCount: 4});
+    expect(test3state).to.deep.equal({absDistance: 13});
+    expect(test3state2).to.deep.equal({absDistance: 13});
 
     // Test projection
     const evts = [
-      { type: "incremented", oldValue: 0, newValue: 2, by: 2},
-      { type: "incremented", oldValue: 2, newValue: 4, by: 2},
-      { type: "decremented", oldValue: 4, newValue: 3, by: -1}
+      {type: "incremented", oldValue: 0, newValue: 2, by: 2},
+      {type: "incremented", oldValue: 2, newValue: 4, by: 2},
+      {type: "decremented", oldValue: 4, newValue: 3, by: -1}
     ];
 
-    const projectionState = evts.reduce((prevState, evt) => {
-      return projections["test1"](prevState, evt);
-    }, void(0));
+    const projectionState = evts.reduce((prevState, evt) =>
+      projections.test1(prevState, evt), void(0));
     expect(projectionState).to.deep.equal({count: 3});
 
     // Debug instance tests
     const gyreList = Object.keys(gyreDebugger.getGyres());
-    const simpleGyreId = gyreList[0];
     expect(gyreList).to.deep.equal(["simple-1", "simple-2"]);
 
     // Cleanup listeners
     test1L();
     test2L();
     test3L();
-    test3L_2();
+    test3L2();
 
     // Manually trigger an event again
     simpleGyre

@@ -4,9 +4,8 @@ import attachDependencies from "./dependencies";
 import Routes from "../react-components/routes";
 import gyreDebuggerSetup from "./debugger";
 import gyreLocalSetup from "./local";
-import GyreJS from "../../index";
 
-export const GyreDebuggerGUI = function(GyreDebugger) {
+export const GyreDebuggerGUI = function (GyreDebugger) {
   const self = this;
   this.gyreDebugger = gyreDebuggerSetup(GyreDebugger);
   this.localDebugger = gyreLocalSetup();
@@ -17,7 +16,7 @@ export const GyreDebuggerGUI = function(GyreDebugger) {
   });
 };
 
-GyreDebuggerGUI.prototype.show = function() {
+GyreDebuggerGUI.prototype.show = function () {
   // Create window
   const windowObjectReference = createPopup();
 
@@ -34,7 +33,7 @@ GyreDebuggerGUI.prototype.show = function() {
 
   // Render app
   ReactDOM.render(
-    Routes(this.gyreDebugger, this.localDebugger),
+    Routes(this.gyreDebugger, this.localDebugger, windowObjectReference),
     mainDiv
   );
 };

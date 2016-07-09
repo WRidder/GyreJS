@@ -1,4 +1,10 @@
 import {Link} from "react-router";
-export const GyreLink = (props) => (
-  <Link to={`/gyre/${props.id}`}>{props.id}</Link>
-);
+
+export default function GyreLink(props) {
+  return (
+    <Link to={`/gyre/${props.id}`}>{props.id}</Link>
+  );
+}
+GyreLink.propTypes = {
+  id: React.PropTypes.string.isRequired
+};

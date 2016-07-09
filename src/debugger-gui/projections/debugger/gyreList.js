@@ -4,14 +4,14 @@ module.exports = {
     nrTriggered: 0
   }),
   events: {
-    "gyreInstantiated": (state, event) => {
+    "gyreCreated": (state, event) => {
       state.gyreList = [...state.gyreList, {
         time: event._t,
         gId: event.gId
       }];
       return state;
     },
-    "eventTriggered": (state, event) => {
+    "eventTriggered": (state) => {
       state.nrTriggered++;
       return state;
     }

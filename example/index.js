@@ -29,6 +29,9 @@ var Container = React.createClass({
   handleDecrement: function() {
     simpleGyre.issue("decrementCounter", 1);
   },
+  handleLoadUsers: function() {
+    simpleGyre.issue("loadUsers");
+  },
   render: function() {
     var Component;
 
@@ -48,6 +51,9 @@ var Container = React.createClass({
           <button onClick={this.handleIncrementIfOdd}>
             Increment + 1 if odd
           </button>
+          <button onClick={this.handleLoadUsers}>
+            Load users
+          </button>
         </div>
       );
     }
@@ -65,6 +71,9 @@ var Container = React.createClass({
           </button>
           <button onClick={this.handleIncrementIfOdd}>
             Increment + 1 if odd
+          </button>
+          <button onClick={this.handleLoadUsers}>
+            Load users
           </button>
         </div>
       );

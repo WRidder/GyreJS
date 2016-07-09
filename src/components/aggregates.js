@@ -1,5 +1,5 @@
-const aggregateFactory = (_internal, {reducer, eventFilter, methods = {}}) => {
-  return (options) => {
+const aggregateFactory = (_internal, {reducer, eventFilter, methods = {}}) =>
+  (options) => {
     const API = {};
     let state = reducer.initialValue();
     let evtOffset = 0;
@@ -114,6 +114,5 @@ const aggregateFactory = (_internal, {reducer, eventFilter, methods = {}}) => {
 
     return API;
   };
-};
 
 export default aggregateFactory;

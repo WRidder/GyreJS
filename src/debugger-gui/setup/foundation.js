@@ -1,3 +1,3 @@
-setTimeout(function() {
+setTimeout(() => {
   $(document).foundation();
 }, 0);

@@ -2,7 +2,6 @@ const busFactory = () => {
   let newEvents = [];
   let eventList = [];
   const projections = [];
-  projections.ticker = (cb) => cb();
 
   /**
    * Send update to all registered selectors.
@@ -10,9 +9,7 @@ const busFactory = () => {
    * @param {Function} [cb] Specific callback to solely invoke.
    * @returns {Function} sendUpdate function for a namespace.
    */
-  const sendUpdate = (cb) => () => {
-    projections.updateRequested = false;
-
+  const sendUpdate = (cb) => {
     // After new evnets processed, concat to eventlist
     eventList = eventList.concat(newEvents);
 
@@ -26,19 +23,6 @@ const busFactory = () => {
         );
       });
       newEvents = [];
-    }
-  };
-
-  /**
-   * Request to issue update to filters of a given namespace.
-   *
-   * @param {Function} [cb] Specific callback to solely invoke.
-   * @returns {void}
-   */
-  const requestUpdate = (cb) => {
-    if (!projections.updateRequested) {
-      projections.updateRequested = true;
-      projections.ticker(sendUpdate(cb));
     }
   };
 
@@ -64,7 +48,7 @@ const busFactory = () => {
     projections.push(cb);
 
     if (playAll) {
-      requestUpdate(cb);
+      sendUpdate(cb);
     }
 
     // Return function to remove selector from store.
@@ -75,28 +59,12 @@ const busFactory = () => {
    * Triggers an event on the bus.
    *
    * @param {Object} evt Event.
-   * @returns {void}
+   * @returns {Object}
    */
   const trigger = (evt) => {
     newEvents.push(evt);
-    requestUpdate();
+    sendUpdate();
     return evt;
-  };
-
-  /**
-   * Set tick function
-   *
-   * The tick function is added as a property to the topology array.
-   *
-   * @param {Function} ticker Store update tick function.
-   * @returns {void}
-   */
-  const setTicker = (ticker) => {
-    if (typeof ticker !== "function") {
-      throw new Error("GyreJS (setTicker): Ticker should be a function.");
-    }
-
-    projections.ticker = ticker;
   };
 
   /**
@@ -107,7 +75,6 @@ const busFactory = () => {
   return {
     addProjection,
     getEvents,
-    setTicker,
     trigger
   };
 };

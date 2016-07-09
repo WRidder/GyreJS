@@ -5,9 +5,8 @@
  * @returns {{applyEvent, initialValue: Function}} Reducer API.
  */
 
-const initialValue = (reducer) => {
-  return typeof reducer === "function" ? reducer(void(0), {type: null}) : reducer.initialState();
-};
+const initialValue = (reducer) =>
+  typeof reducer === "function" ? reducer(void(0), {type: null}) : reducer.initialState();
 
 const applyEvent = (reducer) => {
   if (typeof reducer === "function") {
@@ -37,9 +36,7 @@ const applyEvent = (reducer) => {
   };
 };
 
-module.exports = (reducer) => {
-  return {
-    applyEvent: (...args) => applyEvent(reducer)(...args),
-    initialValue: () => initialValue(reducer)
-  };
-};
+module.exports = (reducer) => ({
+  applyEvent: (...args) => applyEvent(reducer)(...args),
+  initialValue: () => initialValue(reducer)
+});

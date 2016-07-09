@@ -4,19 +4,19 @@ import Command from "./commands";
 import Event from "./events";
 import ListenerHandler from "./listeners";
 import AggregateCache from "./aggregateCache";
-import tickers from "./tickers";
 import generateName from "sillyname";
+
 /**
  * Gyre Factory
  *
- * @param {Function} [ticker] Store update tick function.
+ * @param {String} [id] Gyre ID.
  * @param {Object} [commands] Commands object.
  * @param {Object} [events] Events object.
  * @param {Object} [aggregates] Aggregates object.
  * @param {Object} [projections] Projections object.
  * @returns {Function} Gyre factory function.
  */
-const gyreFactory = ({id, ticker = "synchronous", commands = {}, events = {}, aggregates = {}, projections = {}} = {}) =>
+const gyreFactory = ({id, commands = {}, events = {}, aggregates = {}, projections = {}} = {}) =>
   (options) => {
     // Private variables
     const API = {};
@@ -27,9 +27,12 @@ const gyreFactory = ({id, ticker = "synchronous", commands = {}, events = {}, ag
     const _internal = {};
     _internal.bus = Bus();
     _internal.dispatcher = Dispatcher(_internal, _commands, _events);
-    _internal.ListenerHandler = ListenerHandler(_internal);
+    _internal.listenerHandler = ListenerHandler(_internal);
     _internal.aggregateCache = AggregateCache(_internal, options.aggregateCache || {});
     _internal.id = id || generateName();
+    _internal.getCommands = () => _commands;
+    _internal.getEvents = () => _events;
+    _internal.fetch = fetch;
     const commandFactory = Command(_internal);
 
     // Public methods
@@ -37,12 +40,12 @@ const gyreFactory = ({id, ticker = "synchronous", commands = {}, events = {}, ag
      *
      * @type {Function}
      */
-    const addCommand = API.addCommand = (id, cFunction, replace) => {
-      if (!Object.prototype.hasOwnProperty.call(_commands, id) || replace) {
-        _commands[id] = commandFactory(cFunction, id);
+    const addCommand = (cId, cFunction, replace) => {
+      if (!Object.prototype.hasOwnProperty.call(_commands, cId) || replace) {
+        _commands[cId] = commandFactory(cFunction, cId);
       }
       else {
-        console.warn(`>> GyreJS-gyre: AddCommand -> Selector with id: '${id}' already exists.`); // eslint-disable-line no-console
+        console.warn(`>> GyreJS-gyre: AddCommand -> Selector with id: '${cId}' already exists.`); // eslint-disable-line no-console
       }
       return API;
     };
@@ -57,7 +60,7 @@ const gyreFactory = ({id, ticker = "synchronous", commands = {}, events = {}, ag
       }
 
       Object.keys(commandsObj).forEach(command => {
-        API.addCommand(command, commandsObj[command], replace);
+        addCommand(command, commandsObj[command], replace);
       });
       return API;
     };
@@ -66,12 +69,12 @@ const gyreFactory = ({id, ticker = "synchronous", commands = {}, events = {}, ag
      *
      * @type {Function}
      */
-    const addEvent = API.addEvent = (id, eFunction, replace) => {
-      if (!Object.prototype.hasOwnProperty.call(_events, id) || replace) {
-        _events[id] = Event(id, eFunction);
+    const addEvent = (eId, eFunction, replace) => {
+      if (!Object.prototype.hasOwnProperty.call(_events, eId) || replace) {
+        _events[eId] = Event(eId, eFunction);
       }
       else {
-        console.warn(`>> GyreJS-gyre: addEvent -> Selector with id: '${id}' already exists.`); // eslint-disable-line no-console
+        console.warn(`>> GyreJS-gyre: addEvent -> Selector with id: '${eId}' already exists.`); // eslint-disable-line no-console
       }
       return API;
     };
@@ -86,7 +89,7 @@ const gyreFactory = ({id, ticker = "synchronous", commands = {}, events = {}, ag
       }
 
       Object.keys(eventsObj).forEach(event => {
-        API.addEvent(event, eventsObj[event], replace);
+        addEvent(event, eventsObj[event], replace);
       });
       return API;
     };
@@ -95,7 +98,7 @@ const gyreFactory = ({id, ticker = "synchronous", commands = {}, events = {}, ag
      *
      * @type {Function}
      */
-    const addAggregate = API.addAggregate = (...args) => {
+    const addAggregate = (...args) => {
       _internal.aggregateCache.addAggregate(...args);
       return API;
     };
@@ -104,13 +107,16 @@ const gyreFactory = ({id, ticker = "synchronous", commands = {}, events = {}, ag
      *
      * @type {Function}
      */
-    const addAggregates = API.addAggregates = (_aggregatesObj, replace) => {
-      if (typeof _aggregatesObj !== "object") {
+    const addAggregates = API.addAggregates = (aggregatesObj, replace) => {
+      if (typeof aggregatesObj !== "object") {
         throw new Error("GyreJS (addEvents): first argument (selectors) should be an object.");
       }
 
-      Object.keys(_aggregatesObj).forEach(id => {
-        API.addAggregate(id, _aggregatesObj[id], replace);
+      Object.keys(aggregatesObj).forEach(aId => {
+        if (!aggregatesObj[aId].name) {
+          aggregatesObj[aId].name = aId;
+        }
+        addAggregate(aId, aggregatesObj[aId], replace);
       });
       return API;
     };
@@ -119,7 +125,7 @@ const gyreFactory = ({id, ticker = "synchronous", commands = {}, events = {}, ag
      *
      * @type {Function}
      */
-    const addProjection = API.addProjection = (...args) => _internal.ListenerHandler.addProjection(...args) && API;
+    const addProjection = (...args) => _internal.listenerHandler.addProjection(...args) && API;
 
     /**
      *
@@ -130,8 +136,11 @@ const gyreFactory = ({id, ticker = "synchronous", commands = {}, events = {}, ag
         throw new Error("GyreJS (addProjections): first argument should be an object.");
       }
 
-      Object.keys(projectionsObj).forEach(id => {
-        API.addProjection(id, projectionsObj[id], replace);
+      Object.keys(projectionsObj).forEach(pId => {
+        if (!projectionsObj[pId].name) {
+          projectionsObj[pId].name = pId;
+        }
+        addProjection(pId, projectionsObj[pId], replace);
       });
       return API;
     };
@@ -140,17 +149,16 @@ const gyreFactory = ({id, ticker = "synchronous", commands = {}, events = {}, ag
      *
      * @type {Function}
      */
-    const removeProjection = API.removeProjection = (id) => {
-      return _internal.ListenerHandler.removeProjection(id);
-    };
+    const removeProjection = API.removeProjection = (pId) =>
+      _internal.listenerHandler.removeProjection(pId);
 
     /**
      *
-     * @param id
+     * @param lId
      * @param callback
      * @returns {Function}
      */
-    const addListener = (id, callback) => _internal.ListenerHandler.addListener(id, callback);
+    const addListener = (lId, callback) => _internal.listenerHandler.addListener(lId, callback);
 
     /**
      * Issue a registered command.
@@ -179,17 +187,12 @@ const gyreFactory = ({id, ticker = "synchronous", commands = {}, events = {}, ag
     addEvents(events);
     addAggregates(aggregates);
     addProjections(projections);
-    _internal.bus.setTicker(tickers.get(ticker));
 
     // Gyre API
     Object.assign(API, {
-      addCommand,
       addCommands,
-      addEvent,
       addEvents,
-      addAggregate,
       addAggregates,
-      addProjection,
       addProjections,
       removeProjection,
       addListener,

@@ -16,6 +16,7 @@ const dispatcherFactory = (_internal, commands, events) => {
       return false;
     }
     commands[cmdId](...args);
+    return true;
   };
 
   const getEventInstance = (evtId, ...args) => {

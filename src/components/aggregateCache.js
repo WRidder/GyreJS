@@ -3,14 +3,16 @@ import Reducer from "./reducers";
 const isEqual = require("lodash.isequal");
 
 const AggregateCache = (_internal, {cacheSize = 5}) => {
-  const _aggregates = {};
+  const aggregates = {};
   const cache = {};
 
+  _internal.getAggregates = () => aggregates;
+
   const addAggregate = (id, aggregateDefinition, replace) => {
-    if (!Object.prototype.hasOwnProperty.call(_aggregates, id) || replace) {
+    if (!Object.prototype.hasOwnProperty.call(aggregates, id) || replace) {
       const aggDef = Object.assign({}, aggregateDefinition);
       aggDef.reducer = Reducer(aggregateDefinition.reducer);
-      _aggregates[id] = Aggregate(_internal, aggDef);
+      aggregates[id] = Aggregate(_internal, aggDef);
     }
     else {
       console.warn(`>> GyreJS-gyre: addAggregate -> Aggregate with id: '${id}' already exists.`); // eslint-disable-line no-console
@@ -19,7 +21,7 @@ const AggregateCache = (_internal, {cacheSize = 5}) => {
 
   const getAggregate = (id, options = {}) => {
     // Check if aggregate factory exists
-    if (!Object.prototype.hasOwnProperty.call(_aggregates, id)) {
+    if (!Object.prototype.hasOwnProperty.call(aggregates, id)) {
       return null;
     }
 
@@ -44,7 +46,7 @@ const AggregateCache = (_internal, {cacheSize = 5}) => {
     }
 
     // Not in cache, instantiate aggregate
-    const aggregate = _aggregates[id](options);
+    const aggregate = aggregates[id](options);
 
     // If no cache exists already for this type of aggregate, create it.
     if (!Object.prototype.hasOwnProperty.call(cache, id)) {

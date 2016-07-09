@@ -2,9 +2,11 @@
  * Create commands and events
  * @param {Object} aggregateCache Object containing the aggregates.
  * @param {Object} dispatcher Dispatcher instance.
+ * @param {Function} fetch Fetch instance.
  * @returns {Function} Command factory function.
  */
-const commandFactory = ({dispatcher, aggregateCache}) => {
+const commandFactory = (_internal) => {
+  const {aggregateCache, dispatcher} = _internal;
   const {getAggregate} = aggregateCache;
 
   /**
@@ -33,13 +35,15 @@ const commandFactory = ({dispatcher, aggregateCache}) => {
       };
     }
 
-    return (...args) => {
-      return func.apply(null, [{
+    return (...args) =>
+      func.apply(null, [{
         getAggregate,
         issue: dispatcher.issueCommand,
-        trigger: dispatcher.triggerEvent
+        trigger: dispatcher.triggerEvent,
+        fetch: _internal.fetch || (() => {
+          throw new Error("GyreJS: Fetch not defined globally. You may need a polyfill if you'd like to call fetch from the command handlers.");
+        })
       }, ...args]);
-    };
   };
 };
 

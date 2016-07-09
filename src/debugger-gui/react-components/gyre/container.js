@@ -1,7 +1,6 @@
-export default React.createClass({
-  render: function() {
-    return (
-      <div className="route-view">Gyre main! {this.props.children}</div>
-    );
-  }
-});
+import {Tabs} from "./tabs";
+export default () => (
+  <div className="route-view">
+    <Tabs />
+  </div>
+);
