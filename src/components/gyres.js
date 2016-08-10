@@ -25,7 +25,7 @@ const gyreFactory = ({id, commands = {}, events = {}, aggregates = {}, projectio
 
     // Gyre internal instances
     const _internal = {};
-    _internal.bus = Bus();
+    _internal.bus = Bus(options.volatile || false);
     _internal.dispatcher = Dispatcher(_internal, _commands, _events);
     _internal.listenerHandler = ListenerHandler(_internal);
     _internal.aggregateCache = AggregateCache(_internal, options.aggregateCache || {});

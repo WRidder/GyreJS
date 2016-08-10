@@ -1,4 +1,4 @@
-const busFactory = () => {
+const busFactory = ({volatile}) => {
   let newEvents = [];
   let eventList = [];
   const projections = [];
@@ -62,7 +62,9 @@ const busFactory = () => {
    * @returns {Object}
    */
   const trigger = (evt) => {
-    newEvents.push(evt);
+    if (!volatile) {
+      newEvents.push(evt);
+    }
     sendUpdate();
     return evt;
   };
