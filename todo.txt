@@ -1,0 +1,97 @@
+- Add input checking for addCommand, addProjection etc
+- hmr support
+-- example https://github.com/rackt/redux/blob/master/examples/todomvc/store/configureStore.js
+- Cleanup main API (register, create, unregisterGyre, etc)
+- Cleanup tests
+- reducers are allowed to match events using a regex.
+- Saga vs aggregates
+-- http://programmers.stackexchange.com/questions/157323/ddd-saga-event-sourcing-can-a-compensate-action-simply-be-a-delete-on-the-ev
+
+- Enable manual cleanup of events in bus:
+-- by type, time (filter function over event array)
+
+- Add design document, outline choices.
+
+Debugger
+- Edit command/event payload
+-- recalculate from there
+- dispatch command/event
+-- use Function.length to determine number of arguments.
+- History slider
+- Trace graphs
+-- Timing, payloads, diffs
+- event charts
+- error indication on commands/events (try/catch and rethrow error to prevent swallowing)
+- show commands/events, aggregates, bus (size, events), projections
+- Wrap fetch api to show outgoing calls (timing, response)
+- Seperate gdebugger core and gui
+- Gyres overview
+- Event/(command?) playback, replay, change
+- traces (command -> projection)
+- gyre event/history log
+- potion to display inline with button to go to window. like chrome ddebugger)
+- in replay mode, prevent generation of new events?
+- gyre overview: show in 'standard layout' style.
+-- e.g. first commands, then events, aggregates, event log, etc
+-- as a diagram
+- chrome debug console style docking. allow modal for quick views of log.
+-- remove dock from page if itś in window.
+-- in modal: slightly different ui. use single select to switch between gyres.
+-- use iframes for modal and dock (easier styling)
+-- in dock: show nr of events/commands and errors/warnings.
+--- use multiselect to enable/disable notifications of gyres.
+- async call stack: http://www.html5rocks.com/en/tutorials/developertools/async-call-stack/
+
+CQRS style:
+
+Features:
+- Full history / replayability
+- capture user intent
+- single source of truth
+- smart emit using tickers to prevent rendering until event is finished
+- Web worker support if available? *use blob instead of external file)
+-- Run entire thing in separate thread? Except for listeners
+--- maybe only the topologies/projections
+--- http://stackoverflow.com/questions/10343913/how-to-create-a-web-worker-from-a-string
+--- https://coderwall.com/p/5te2lg/web-workers-for-beginners-and-without-external-files
+--- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/toString
+--- NO WEB WORKER SUPPORT, NOT WORTH IT.
+
+Examples
+- Mobservable
+- RX/kefir
+-- http://stackoverflow.com/questions/30249010/kefir-js-how-to-stream-events-from-a-callback-function
+-- rx: fromcallback
+- Falcor? (model may be the store. on other hand, replay wont be reliable then. Maybe model should generate events)
+- examples on how to deal with reducers. e.g. https://www.reddit.com/r/reactjs/comments/4t8aoa/redux_any_reason_to_user_switch_instead_of_lookup/
+- debugging tips (e.g. async call stacks in chrome debugger)
+
+Guide
+- Where to do command input validation?
+-- In command handler; not in aggregate (i suppose)
+-- Advise: only do it in development mode?
+- Add bunch of patterns (login, fetching data, navigation, etc)
+
+Done:
+- X Enable/disable debugging of specific gyre through option
+- X Allow projections to use any data type desirable (immutable, numbers, etc)
+- X Combine aggregate and projection reducers to single reducer object with fixed interface
+- X commands, events, 'bus', computed views (stores),
+- X event bus namespace
+- X event namespace per gyre (set a default)
+- x aggregate caches
+
+Challenges:
+- How to deal with large sets of data. If stored in evt bus, quickly fails.
+-- think about @Fortes, how'd that work?
+--- possible solution: resolvable data.. just pass object that fetches data on demand in projections/aggregates.
+--- warn if browser doesnt cache response of server serves uncachable responses.
+--- this prvents (large) datasets in eventlog
+--- gyre could cache x-items (configurabe per fetch as well?)
+--- think about suitable name.. fetchable?
+--- how to deal with the promises/resolvables needed?
+--- set flag on event indicating it has promise
+--- warn if multiple fetches resolves different data (checksum/hash?)
+--- wrap fetch such that 'let fetchable = fetch("./url...")'
+--- make sure to clear fetchcache entry if events are removed
+--- fetchables could also manage multiple calls to it (take note if call is alread made)

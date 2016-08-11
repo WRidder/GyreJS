@@ -1,0 +1,47 @@
+{
+  "extends": "airbnb",
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
+  "globals": {
+    "React": true,
+    "it": true,
+    "describe": true,
+    "$": true
+  },
+  "settings": {
+    "react": {
+      "pragma": "React",  // Pragma to use, default to "React"
+      "version": "15.0" // React version, default to the latest React stable release
+    }
+  },
+  "rules": {
+    "valid-jsdoc": 1,
+    "quotes": [
+      2,
+      "double"
+    ],
+    "new-cap": 0,
+    "brace-style": [2, "stroustrup", { "allowSingleLine": false }],
+    "id-length": [2, {"min": 1, "properties": "never"}],
+    "no-param-reassign": 0,
+    "no-console": 2,
+    "object-curly-spacing": ["error", "never"],
+
+    // Disable until Flow supports let and const
+    "no-var": 0,
+    "vars-on-top": 0,
+
+    // Disable comma-dangle unless need to support it
+    "comma-dangle": 0,
+    "no-underscore-dangle": [0, { "allow": ["foo_", "_bar"] }],
+    "max-len": [0, 120],
+    "no-confusing-arrow": 0,
+    "quote-props": 0,
+    "react/prefer-es6-class": 1,
+    "import/no-unresolved": 1
+  },
+  "root": true
+}

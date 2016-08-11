@@ -1,0 +1,147 @@
+// for presentation only
+body {marging-top: 2rem;}
+
+div.main {
+  padding: 0px 24px;
+}
+
+$menu-background: #333;
+
+nav {
+  padding: 5px 0px 0px 1rem;
+}
+
+.title-bar {
+  background: $menu-background;
+  padding: 0.9rem;
+}
+
+.top-bar {
+  background: $menu-background;
+
+  ul {
+    background: $menu-background;
+
+    li {
+      background: $menu-background;
+
+      a {
+        color: #fff;
+      }
+    }
+  }
+}
+
+.menu-text {
+  color: #fff;
+
+  @media only screen and (max-width: 40em) {
+    display: none !important;
+  }
+}
+
+@media only screen and (min-width: 40em) {
+  .menu:last-child {
+    border-left: 1px solid #4e4e4e;
+  }
+
+  .menu:first-child {
+    border-left: none;
+  }
+
+  .menu {
+    li:not(:last-child) {
+      border-right: 1px solid #4e4e4e;
+    }
+  }
+}
+
+.dropdown.menu .submenu {
+  border: none;
+}
+
+.dropdown.menu .is-dropdown-submenu-parent.is-right-arrow>a::after {
+  border-color: #fff transparent transparent;
+}
+
+.is-drilldown-submenu-parent>a::after {
+  border-color: transparent transparent transparent #fff;
+}
+
+.js-drilldown-back::before {
+  border-color: transparent #fff transparent transparent;
+}
+
+// Event flash
+@keyframes event-flash {
+  0% {
+    background-color: rgba(109, 232, 97, 1);
+  }
+  22% {
+    background-color: rgba(109, 232, 97, 0.8);
+  }
+  44% {
+    background-color: rgba(109, 232, 97, 0.6);
+  }
+  66% {
+    background-color: rgba(109, 232, 97, 0.4);
+  }
+  88% {
+    background-color: rgba(109, 232, 97, 0.2);
+  }
+  100% {
+    background-color: inherit;
+  }
+}
+
+.event-flash {
+  animation-name: event-flash;
+  animation-duration: 500ms;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in-out;
+}
+
+// GyreJS Docs Iframe
+// TODO: use css flex to set container below header to fill height.
+iframe.iframe-docs {
+  width: 100%;
+  flex: 1;
+}
+
+// Container
+div.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+// Container
+div.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+// Menu css
+.menu-text {
+  padding: 0;
+}
+
+.top-bar {
+  padding: 0;
+}
+
+div.route-view {
+  overflow-y: scroll;
+}
+
+// Gyre card
+span.gyre-header {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+ul.breadcrumbs {
+  margin: 0 0 0.25rem 0;
+}
+
