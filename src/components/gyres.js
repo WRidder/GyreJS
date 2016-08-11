@@ -4,7 +4,6 @@ import Command from "./commands";
 import Event from "./events";
 import ListenerHandler from "./listeners";
 import AggregateCache from "./aggregateCache";
-import generateName from "sillyname";
 
 /**
  * Gyre Factory
@@ -23,13 +22,18 @@ const gyreFactory = ({id, commands = {}, events = {}, aggregates = {}, projectio
     const _commands = {};
     const _events = {};
 
+    // Id error checking
+    if (typeof id !== "string") {
+      throw new Error("GyreJS: Gyre should be instantiated with a valid 'id' (string).");
+    }
+
     // Gyre internal instances
     const _internal = {};
-    _internal.bus = Bus(options.volatile || false);
+    _internal.bus = Bus(options.volatile || true);
     _internal.dispatcher = Dispatcher(_internal, _commands, _events);
     _internal.listenerHandler = ListenerHandler(_internal);
     _internal.aggregateCache = AggregateCache(_internal, options.aggregateCache || {});
-    _internal.id = id || generateName();
+    _internal.id = id;
     _internal.getCommands = () => _commands;
     _internal.getEvents = () => _events;
     _internal.fetch = fetch;
@@ -160,6 +164,14 @@ const gyreFactory = ({id, commands = {}, events = {}, aggregates = {}, projectio
      */
     const addListener = (lId, callback) => _internal.listenerHandler.addListener(lId, callback);
 
+      /**
+       *
+       * @param pId
+       * @returns {*}
+       */
+    const value = (pId) =>
+      _internal.listenerHandler.getProjection(pId).getState();
+
     /**
      * Issue a registered command.
      *
@@ -196,6 +208,7 @@ const gyreFactory = ({id, commands = {}, events = {}, aggregates = {}, projectio
       addProjections,
       removeProjection,
       addListener,
+      value,
       issue,
       trigger
     });
