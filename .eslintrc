@@ -9,7 +9,8 @@
     "React": true,
     "it": true,
     "describe": true,
-    "$": true
+    "$": true,
+    "ENV": true
   },
   "settings": {
     "react": {
@@ -27,7 +28,7 @@
     "brace-style": [2, "stroustrup", { "allowSingleLine": false }],
     "id-length": [2, {"min": 1, "properties": "never"}],
     "no-param-reassign": 0,
-    "no-console": 2,
+    "no-console": 1,
     "object-curly-spacing": ["error", "never"],
 
     // Disable until Flow supports let and const

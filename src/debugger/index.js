@@ -19,7 +19,10 @@ const GDebugger = function () {
     configurable: false,
     writable: false,
     value: GyreJS.createGyre(DebugGyre, {
-      noDebug: true
+      noDebug: true,
+      dev: {
+        disableAllWarnings: true
+      }
     })
   });
 

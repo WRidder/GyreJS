@@ -35,7 +35,7 @@ const ListenerHandler = (_internal) => {
     if (!Object.prototype.hasOwnProperty.call(projections, id) || replace) {
       projections[id] = Projection(_internal, Reducer(reducer), () => {
         _internal.listenerHandler.sendUpdate(id);
-      });
+      }, id);
     }
     else {
       console.warn(`>> GyreJS-gyre: addProjection -> Projection with id: '${id}' already exists.`); // eslint-disable-line no-console

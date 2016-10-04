@@ -37,6 +37,7 @@ const gyreFactory = ({id, commands = {}, events = {}, aggregates = {}, projectio
     _internal.getCommands = () => _commands;
     _internal.getEvents = () => _events;
     _internal.fetch = fetch;
+    _internal.options = options;
     const commandFactory = Command(_internal);
 
     // Public methods
