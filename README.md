@@ -1,5 +1,6 @@
 # GyreJS
-[![Build Status](https://travis-ci.org/WRidder/GyreJS.svg)](https://travis-ci.org/WRidder/GyreJS)  
+[![Build Status](https://travis-ci.org/WRidder/GyreJS.svg)](https://travis-ci.org/WRidder/GyreJS)
+[![CDNJS](https://img.shields.io/cdnjs/v/gyrejs.svg)](https://cdnjs.com/libraries/gyrejs)  
 Uni-directional data flow library. Based on CQRS (Command and Query Responsibility Segregation) and Event sourcing principles. 
 This is an experimental project.
 
