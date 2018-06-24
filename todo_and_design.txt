@@ -1,0 +1,74 @@
+Overview
+============
+Main components: Scheduler, Projections, Event Queue, Commands, Events, Tasks
+Commands/events: ConfirmOrder / OrderConfirmed
+
+Scheduler
+================
+Public API:
+- Register a listener
+-$ Inputs: Projection ID, callback
+- Unregister a listener
+-$ Inputs: ID and callback
+- Run
+-- Go over queue
+Internals:
+- Limits execution time by comparing with quota
+-- Quote provides lower bound since function execution time of single callback is not known beforehand
+- Upon receiving data (which contains certain ID), add to queue
+
+Misc:
+- Could allow for cooperative scheduling (yielding), maybe use ES2015 yield?
+- Use both for render side as well as for tasks
+-- For tasks, could use multiple workers. Use 'affinity' (modulo #workers?) to distribute.
+-- TaskScheduler and RenderScheduler
+- Listener maybe subscribe to multiple projections?
+- Use pop instead of shift to get items from queue, it's usually much faster (does not require reindexing)
+- How to deal with starvation? I.e. increment priority of remaining items in queue.
+
+Assumptions:
+- Scheduler is only top-level function in renderer thread
+- Any events, like click handlers, should be seen as interrupt handlers, and their execution as short as possible.
+
+Terminology
+=============
+- Projection: data structure formed from events
+- Event
+- Scheduler
+- Listener: Subscribed through scheduler using some ID
+- Task
+-- Only outputs events
+- Deterministic barrier
+-- Projections only form by events, so replaying events results in the same projections
+-- Projections do not have any side effects (pure)
+-- The view (browser) should only depend on current state of all projections.
+- A task is RUN, an event is TRIGGERED, a command is ISSUED.
+
+Considerations
+==============
+- Do new registered listeners get a copy of current state, or only after update
+-- If no, data can be kept in worker only
+-- If yes, the scheduler should probably keep copy of latest state of projection..
+--- Means data duplication, this is a downside.
+- ShouldUpdate functions are probably important
+
+Possible future features (only if a real need exists)
+========================
+- Chaining projections
+- Listeners can subscribe to multiple projections
+
+Tools
+===============
+Proper tooling is the most important part and has a front-row seat in this project.
+- Monitor (debugging and tracing application)
+-- Support custom events which can be used to trace function execution
+
+Inspiration
+========================
+- Business logic
+-- https://medium.com/@jeffbski/where-do-i-put-my-business-logic-in-a-react-redux-application-9253ef91ce1
+
+Documentation
+=============
+- User doc
+- Developer doc

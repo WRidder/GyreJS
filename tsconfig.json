@@ -1,12 +1,15 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
+    "outDir": "./types/",
     "sourceMap": true,
     "noImplicitAny": true,
     "module": "es6",
     "target": "es5",
     "jsx": "react",
-    "allowJs": true
+    "declaration": true,
+    "lib": [
+      "es2016"
+    ]
   },
   "include": [
     "./src/**/*"

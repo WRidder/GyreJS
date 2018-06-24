@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const merge = require('webpack-merge');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
@@ -11,10 +12,14 @@ module.exports = merge(common, {
     new UglifyJSPlugin({
       sourceMap: true
     }),
-    new CleanWebpackPlugin(['dist']),
+    //new CleanWebpackPlugin(['dist']),
+    new webpack.DefinePlugin({'process.env.NODE_ENV': JSON.stringify('production')}),
   ],
   output: {
-    filename: 'gyrejs.min.js',
-    path: path.resolve(__dirname, 'dist')
+    filename: 'main.min.js',
+    path: path.resolve(__dirname, 'lib'),
+    library: "gyrejs",
+    libraryTarget: 'umd',
+    umdNamedDefine: true
   }
 });
