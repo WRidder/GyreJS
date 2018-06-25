@@ -7,7 +7,7 @@ interface Listener {
   id: string;
   pIds: string[];
   priority: number;
-  cb: (data: object, pId: string) => void; // Arguments: data, 'pId'
+  cb: (data: any, pId: string) => any;
 }
 
 interface QueueItem {
@@ -26,37 +26,49 @@ export class Scheduler {
 
   constructor() {}
 
-  register(projectionId: string | string[], cb: (data: object, pId: string) => void,
+  register(projectionId: string | string[], cb: (data: any, pId: string) => any,
            opts: ListenerOptions = { priority: 0, id: 'unnamed' }) {
-    // Input checking
-    if (typeof projectionId !== 'string' && projectionId.constructor !== Array) {
-      throw 'ProjectionId should be a(n array of) string(s) with non-zero length.';
-    }
-    if (typeof projectionId === 'string' && projectionId.length === 0) {
-      throw 'ProjectionId should be a(n array of) string(s) with non-zero length.';
-    }
-    if (projectionId.constructor === Array) {
-      projectionId.forEach((pId) => {
-        if (typeof pId === 'string' || pId.length === 0) {
-          throw 'ProjectionId should be a(n array of) string(s) with non-zero length.';
-        }
-      });
-    }
+    const pIds = this.checkIfValidProjectionId(projectionId);
 
     if (typeof cb !== 'function') {
       throw 'Callback should be a function.';
     }
 
     this.listeners.set(this.listenerCount, {
+      pIds,
       cb,
       id: opts.id,
       priority: opts.priority,
-      pIds: (typeof projectionId === 'string') ? [projectionId] : projectionId,
     });
 
     this.addListenerToQueue(this.listenerCount);
 
     this.listenerCount = this.listenerCount + 1;
+
+    return this.listenerCount - 1;
+  }
+
+  unregister(lsId: number, projectionId?: string[] | string) {
+    const pIdsToUnsubscribe: string[] = this.checkIfValidProjectionId(projectionId);
+
+    if (this.listeners.has(lsId)) {
+      const listener: Listener = this.listeners.get(lsId);
+
+      // If all projectionIds of the current listener are to unsubscribed, remove completely
+      const remainingPIds = listener.pIds.filter(x => !pIdsToUnsubscribe.includes(x));
+      if (remainingPIds.length === 0) {
+        this.listeners.delete(lsId);
+      }
+
+      // Remove from readyQueue
+      let i = this.readyQueueQueue.length;
+      while (i) {
+        if (pIdsToUnsubscribe.includes(this.readyQueueQueue[i-1].pId)) {
+          this.readyQueueQueue.splice(i,1);
+        }
+        i -= 1;
+      }
+    }
   }
 
   /**
@@ -129,7 +141,7 @@ export class Scheduler {
    * Returns timestamp in milliseconds.
    */
   private getCurrentTime(): number {
-    return new Date().getTime();
+    return Date.now();
   }
 
   private getCallbackById(lsId: number): Function | null {
@@ -166,7 +178,7 @@ export class Scheduler {
         do {
           i = i - 1;
 
-          if (this.readyQueueQueue[i].priority < listener.priority) {
+          if (this.readyQueueQueue[i].priority <= listener.priority) {
             this.readyQueueQueue.splice(i + 1, 0, {
               pId,
               lsId,
@@ -178,5 +190,24 @@ export class Scheduler {
         } while (i);
       }
     }
+  }
+
+  private checkIfValidProjectionId(projectionId: string | string[]): string[] {
+    // Input checking
+    if (typeof projectionId !== 'string' && projectionId.constructor !== Array) {
+      throw 'ProjectionId should be a(n array of) string(s) with non-zero length.';
+    }
+    if (typeof projectionId === 'string' && projectionId.length === 0) {
+      throw 'ProjectionId should be a(n array of) string(s) with non-zero length.';
+    }
+    if (typeof projectionId !== 'string') {
+      projectionId.forEach((pId) => {
+        if (typeof pId !== 'string' || pId.length === 0) {
+          throw 'ProjectionId should be a(n array of) string(s) with non-zero length.';
+        }
+      });
+    }
+
+    return (typeof projectionId === 'string') ? [projectionId] : projectionId;
   }
 }

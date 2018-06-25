@@ -12,19 +12,23 @@ Public API:
 -$ Inputs: ID and callback
 - Run
 -- Go over queue
+
 Internals:
-- Limits execution time by comparing with quota
+- [Done] Limits execution time by comparing with quota
 -- Quote provides lower bound since function execution time of single callback is not known beforehand
-- Upon receiving data (which contains certain ID), add to queue
+- [Done] Upon receiving data (which contains certain ID), add listeners for this projection to queue
 
 Misc:
-- Could allow for cooperative scheduling (yielding), maybe use ES2015 yield?
+- [Done] Could allow for cooperative scheduling (yielding), maybe use ES2015 yield?
 - Use both for render side as well as for tasks
 -- For tasks, could use multiple workers. Use 'affinity' (modulo #workers?) to distribute.
 -- TaskScheduler and RenderScheduler
 - Listener maybe subscribe to multiple projections?
-- Use pop instead of shift to get items from queue, it's usually much faster (does not require reindexing)
+- [Done] Use pop instead of shift to get items from queue, it's usually much faster (does not require reindexing)
 - How to deal with starvation? I.e. increment priority of remaining items in queue.
+
+To fix:
+- Prevent adding same listener for a projection in queue more than once
 
 Assumptions:
 - Scheduler is only top-level function in renderer thread

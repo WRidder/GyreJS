@@ -18,7 +18,7 @@ describe('Scheduler', () => {
 
   describe('provides an API', () => {
     let aScheduler : Scheduler;
-    let cb: Function;
+    let cb: (data: any, pId: string) => any;
 
     beforeEach(() => {
       aScheduler = new Scheduler();
@@ -39,6 +39,7 @@ describe('Scheduler', () => {
         expect(() => aScheduler.register('', cb)).toThrow();
         expect(() => aScheduler.register([''], cb)).toThrow();
         expect(() => aScheduler.register(['', ''], cb)).toThrow();
+        // @ts-ignore: need to check invalid inputs for non-TypeScript users.
         expect(() => aScheduler.register([null, 3], cb)).toThrow();
       });
 
@@ -50,7 +51,12 @@ describe('Scheduler', () => {
 
     it('to unregister listeners', () => {
       const projectionToSubscribeTo = 'AProjection';
-      aScheduler.unregister(projectionToSubscribeTo, cb);
+      const options: ListenerOptions = {
+        id: 'SomeListener',
+        priority: 99,
+      };
+      const lsId = aScheduler.register(projectionToSubscribeTo, cb, options);
+      aScheduler.unregister(lsId, projectionToSubscribeTo);
     });
 
     it('to get and set the time budget', () => {
@@ -147,7 +153,7 @@ describe('Scheduler', () => {
       expect(listener1).toHaveBeenCalledTimes(1);
     });
 
-    it('calls a listener only once per projection update', () => {
+    it('calls a listener once for all defined projections', () => {
       // Register listeners
       const listener1 = jest.fn();
       aScheduler.register(['MiscProjection', 'AnotherProjection'], listener1);
@@ -158,7 +164,7 @@ describe('Scheduler', () => {
         val2: 3,
       });
 
-      // Run the scheduler twice
+      // Run the scheduler
       aScheduler.runOnce();
 
       expect(listener1).toHaveBeenCalledTimes(2);
