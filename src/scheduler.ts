@@ -56,7 +56,7 @@ export class Scheduler {
       const listener: IListener = this.listeners.get(lsId);
 
       // If all projectionIds of the current listener are to un-subscribed, remove completely
-      const remainingPIds = listener.pIds.filter(x => !pIdsToUnsubscribe.includes(x));
+      const remainingPIds = listener.pIds.filter(x => !(pIdsToUnsubscribe.indexOf(x) > -1));
       if (remainingPIds.length === 0) {
         this.listeners.delete(lsId);
       }
@@ -64,7 +64,7 @@ export class Scheduler {
       // Remove from readyQueue
       let i = this.readyQueue.length;
       while (i) {
-        if (pIdsToUnsubscribe.includes(this.readyQueue[i - 1].pId)) {
+        if (pIdsToUnsubscribe.indexOf(this.readyQueue[i - 1].pId) > -1) {
           this.readyQueueIDlist.delete(Scheduler.createIDForIQueueItem(this.readyQueue[i - 1]));
           this.readyQueue.splice(i,1);
         }
@@ -93,7 +93,7 @@ export class Scheduler {
 
     // Iterate over listeners
     this.listeners.forEach((listener, lsId) => {
-      if (listener.pIds.includes(id)) {
+      if (listener.pIds.indexOf(id) > -1) {
         this.scheduleIListener(lsId, id);
       }
     });
