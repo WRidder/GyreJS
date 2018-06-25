@@ -28,12 +28,13 @@ export class Scheduler {
 
   register(projectionId: string | string[], cb: (data: any, pId: string) => any,
            opts: ListenerOptions = { priority: 0, id: 'unnamed' }) {
-    const pIds = this.checkIfValidProjectionId(projectionId);
+    const pIds = Scheduler.checkIfValidProjectionId(projectionId);
 
     if (typeof cb !== 'function') {
       throw 'Callback should be a function.';
     }
 
+    const lsId = this.listenerCount;
     this.listeners.set(this.listenerCount, {
       pIds,
       cb,
@@ -41,15 +42,14 @@ export class Scheduler {
       priority: opts.priority,
     });
 
-    this.addListenerToQueue(this.listenerCount);
-
+    this.addListenerToQueue(lsId);
     this.listenerCount = this.listenerCount + 1;
 
-    return this.listenerCount - 1;
+    return lsId;
   }
 
   unregister(lsId: number, projectionId?: string[] | string) {
-    const pIdsToUnsubscribe: string[] = this.checkIfValidProjectionId(projectionId);
+    const pIdsToUnsubscribe: string[] = Scheduler.checkIfValidProjectionId(projectionId);
 
     if (this.listeners.has(lsId)) {
       const listener: Listener = this.listeners.get(lsId);
@@ -101,10 +101,12 @@ export class Scheduler {
    * Iterates the ready queue
    */
   runOnce() {
-    const startTime = this.getCurrentTime();
+    const startTime = Scheduler.getCurrentTime();
     let ranOnce = false;
 
-    while ((this.getCurrentTime() < (startTime + this.timeBudget) || !ranOnce) && this.readyQueueQueue.length > 0) {
+    while ((Scheduler.getCurrentTime() < (startTime + this.timeBudget) ||
+      !ranOnce) && this.readyQueueQueue.length > 0) {
+
       // Get work item
       const item = this.readyQueueQueue.pop();
       const cb = this.getCallbackById(item.lsId);
@@ -140,7 +142,7 @@ export class Scheduler {
   /**
    * Returns timestamp in milliseconds.
    */
-  private getCurrentTime(): number {
+  static getCurrentTime(): number {
     return Date.now();
   }
 
@@ -189,7 +191,7 @@ export class Scheduler {
     }
   }
 
-  private checkIfValidProjectionId(projectionId: string | string[]): string[] {
+  static checkIfValidProjectionId(projectionId: string | string[]): string[] {
     // Input checking
     if (typeof projectionId !== 'string' && projectionId.constructor !== Array) {
       throw 'ProjectionId should be a(n array of) string(s) with non-zero length.';
