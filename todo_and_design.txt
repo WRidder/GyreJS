@@ -118,5 +118,4 @@ USPs
 - No dependencies
 - Supports multithreading
 - Fully tested (100% coverage?)
-- Typescript support
-
+- Typescript support (also comes with the types)
