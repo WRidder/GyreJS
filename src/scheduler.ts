@@ -32,7 +32,10 @@ export class Scheduler {
     const pIds = Scheduler.checkIfValidProjectionId(projectionId);
 
     if (typeof cb !== 'function') {
-      throw 'Callback should be a function.';
+      throw '[GyreJS] Callback should be a function.';
+    }
+    if (opts.priority < 0 || opts.priority > 99) {
+      throw '[GyreJS] Listener priority should be a number in range of [0,99].';
     }
 
     const lsId = this.listenerCount;
@@ -44,7 +47,7 @@ export class Scheduler {
     });
 
     this.addListenerToQueue(lsId);
-    this.listenerCount = this.listenerCount + 1;
+    this.listenerCount += 1;
 
     return lsId;
   }
@@ -55,7 +58,7 @@ export class Scheduler {
     if (this.listeners.has(lsId)) {
       const listener: Listener = this.listeners.get(lsId);
 
-      // If all projectionIds of the current listener are to unsubscribed, remove completely
+      // If all projectionIds of the current listener are to un-subscribed, remove completely
       const remainingPIds = listener.pIds.filter(x => !pIdsToUnsubscribe.includes(x));
       if (remainingPIds.length === 0) {
         this.listeners.delete(lsId);
@@ -65,7 +68,7 @@ export class Scheduler {
       let i = this.readyQueue.length;
       while (i) {
         if (pIdsToUnsubscribe.includes(this.readyQueue[i - 1].pId)) {
-          this.readyQueueIDlist.delete(this.createIDForQueueItem(this.readyQueue[i - 1]));
+          this.readyQueueIDlist.delete(Scheduler.createIDForQueueItem(this.readyQueue[i - 1]));
           this.readyQueue.splice(i,1);
         }
         i -= 1;
@@ -151,9 +154,10 @@ export class Scheduler {
     }
 
     // Check if we ran out of budget. If so, increment priorities to prevent starvation.
+    // However, priorities above 89 are fixed.
     if (this.readyQueue.length) {
       this.readyQueue.forEach((qItem) => {
-        qItem.priority += 1;
+        qItem.priority += qItem.priority < 89 ? 1 : 0;
       });
     }
   }
@@ -194,7 +198,7 @@ export class Scheduler {
       };
 
       // Check if not already in queue
-      if (this.readyQueueIDlist.has(this.createIDForQueueItem(queueItem))) {
+      if (this.readyQueueIDlist.has(Scheduler.createIDForQueueItem(queueItem))) {
         return;
       }
 
@@ -218,15 +222,15 @@ export class Scheduler {
   private addItemToQueue(qItem: QueueItem, idx: number): void {
     if (idx === 0) {
       this.readyQueue.unshift(qItem);
-    } else if(idx === this.readyQueue.length) {
+    } else if (idx === this.readyQueue.length) {
       this.readyQueue.push(qItem);
     } else {
       this.readyQueue.splice(idx, 0, qItem);
     }
-    this.readyQueueIDlist.add(this.createIDForQueueItem(qItem));
+    this.readyQueueIDlist.add(Scheduler.createIDForQueueItem(qItem));
   }
 
-  private createIDForQueueItem(qItem: QueueItem): string {
+  private static createIDForQueueItem(qItem: QueueItem): string {
     return qItem.lsId + '-' + qItem.pId;
   }
 

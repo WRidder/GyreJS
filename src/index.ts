@@ -1,2 +1,2 @@
-export {Scheduler} from './scheduler';
+export {Gyre} from './gyre';
 console.log("Hello from gyrejs!");

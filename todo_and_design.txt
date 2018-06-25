@@ -61,6 +61,7 @@ Possible future features (only if a real need exists)
 ========================
 - Chaining projections
 - Listeners can subscribe to multiple projections
+- Save / reload projection states for session resume
 
 Tools
 ===============
@@ -68,6 +69,7 @@ Proper tooling is the most important part and has a front-row seat in this proje
 - Monitor (debugging and tracing application)
 -- Support custom events which can be used to trace function execution
 -- Allow show diff of each projection as result from event
+--- https://github.com/zgrossbart/jdd
 
 Inspiration
 ========================
@@ -79,3 +81,14 @@ Documentation
 - User doc
 -- OVerview of where does business logic go (in commands (for validation)/projections), etc
 - Developer doc
+
+Child extensions
+================
+Sensible hooks
+- I.e. returns a gyre with some sensible default hooks
+-- an Immutable hook for data to listeners and commands (https://stackoverflow.com/questions/16064136/create-a-read-only-immutable-copy-of-any-object-including-deep-properties)
+
+Demos
+======
+- A page with 100 updating graphs
+- Reddit viewer
