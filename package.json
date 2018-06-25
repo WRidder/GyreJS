@@ -35,7 +35,7 @@
     "watch": "watch 'npm run build-prod' ./src/",
     "api-docs": "jsdoc ./src/index.ts -c jsdoc.conf.json"
   },
-  "author": "",
+  "author": "Wilbert van de Ridder",
   "license": "MIT",
   "jest": {
     "transform": {
