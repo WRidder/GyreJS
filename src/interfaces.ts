@@ -21,3 +21,7 @@ export interface IListenerOptions {
   id?: string;
   priority?: number;
 }
+
+export interface IReducer {
+  (state: object, event: IGyreEvent): any | undefined;
+}

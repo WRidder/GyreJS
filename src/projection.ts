@@ -1,8 +1,4 @@
-import { IGyreEvent } from './interfaces';
-
-export interface IReducer {
-  (state: object, event: IGyreEvent): any | undefined;
-}
+import { IGyreEvent, IReducer } from './interfaces';
 
 export class Projection {
   // Members
