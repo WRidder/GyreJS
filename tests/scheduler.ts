@@ -78,6 +78,8 @@ describe('Scheduler', () => {
 
   describe('when run', () => {
     let aScheduler : Scheduler;
+    const realDate = Date;
+
     beforeEach(() => {
       aScheduler = new Scheduler();
       aScheduler.setTimeBudget(Number.MAX_SAFE_INTEGER);
@@ -88,6 +90,29 @@ describe('Scheduler', () => {
         val2: 3,
       });
     });
+
+    function mockDate(isoDate: string): any {
+      // @ts-ignore:
+      global.Date = class extends realDate {
+        constructor(...theArgs: any[]) {
+          super();
+          if (theArgs.length) {
+            // @ts-ignore:
+            return new realDate(...theArgs);
+          }
+          return new realDate(isoDate);
+        }
+
+        static now() {
+          return new realDate(isoDate).getTime();
+        }
+      };
+    }
+
+    afterEach(() => {
+      global.Date = realDate;
+    });
+
 
     it('calls listeners in order of priority', () => {
       const callArray: number[] = [];
@@ -192,7 +217,36 @@ describe('Scheduler', () => {
 
     it('calls listeners as long as the time budget remains', () => {
       aScheduler.setTimeBudget(10);
-      expect(typeof (new Scheduler()) === 'object').toBe(true);
+      const callArray: number[] = [];
+
+      mockDate('2018-06-01T00:00:00z');
+      expect(Date.now()).toEqual(1527811200000);
+
+      // Create listeners
+      const listener1 = () => callArray.push(1);
+      const listener2 = () => {
+        callArray.push(2);
+
+        // Advance time by one second
+        mockDate('2018-06-01T00:00:01z');
+      };
+
+      // Add listeners
+      aScheduler.register('MiscProjection', listener1, { priority: 1 });
+      aScheduler.register('MiscProjection', listener2, { priority: 3 });
+
+      // Run the scheduler
+      aScheduler.runOnce();
+
+      expect(Date.now()).toEqual(1527811201000);
+      expect(callArray).toEqual([2]);
+
+      // Run the scheduler
+      aScheduler.runOnce();
+
+      // It will always call at least one listener, regardless of budget, to prevent starvation.
+      // So now, the remaining listener should have been called.
+      expect(callArray).toEqual([2, 1]);
     });
   });
 });

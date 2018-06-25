@@ -116,7 +116,12 @@ export class Scheduler {
 
       // If the item has been called before and the callback is a generator, invoke the generator again.
       if (item.genFn) {
-        const ret = item.genFn.next();
+        let ret;
+        try {
+          ret = item.genFn.next();
+        } catch (e) {
+          console.error(`[GyreJS] Error invoking listener (id: ${item.lsId}) for projection ${item.pId}: `, e);
+        }
         if (!ret.done) {
           this.readyQueueQueue.push(item);
         }
@@ -124,7 +129,12 @@ export class Scheduler {
       }
 
       // Invoke callback
-      const res = cb(this.projectionData.get(item.pId), item.pId);
+      let res;
+      try {
+        res = cb(this.projectionData.get(item.pId), item.pId);
+      } catch (e) {
+        console.error(`[GyreJS] Error invoking listener (id: ${item.lsId}) for projection ${item.pId}: `, e);
+      }
 
       // Check if it is a generator function
       if (res && res.next) {
@@ -137,12 +147,19 @@ export class Scheduler {
       }
       ranOnce = true;
     }
+
+    // Check if we ran out of budget. If so, increment priorities to prevent starvation.
+    if (this.readyQueueQueue.length) {
+      this.readyQueueQueue.forEach((qItem) => {
+        qItem.priority += 1;
+      });
+    }
   }
 
   /**
    * Returns timestamp in milliseconds.
    */
-  static getCurrentTime(): number {
+  private static getCurrentTime(): number {
     return Date.now();
   }
 
@@ -191,7 +208,7 @@ export class Scheduler {
     }
   }
 
-  static checkIfValidProjectionId(projectionId: string | string[]): string[] {
+  private static checkIfValidProjectionId(projectionId: string | string[]): string[] {
     // Input checking
     if (typeof projectionId !== 'string' && projectionId.constructor !== Array) {
       throw 'ProjectionId should be a(n array of) string(s) with non-zero length.';

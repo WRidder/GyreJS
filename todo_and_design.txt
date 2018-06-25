@@ -23,7 +23,7 @@ Misc:
 - Use both for render side as well as for tasks
 -- For tasks, could use multiple workers. Use 'affinity' (modulo #workers?) to distribute.
 -- TaskScheduler and RenderScheduler
-- Listener maybe subscribe to multiple projections?
+- [Done] Listener maybe subscribe to multiple projections?
 - [Done] Use pop instead of shift to get items from queue, it's usually much faster (does not require reindexing)
 - How to deal with starvation? I.e. increment priority of remaining items in queue.
 
@@ -55,6 +55,7 @@ Considerations
 -- If yes, the scheduler should probably keep copy of latest state of projection..
 --- Means data duplication, this is a downside.
 - ShouldUpdate functions are probably important
+- Add possibility for hooks, i.e. for (de)serialization (for example if you want to use ImmutableJS)
 
 Possible future features (only if a real need exists)
 ========================
@@ -66,6 +67,7 @@ Tools
 Proper tooling is the most important part and has a front-row seat in this project.
 - Monitor (debugging and tracing application)
 -- Support custom events which can be used to trace function execution
+-- Allow show diff of each projection as result from event
 
 Inspiration
 ========================
@@ -75,4 +77,5 @@ Inspiration
 Documentation
 =============
 - User doc
+-- OVerview of where does business logic go (in commands (for validation)/projections), etc
 - Developer doc
