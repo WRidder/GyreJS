@@ -23,5 +23,12 @@ export interface IListenerOptions {
 }
 
 export interface IReducer {
+  /**
+   * Is a reducer function
+   *
+   * @param state The current state of the projection.
+   * @param event The event to apply.
+   * @return Returns the new state if it has been changed.
+   */
   (state: object, event: IGyreEvent): any | undefined;
 }
