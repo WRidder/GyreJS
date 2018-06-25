@@ -1,4 +1,4 @@
-export class GyreCommand {
-  constructor() {}
-
+export interface GyreCommand {
+  id: string;
+  data: any;
 }

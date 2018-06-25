@@ -1,4 +1,4 @@
-export class GyreEvent {
-  constructor() {}
-
+export interface GyreEvent {
+  id: string;
+  data: any;
 }

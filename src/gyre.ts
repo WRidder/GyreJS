@@ -1,3 +1,5 @@
+import {GyreCommand} from './command';
+import {GyreEvent} from './event';
 import {Scheduler} from './scheduler';
 
 export interface GyreOptions {
@@ -10,6 +12,14 @@ export class Gyre {
   constructor() {}
 
   start(opts: GyreOptions = {}) {
+
+  }
+
+  trigger(evt: GyreEvent) {
+
+  }
+
+  issue(cmd: GyreCommand) {
 
   }
 

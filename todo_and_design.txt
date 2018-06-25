@@ -34,6 +34,10 @@ Assumptions:
 - Scheduler is only top-level function in renderer thread
 - Any events, like click handlers, should be seen as interrupt handlers, and their execution as short as possible.
 
+ECManager
+=========
+- Add timed events and commands using setInterval
+
 Terminology
 =============
 - Projection: data structure formed from events
@@ -50,7 +54,7 @@ Terminology
 
 Considerations
 ==============
-- Do new registered listeners get a copy of current state, or only after update
+- Do new registered listeners get a copy of current state, or only after update (chose to retain copy)
 -- If no, data can be kept in worker only
 -- If yes, the scheduler should probably keep copy of latest state of projection..
 --- Means data duplication, this is a downside.
@@ -60,7 +64,6 @@ Considerations
 Possible future features (only if a real need exists)
 ========================
 - Chaining projections
-- Listeners can subscribe to multiple projections
 - Save / reload projection states for session resume
 
 Tools
@@ -91,4 +94,12 @@ Sensible hooks
 Demos
 ======
 - A page with 100 updating graphs
+-- show difference single-threaded and multi-threaded version. So, 2 different pages.
 - Reddit viewer
+
+Production use notes
+====================
+Make separate bundles for (if want to use multithreading):
+- render thread
+- projection / command handler thread
+- Task thread
