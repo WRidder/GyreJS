@@ -18,7 +18,8 @@ interface QueueItem {
 }
 
 export class Scheduler {
-  private readyQueueQueue: QueueItem[] = [];
+  private readyQueue: QueueItem[] = [];
+  private readyQueueIDlist: Set<string> = new Set();
   private timeBudget: number = 10;
   private projectionData: Map<string, object> = new Map();
   private listeners: Map<number, Listener> = new Map();
@@ -61,10 +62,11 @@ export class Scheduler {
       }
 
       // Remove from readyQueue
-      let i = this.readyQueueQueue.length;
+      let i = this.readyQueue.length;
       while (i) {
-        if (pIdsToUnsubscribe.includes(this.readyQueueQueue[i - 1].pId)) {
-          this.readyQueueQueue.splice(i,1);
+        if (pIdsToUnsubscribe.includes(this.readyQueue[i - 1].pId)) {
+          this.readyQueueIDlist.delete(this.createIDForQueueItem(this.readyQueue[i - 1]));
+          this.readyQueue.splice(i,1);
         }
         i -= 1;
       }
@@ -105,10 +107,10 @@ export class Scheduler {
     let ranOnce = false;
 
     while ((Scheduler.getCurrentTime() < (startTime + this.timeBudget) ||
-      !ranOnce) && this.readyQueueQueue.length > 0) {
+      !ranOnce) && this.readyQueue.length > 0) {
 
       // Get work item
-      const item = this.readyQueueQueue.pop();
+      const item = this.readyQueue.pop();
       const cb = this.getCallbackById(item.lsId);
       if (!cb) {
         continue;
@@ -123,7 +125,7 @@ export class Scheduler {
           console.error(`[GyreJS] Error invoking listener (id: ${item.lsId}) for projection ${item.pId}: `, e);
         }
         if (!ret.done) {
-          this.readyQueueQueue.push(item);
+          this.readyQueue.push(item);
         }
         continue;
       }
@@ -142,15 +144,15 @@ export class Scheduler {
 
         if (!ret.done) {
           item.genFn = res;
-          this.readyQueueQueue.push(item);
+          this.readyQueue.push(item);
         }
       }
       ranOnce = true;
     }
 
     // Check if we ran out of budget. If so, increment priorities to prevent starvation.
-    if (this.readyQueueQueue.length) {
-      this.readyQueueQueue.forEach((qItem) => {
+    if (this.readyQueue.length) {
+      this.readyQueue.forEach((qItem) => {
         qItem.priority += 1;
       });
     }
@@ -183,29 +185,49 @@ export class Scheduler {
 
   private scheduleListener(lsId: number, pId: string) {
     const listener = this.listeners.get(lsId);
-    const queueItem = {
-      pId,
-      lsId,
-      priority: listener.priority,
-    };
 
     if (listener) {
-      let i = this.readyQueueQueue.length;
+      const queueItem = {
+        pId,
+        lsId,
+        priority: listener.priority,
+      };
 
-      if (i === 0 || listener.priority > this.readyQueueQueue[i - 1].priority) {
-        this.readyQueueQueue.push(queueItem);
-      } else if (this.readyQueueQueue[0].priority > listener.priority) {
-        this.readyQueueQueue.unshift(queueItem);
+      // Check if not already in queue
+      if (this.readyQueueIDlist.has(this.createIDForQueueItem(queueItem))) {
+        return;
+      }
+
+      let i = this.readyQueue.length;
+      if (i === 0 || listener.priority > this.readyQueue[i - 1].priority) {
+        this.addItemToQueue(queueItem, i);
+      } else if (this.readyQueue[0].priority > listener.priority) {
+        this.addItemToQueue(queueItem, 0);
       } else {
         do {
           i = i - 1;
-          if (this.readyQueueQueue[i].priority <= listener.priority) {
-            this.readyQueueQueue.splice(i + 1, 0, queueItem);
+          if (this.readyQueue[i].priority <= listener.priority) {
+            this.addItemToQueue(queueItem, i + 1);
             break;
           }
         } while (i);
       }
     }
+  }
+
+  private addItemToQueue(qItem: QueueItem, idx: number): void {
+    if (idx === 0) {
+      this.readyQueue.unshift(qItem);
+    } else if(idx === this.readyQueue.length) {
+      this.readyQueue.push(qItem);
+    } else {
+      this.readyQueue.splice(idx, 0, qItem);
+    }
+    this.readyQueueIDlist.add(this.createIDForQueueItem(qItem));
+  }
+
+  private createIDForQueueItem(qItem: QueueItem): string {
+    return qItem.lsId + '-' + qItem.pId;
   }
 
   private static checkIfValidProjectionId(projectionId: string | string[]): string[] {

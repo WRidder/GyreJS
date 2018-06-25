@@ -6,11 +6,11 @@ Commands/events: ConfirmOrder / OrderConfirmed
 Scheduler
 ================
 Public API:
-- Register a listener
+- [done] Register a listener
 -$ Inputs: Projection ID, callback
-- Unregister a listener
+- [done] Unregister a listener
 -$ Inputs: ID and callback
-- Run
+- [done] Run
 -- Go over queue
 
 Internals:
@@ -25,10 +25,10 @@ Misc:
 -- TaskScheduler and RenderScheduler
 - [Done] Listener maybe subscribe to multiple projections?
 - [Done] Use pop instead of shift to get items from queue, it's usually much faster (does not require reindexing)
-- How to deal with starvation? I.e. increment priority of remaining items in queue.
+- [Done] How to deal with starvation? I.e. increment priority of remaining items in queue.
 
 To fix:
-- Prevent adding same listener for a projection in queue more than once
+- [Done] Prevent adding same listener for a projection in queue more than once
 
 Assumptions:
 - Scheduler is only top-level function in renderer thread

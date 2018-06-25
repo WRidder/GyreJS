@@ -10,7 +10,6 @@ jest.useFakeTimers();
  */
 
 describe('Scheduler', () => {
-
   it('should be instantiable', () => {
     const aScheduler = new Scheduler();
     expect(typeof aScheduler === 'object').toBe(true);
@@ -166,6 +165,33 @@ describe('Scheduler', () => {
       expect(callArray).toEqual([2, 3, 1]);
     });
 
+    it('calls listeners only for last projection update', () => {
+      const callArray: number[] = [];
+
+      // Create listeners
+      const listener1 = () => callArray.push(1);
+
+      // Add listeners
+      aScheduler.register('AnotherProjection', listener1, { priority: 1 });
+
+      // Run the scheduler
+      aScheduler.runOnce();
+
+      // Check
+      expect(callArray).toEqual([]);
+
+      // Add data from a projection, perform 2 updates.
+      // However, this should only trigger 1 listener callback.
+      aScheduler.projectionUpdate('AnotherProjection', {});
+      aScheduler.projectionUpdate('AnotherProjection', {});
+
+      // Run the scheduler
+      aScheduler.runOnce();
+
+      // Check
+      expect(callArray).toEqual([1]);
+    });
+
     it('calls a listener only once per projection update', () => {
       // Register listeners
       const listener1 = jest.fn();
@@ -244,7 +270,7 @@ describe('Scheduler', () => {
       // Run the scheduler
       aScheduler.runOnce();
 
-      // It will always call at least one listener, regardless of budget, to prevent starvation.
+      // It should always call at least one listener, regardless of budget, to prevent starvation.
       // So now, the remaining listener should have been called.
       expect(callArray).toEqual([2, 1]);
     });
