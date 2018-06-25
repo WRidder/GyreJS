@@ -32,8 +32,7 @@
     "build": "webpack --config webpack.dev.js",
     "build-prod": "webpack --config webpack.prod.js",
     "dev": "npm-run-all test start",
-    "watch": "watch 'npm run build-prod' ./src/",
-    "api-docs": "jsdoc ./src/index.ts -c jsdoc.conf.json"
+    "watch": "watch 'npm run build-prod' ./src/"
   },
   "author": "Wilbert van de Ridder",
   "license": "MIT",
