@@ -112,3 +112,9 @@ Code layout
 Public release of lib
 =====================
 - Squash commit history
+
+USPs
+====
+- No dependencies
+- Supports multithreading
+

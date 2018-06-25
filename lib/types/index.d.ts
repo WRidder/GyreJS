@@ -1,1 +1,2 @@
-export { SomeFunction } from './scheduler';
+export { Gyre } from './gyre';
+export { IGyreCommand, IGyreEvent, IListenerOptions } from './interfaces';
