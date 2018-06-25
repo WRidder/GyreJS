@@ -98,15 +98,15 @@ describe('Scheduler', () => {
       const listener3 = () => callArray.push(3);
 
       // Add listeners
-      aScheduler.register('MiscProjection', listener1, { priority: 1 });
-      aScheduler.register('MiscProjection', listener2, { priority: 3 });
+      aScheduler.register('MiscProjection', listener1, { priority: 3 });
+      aScheduler.register('MiscProjection', listener2, { priority: 1 });
       aScheduler.register('MiscProjection', listener3, { priority: 2 });
 
       // Run the scheduler
       aScheduler.runOnce();
 
       // Check
-      expect(callArray).toEqual([2, 3, 1]);
+      expect(callArray).toEqual([1, 3, 2]);
     });
 
     it('calls listeners after a projection has been updated', () => {

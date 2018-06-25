@@ -63,7 +63,7 @@ export class Scheduler {
       // Remove from readyQueue
       let i = this.readyQueueQueue.length;
       while (i) {
-        if (pIdsToUnsubscribe.includes(this.readyQueueQueue[i-1].pId)) {
+        if (pIdsToUnsubscribe.includes(this.readyQueueQueue[i - 1].pId)) {
           this.readyQueueQueue.splice(i,1);
         }
         i -= 1;
@@ -164,27 +164,24 @@ export class Scheduler {
 
   private scheduleListener(lsId: number, pId: string) {
     const listener = this.listeners.get(lsId);
+    const queueItem = {
+      pId,
+      lsId,
+      priority: listener.priority,
+    };
 
     if (listener) {
       let i = this.readyQueueQueue.length;
 
-      if (i === 0) {
-        this.readyQueueQueue.push({
-          pId,
-          lsId,
-          priority: listener.priority,
-        });
+      if (i === 0 || listener.priority > this.readyQueueQueue[i - 1].priority) {
+        this.readyQueueQueue.push(queueItem);
+      } else if (this.readyQueueQueue[0].priority > listener.priority) {
+        this.readyQueueQueue.unshift(queueItem);
       } else {
         do {
           i = i - 1;
-
           if (this.readyQueueQueue[i].priority <= listener.priority) {
-            this.readyQueueQueue.splice(i + 1, 0, {
-              pId,
-              lsId,
-              priority: listener.priority,
-            });
-
+            this.readyQueueQueue.splice(i + 1, 0, queueItem);
             break;
           }
         } while (i);
