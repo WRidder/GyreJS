@@ -1,4 +1,4 @@
-import { IGyreEvent } from './event';
+import { IGyreEvent } from './interfaces';
 
 export interface IReducer {
   (state: object, event: IGyreEvent): any | undefined;

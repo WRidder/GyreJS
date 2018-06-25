@@ -1,4 +1,5 @@
-import { Scheduler, IListenerOptions } from '../src/scheduler';
+import { Scheduler } from '../src/scheduler';
+import { IListenerOptions } from '../src/interfaces';
 
 jest.useFakeTimers();
 

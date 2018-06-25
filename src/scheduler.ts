@@ -1,7 +1,4 @@
-export interface IListenerOptions {
-  id?: string;
-  priority?: number;
-}
+import { IListenerOptions } from './interfaces';
 
 interface IListener {
   id: string;

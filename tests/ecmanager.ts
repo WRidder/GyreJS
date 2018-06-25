@@ -1,8 +1,6 @@
 import { Projection, IReducer } from '../src/projection';
 import { ECManager } from '../src/ecmanager';
-import { IGyreEvent } from '../src/event';
-import { IGyreCommand } from '../src/command';
-import { ICommandHandler } from '../src/commandhandler';
+import { IGyreCommand, IGyreEvent, ICommandHandler } from '../src/interfaces';
 
 describe('ECManager', () => {
   it('should be instantiable', () => {

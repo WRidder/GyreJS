@@ -1,7 +1,5 @@
-import { IGyreCommand } from './command';
-import { IGyreEvent } from './event';
+import { IGyreCommand, IGyreEvent, ICommandHandler } from './interfaces';
 import { Projection } from './projection';
-import { ICommandHandler } from './commandhandler';
 
 export class ECManager {
   private projections: Map<string, Projection> = new Map();

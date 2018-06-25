@@ -1,10 +1,5 @@
-import {GyreCommand} from './command';
-import {GyreEvent} from './event';
-import {Scheduler} from './scheduler';
-
-export interface IGyreOptions {
-  useMultithreading?: boolean;
-}
+import { IGyreCommand, IGyreEvent, IGyreOptions } from './interfaces';
+import { Scheduler } from './scheduler';
 
 export class Gyre {
   scheduler = new Scheduler();
@@ -15,11 +10,11 @@ export class Gyre {
 
   }
 
-  trigger(evt: GyreEvent) {
+  trigger(evt: IGyreEvent) {
 
   }
 
-  issue(cmd: GyreCommand) {
+  issue(cmd: IGyreCommand) {
 
   }
 
