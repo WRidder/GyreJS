@@ -1,13 +1,13 @@
-import { GyreCommand } from './command';
-import { GyreEvent } from './event';
+import { IGyreCommand } from './command';
+import { IGyreEvent } from './event';
 import { Projection } from './projection';
 import { ICommandHandler } from './commandhandler';
 
 export class ECManager {
   private projections: Map<string, Projection> = new Map();
   private cmdHandlers: Map<string, ICommandHandler> = new Map();
-  private events: GyreEvent[] = [];
-  private commands: GyreCommand[] = [];
+  private events: IGyreEvent[] = [];
+  private commands: IGyreCommand[] = [];
   private changeList: Map<string, any> = new Map();
 
   constructor() {}
@@ -20,7 +20,7 @@ export class ECManager {
     this.cmdHandlers.set(id, cmdHandler);
   }
 
-  execute(cmds: GyreCommand[], evts: GyreEvent[]) {
+  execute(cmds: IGyreCommand[], evts: IGyreEvent[]) {
     this.events = this.events.concat(evts);
     this.commands = this.commands.concat(cmds);
 
@@ -34,16 +34,18 @@ export class ECManager {
     }
   }
 
-  trigger(evt: GyreEvent) {
+  trigger(evt: IGyreEvent) {
     this.events.push(evt);
   }
 
-  issue(cmd: GyreCommand) {
+  issue(cmd: IGyreCommand) {
     this.commands.push(cmd);
   }
 
   getChangeList(): Map<string, any> {
-    return this.changeList;
+    const list = new Map(this.changeList);
+    this.changeList.clear();
+    return list;
   }
 
   private handleEvents() {
@@ -66,7 +68,7 @@ export class ECManager {
     while (this.commands.length) {
       const cmd = this.commands.pop();
       this.cmdHandlers.forEach((cmdHandler: ICommandHandler) => {
-        cmdHandler(cmd, this.issue, this.trigger, this.getProjectionState);
+        cmdHandler(cmd, this.issue.bind(this), this.trigger.bind(this), this.getProjectionState.bind(this));
       });
     }
   }

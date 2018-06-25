@@ -1,4 +1,4 @@
-export interface GyreEvent {
+export interface IGyreEvent {
   id: string;
   data: any;
 }

@@ -1,16 +1,16 @@
-export interface ListenerOptions {
+export interface IListenerOptions {
   id?: string;
   priority?: number;
 }
 
-interface Listener {
+interface IListener {
   id: string;
   pIds: string[];
   priority: number;
   cb: (data: any, pId: string) => any;
 }
 
-interface QueueItem {
+interface IQueueItem {
   pId: string;
   priority: number;
   lsId: number;
@@ -18,24 +18,24 @@ interface QueueItem {
 }
 
 export class Scheduler {
-  private readyQueue: QueueItem[] = [];
+  private readyQueue: IQueueItem[] = [];
   private readyQueueIDlist: Set<string> = new Set();
   private timeBudget: number = 10;
   private projectionData: Map<string, object> = new Map();
-  private listeners: Map<number, Listener> = new Map();
+  private listeners: Map<number, IListener> = new Map();
   private listenerCount = 1;
 
   constructor() {}
 
   register(projectionId: string | string[], cb: (data: any, pId: string) => any,
-           opts: ListenerOptions = { priority: 0, id: 'unnamed' }) {
+           opts: IListenerOptions = { priority: 0, id: 'unnamed' }) {
     const pIds = Scheduler.checkIfValidProjectionId(projectionId);
 
     if (typeof cb !== 'function') {
       throw '[GyreJS] Callback should be a function.';
     }
     if (opts.priority < 0 || opts.priority > 99) {
-      throw '[GyreJS] Listener priority should be a number in range of [0,99].';
+      throw '[GyreJS] IListener priority should be a number in range of [0,99].';
     }
 
     const lsId = this.listenerCount;
@@ -46,7 +46,7 @@ export class Scheduler {
       priority: opts.priority,
     });
 
-    this.addListenerToQueue(lsId);
+    this.addIListenerToQueue(lsId);
     this.listenerCount += 1;
 
     return lsId;
@@ -56,7 +56,7 @@ export class Scheduler {
     const pIdsToUnsubscribe: string[] = Scheduler.checkIfValidProjectionId(projectionId);
 
     if (this.listeners.has(lsId)) {
-      const listener: Listener = this.listeners.get(lsId);
+      const listener: IListener = this.listeners.get(lsId);
 
       // If all projectionIds of the current listener are to un-subscribed, remove completely
       const remainingPIds = listener.pIds.filter(x => !pIdsToUnsubscribe.includes(x));
@@ -68,7 +68,7 @@ export class Scheduler {
       let i = this.readyQueue.length;
       while (i) {
         if (pIdsToUnsubscribe.includes(this.readyQueue[i - 1].pId)) {
-          this.readyQueueIDlist.delete(Scheduler.createIDForQueueItem(this.readyQueue[i - 1]));
+          this.readyQueueIDlist.delete(Scheduler.createIDForIQueueItem(this.readyQueue[i - 1]));
           this.readyQueue.splice(i,1);
         }
         i -= 1;
@@ -97,7 +97,7 @@ export class Scheduler {
     // Iterate over listeners
     this.listeners.forEach((listener, lsId) => {
       if (listener.pIds.includes(id)) {
-        this.scheduleListener(lsId, id);
+        this.scheduleIListener(lsId, id);
       }
     });
   }
@@ -177,17 +177,17 @@ export class Scheduler {
     return null;
   }
 
-  private addListenerToQueue(lsId: number) {
+  private addIListenerToQueue(lsId: number) {
     const listener = this.listeners.get(lsId);
 
     listener.pIds.forEach((pId) => {
       if (this.projectionData.has(pId)) {
-        this.scheduleListener(lsId, pId);
+        this.scheduleIListener(lsId, pId);
       }
     });
   }
 
-  private scheduleListener(lsId: number, pId: string) {
+  private scheduleIListener(lsId: number, pId: string) {
     const listener = this.listeners.get(lsId);
 
     if (listener) {
@@ -198,7 +198,7 @@ export class Scheduler {
       };
 
       // Check if not already in queue
-      if (this.readyQueueIDlist.has(Scheduler.createIDForQueueItem(queueItem))) {
+      if (this.readyQueueIDlist.has(Scheduler.createIDForIQueueItem(queueItem))) {
         return;
       }
 
@@ -219,7 +219,7 @@ export class Scheduler {
     }
   }
 
-  private addItemToQueue(qItem: QueueItem, idx: number): void {
+  private addItemToQueue(qItem: IQueueItem, idx: number): void {
     if (idx === 0) {
       this.readyQueue.unshift(qItem);
     } else if (idx === this.readyQueue.length) {
@@ -227,10 +227,10 @@ export class Scheduler {
     } else {
       this.readyQueue.splice(idx, 0, qItem);
     }
-    this.readyQueueIDlist.add(Scheduler.createIDForQueueItem(qItem));
+    this.readyQueueIDlist.add(Scheduler.createIDForIQueueItem(qItem));
   }
 
-  private static createIDForQueueItem(qItem: QueueItem): string {
+  private static createIDForIQueueItem(qItem: IQueueItem): string {
     return qItem.lsId + '-' + qItem.pId;
   }
 

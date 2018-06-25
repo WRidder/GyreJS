@@ -1,21 +1,25 @@
-import {GyreEvent} from './event';
+import { IGyreEvent } from './event';
+
+export interface IReducer {
+  (state: object, event: IGyreEvent): any | undefined;
+}
 
 export class Projection {
   // Members
   private state: object;
-  private readonly reducer: (state: object, event: GyreEvent) => object | undefined = (state, evt) => state;
+  private readonly reducer: IReducer;
 
-  constructor(state: object = {}, reducer: (state: object, event: GyreEvent) => object | undefined) {
+  constructor(state: object = {}, reducer: IReducer) {
     this.state = state;
     this.reducer = reducer;
   }
 
   /**
    * Apply events on this projection. If the state has been altered, return true.
-   * @param {GyreEvent} evt
+   * @param {IGyreEvent} evt
    * @returns {boolean}
    */
-  applyEvent(evt: GyreEvent): boolean {
+  applyEvent(evt: IGyreEvent): boolean {
     const res = this.reducer(this.state, evt);
     if (res !== void 0) {
       this.state = res;

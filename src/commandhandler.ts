@@ -1,7 +1,7 @@
-import { GyreEvent } from './event';
-import { GyreCommand } from './command';
+import { IGyreEvent } from './event';
+import { IGyreCommand } from './command';
 
 export interface ICommandHandler {
-  (cmd: GyreCommand, issue: (evt: GyreCommand) => void, trigger: (evt: GyreEvent) => void,
+  (cmd: IGyreCommand, issue: (evt: IGyreCommand) => void, trigger: (evt: IGyreEvent) => void,
    getProjectionState: (id: string) => any): void;
 }

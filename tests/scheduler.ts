@@ -1,4 +1,4 @@
-import { Scheduler, ListenerOptions } from '../src/scheduler';
+import { Scheduler, IListenerOptions } from '../src/scheduler';
 
 jest.useFakeTimers();
 
@@ -27,7 +27,7 @@ describe('Scheduler', () => {
     describe('to register listeners', () => {
       it('by id, callback, and options.', () => {
         const projectionToSubscribeTo = 'AProjection';
-        const options: ListenerOptions = {
+        const options: IListenerOptions = {
           id: 'SomeListener',
           priority: 99,
         };
@@ -50,7 +50,7 @@ describe('Scheduler', () => {
 
     it('to unregister listeners', () => {
       const projectionToSubscribeTo = 'AProjection';
-      const options: ListenerOptions = {
+      const options: IListenerOptions = {
         id: 'SomeListener',
         priority: 99,
       };

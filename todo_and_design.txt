@@ -103,3 +103,12 @@ Make separate bundles for (if want to use multithreading):
 - render thread
 - projection / command handler thread
 - Task thread
+
+Code layout
+============
+- Maybe put all interfaces in dedicated file?
+-- Export only public interfaces, i.e. for listeners, events, commands, etc
+
+Public release of lib
+=====================
+- Squash commit history
