@@ -1,2 +1,2 @@
-export {Gyre} from './gyre';
-console.log("Hello from gyrejs!");
+export { Gyre } from './gyre';
+export { IGyreCommand, IGyreEvent, IListenerOptions } from './interfaces';
