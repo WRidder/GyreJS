@@ -52,7 +52,7 @@ Terminology
 -- The view (browser) should only depend on current state of all projections.
 - A task is RUN, an event is TRIGGERED, a command is ISSUED.
 
-Considerations
+Considerations / design decisions
 ==============
 - Do new registered listeners get a copy of current state, or only after update (chose to retain copy)
 -- If no, data can be kept in worker only
@@ -60,6 +60,7 @@ Considerations
 --- Means data duplication, this is a downside.
 - ShouldUpdate functions are probably important
 - Add possibility for hooks, i.e. for (de)serialization (for example if you want to use ImmutableJS)
+- Cannot use sharedworkers due to Safari not supporting it.
 
 Possible future features (only if a real need exists)
 ========================
@@ -96,6 +97,7 @@ Demos
 - A page with 100 updating graphs
 -- show difference single-threaded and multi-threaded version. So, 2 different pages.
 - Reddit viewer
+- have examples on codesandbox or codepen
 
 Production use notes
 ====================
@@ -103,6 +105,9 @@ Make separate bundles for (if want to use multithreading):
 - render thread
 - projection / command handler thread
 - Task thread
+Html API required:
+- Worker (if you want to use the multithreading functionality)
+
 
 Code layout
 ============
@@ -112,6 +117,11 @@ Code layout
 Public release of lib
 =====================
 - Squash commit history
+- Distribution methods
+-- See: https://nolanlawson.com/2015/10/19/the-struggles-of-publishing-a-javascript-library/
+-- web compatible format (UMD, AMD,…) in ./dist
+-- S5 compiled source in lib (keeping the file structure of src)
+-- cdn (jsDelivr / cdnjs)
 
 USPs
 ====
