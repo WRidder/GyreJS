@@ -1,7 +1,10 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/index.ts',
+  entry: {
+    main: './src/index.ts',
+    ecworker: './src/index_ecworker.ts',
+  },
   module: {
     rules: [
       {

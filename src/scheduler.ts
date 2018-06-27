@@ -1,6 +1,6 @@
-import { IListenerOptions } from './interfaces';
+import { IListenerOptions, IListener, IListenerGenerator } from './interfaces';
 
-interface IListener {
+interface IListenerItem {
   id: string;
   pIds: string[];
   priority: number;
@@ -19,26 +19,17 @@ export class Scheduler {
   private readyQueueIDlist: Set<string> = new Set();
   private timeBudget: number = 10;
   private projectionData: Map<string, object> = new Map();
-  private listeners: Map<number, IListener> = new Map();
+  private listeners: Map<number, IListenerItem> = new Map();
   private listenerCount = 1;
 
   constructor() {}
 
-  register(projectionId: string | string[], cb: (data: any, pId: string) => any,
+  register(pIds: string[], cb: (data: any, pId: string) => any,
            opts: IListenerOptions = { priority: 0, id: 'unnamed' }) {
-    const pIds = Scheduler.checkIfValidProjectionId(projectionId);
-
-    if (typeof cb !== 'function') {
-      throw '[GyreJS] Callback should be a function.';
-    }
-    if (opts.priority < 0 || opts.priority > 99) {
-      throw '[GyreJS] IListener priority should be a number in range of [0,99].';
-    }
-
     const lsId = this.listenerCount;
     this.listeners.set(this.listenerCount, {
-      pIds,
       cb,
+      pIds,
       id: opts.id,
       priority: opts.priority,
     });
@@ -49,11 +40,9 @@ export class Scheduler {
     return lsId;
   }
 
-  unregister(lsId: number, projectionId?: string[] | string) {
-    const pIdsToUnsubscribe: string[] = Scheduler.checkIfValidProjectionId(projectionId);
-
+  unregister(lsId: number, pIdsToUnsubscribe: string[] = []) {
     if (this.listeners.has(lsId)) {
-      const listener: IListener = this.listeners.get(lsId);
+      const listener: IListenerItem = this.listeners.get(lsId);
 
       // If all projectionIds of the current listener are to un-subscribed, remove completely
       const remainingPIds = listener.pIds.filter(x => !(pIdsToUnsubscribe.indexOf(x) > -1));
@@ -122,7 +111,9 @@ export class Scheduler {
         try {
           ret = item.genFn.next();
         } catch (e) {
-          console.error(`[GyreJS] Error invoking listener (id: ${item.lsId}) for projection ${item.pId}: `, e);
+          console.error(
+            `[GyreJS] Error during invocation of listener (id: ${item.lsId}) for projection ${item.pId}: `,
+            e);
         }
         if (!ret.done) {
           this.readyQueue.push(item);
@@ -135,14 +126,19 @@ export class Scheduler {
       try {
         res = cb(this.projectionData.get(item.pId), item.pId);
       } catch (e) {
-        console.error(`[GyreJS] Error invoking listener (id: ${item.lsId}) for projection ${item.pId}: `, e);
+        console.error(
+          `[GyreJS] Error during invocation of listener (id: ${item.lsId}) for projection ${item.pId}: `,
+          e);
       }
 
       // Check if it is a generator function
+      // @ts-ignore
       if (res && res.next) {
+        // @ts-ignore
         const ret = res.next();
 
         if (!ret.done) {
+          // @ts-ignore
           item.genFn = res;
           this.readyQueue.push(item);
         }
@@ -166,7 +162,7 @@ export class Scheduler {
     return Date.now();
   }
 
-  private getCallbackById(lsId: number): Function | null {
+  private getCallbackById(lsId: number): (data: any, pId: string) => void  | GeneratorFunction | null {
     const listener = this.listeners.get(lsId);
     if (listener) {
       return listener.cb;
@@ -229,24 +225,5 @@ export class Scheduler {
 
   private static createIDForIQueueItem(qItem: IQueueItem): string {
     return qItem.lsId + '-' + qItem.pId;
-  }
-
-  private static checkIfValidProjectionId(projectionId: string | string[]): string[] {
-    // Input checking
-    if (typeof projectionId !== 'string' && projectionId.constructor !== Array) {
-      throw 'ProjectionId should be a(n array of) string(s) with non-zero length.';
-    }
-    if (typeof projectionId === 'string' && projectionId.length === 0) {
-      throw 'ProjectionId should be a(n array of) string(s) with non-zero length.';
-    }
-    if (typeof projectionId !== 'string') {
-      projectionId.forEach((pId) => {
-        if (typeof pId !== 'string' || pId.length === 0) {
-          throw 'ProjectionId should be a(n array of) string(s) with non-zero length.';
-        }
-      });
-    }
-
-    return (typeof projectionId === 'string') ? [projectionId] : projectionId;
   }
 }

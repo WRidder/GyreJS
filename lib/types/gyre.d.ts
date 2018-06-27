@@ -1,10 +1,13 @@
-import { IGyreCommand, IGyreEvent, IGyreOptions } from './interfaces';
-import { Scheduler } from './scheduler';
+import { IGyreCommand, IGyreEvent, IGyreOptions, IListenerOptions, IListener } from './interfaces';
 export declare class Gyre {
-    scheduler: Scheduler;
-    constructor();
-    start(opts?: IGyreOptions): void;
-    trigger(evt: IGyreEvent): void;
-    issue(cmd: IGyreCommand): void;
-    private startWorkers();
+    private scheduler;
+    private bWorker;
+    constructor(opts: IGyreOptions);
+    trigger({id, data}: IGyreEvent): void;
+    issue({id, data}: IGyreCommand): void;
+    register(projectionId: string | string[], cb: IListener, opts?: IListenerOptions): void;
+    unregister(lsId: number, projectionId?: string[] | string): void;
+    private startWorker(path);
+    private projectionUpdate(msg);
+    private static checkIfValidProjectionId(projectionId);
 }

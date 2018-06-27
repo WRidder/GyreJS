@@ -16,9 +16,9 @@ module.exports = merge(common, {
     new webpack.DefinePlugin({'process.env.NODE_ENV': JSON.stringify('production')}),
   ],
   output: {
-    filename: 'main.min.js',
+    filename: '[name].min.js',
     path: path.resolve(__dirname, 'lib'),
-    library: "gyrejs",
+    library: "gyrejs-[name]",
     libraryTarget: 'umd',
     umdNamedDefine: true
   }

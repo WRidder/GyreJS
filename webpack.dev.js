@@ -21,9 +21,9 @@ module.exports = merge(common, {
     }, path.resolve(__dirname, 'src'))
   ],
   output: {
-    filename: 'main.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'lib'),
-    library: "gyrejs",
+    library: "gyrejs-[name[",
     libraryTarget: 'umd',
     umdNamedDefine: true
   }

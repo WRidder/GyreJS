@@ -112,7 +112,8 @@ Html API required:
 Code layout
 ============
 - [Done] Maybe put all interfaces in dedicated file?
--- Export only public interfaces, i.e. for listeners, events, commands, etc
+-- [Done] Export only public interfaces, i.e. for listeners, events, commands, etc
+- Input verification only in main Gyre object
 
 Public release of lib
 =====================

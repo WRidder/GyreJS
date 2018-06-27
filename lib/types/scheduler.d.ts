@@ -7,8 +7,8 @@ export declare class Scheduler {
     private listeners;
     private listenerCount;
     constructor();
-    register(projectionId: string | string[], cb: (data: any, pId: string) => any, opts?: IListenerOptions): number;
-    unregister(lsId: number, projectionId?: string[] | string): void;
+    register(pIds: string[], cb: (data: any, pId: string) => any, opts?: IListenerOptions): number;
+    unregister(lsId: number, pIdsToUnsubscribe?: string[]): void;
     /**
      * Comment for method ´setTimeBudget´.
      * @param ms  Comment for parameter ´target´.
@@ -32,5 +32,4 @@ export declare class Scheduler {
     private scheduleIListener(lsId, pId);
     private addItemToQueue(qItem, idx);
     private static createIDForIQueueItem(qItem);
-    private static checkIfValidProjectionId(projectionId);
 }
