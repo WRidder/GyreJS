@@ -6,7 +6,7 @@ export class ECManager {
   private cmdHandlers: Map<string, ICommandHandler> = new Map();
   private events: IGyreEvent[] = [];
   private commands: IGyreCommand[] = [];
-  private changeList: Map<string, any> = new Map();
+  private changeList: any = {};
 
   constructor() {}
 
@@ -19,8 +19,13 @@ export class ECManager {
   }
 
   execute(cmds: IGyreCommand[], evts: IGyreEvent[]) {
-    this.events = this.events.concat(evts);
-    this.commands = this.commands.concat(cmds);
+    if (evts) {
+      this.events = this.events.concat(evts);
+    }
+
+    if (cmds) {
+      this.commands = this.commands.concat(cmds);
+    }
 
     // Handle all commands and events until done.
     while (this.events.length || this.commands.length) {
@@ -41,8 +46,8 @@ export class ECManager {
   }
 
   getChangeList(): Map<string, any> {
-    const list = new Map(this.changeList);
-    this.changeList.clear();
+    const list = this.changeList;
+    this.changeList = {};
     return list;
   }
 
@@ -56,7 +61,8 @@ export class ECManager {
 
       this.projections.forEach((projection, id) => {
         if (projection.applyEvent(evt)) {
-          this.changeList.set(id, projection.getState());
+          console.log('Adding to changelist');
+          this.changeList[id] = projection.getState();
         }
       });
     }

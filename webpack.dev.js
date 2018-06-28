@@ -25,6 +25,7 @@ module.exports = merge(common, {
     path: path.resolve(__dirname, 'lib'),
     library: "gyrejs-[name[",
     libraryTarget: 'umd',
-    umdNamedDefine: true
+    umdNamedDefine: true,
+    globalObject: 'this'
   }
 });

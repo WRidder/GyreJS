@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./types/",
+    "outDir": "../types/",
     "sourceMap": true,
     "noImplicitAny": true,
     "module": "es6",

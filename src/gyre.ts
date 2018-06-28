@@ -2,18 +2,16 @@ import { IGyreCommand, IGyreEvent, IGyreOptions, IECInterface, IListenerOptions,
 import { Scheduler } from './scheduler';
 
 interface IProjectionMessage {
-  data: {
-    id: string;
-    data: any;
-  };
+  id: string;
+  data: any;
 }
 
 export class Gyre {
   private scheduler = new Scheduler();
   private bWorker: Worker;
 
-  constructor(opts: IGyreOptions) {
-    this.startWorker(opts.workerScriptPath);
+  constructor(ecworker: Worker) {
+    this.startWorker(ecworker);
   }
 
   trigger({ id, data }: IGyreEvent) {
@@ -58,15 +56,29 @@ export class Gyre {
     this.scheduler.unregister(lsId, pIds);
   }
 
-  private startWorker(path: string) {
-    this.bWorker = new Worker(path);
+  private startWorker(ecworker: Worker) {
+    this.bWorker = ecworker;
 
     // Register callbacks
     this.bWorker.onmessage = this.projectionUpdate.bind(this);
   }
 
-  private projectionUpdate(msg: IProjectionMessage) {
-    this.scheduler.projectionUpdate(msg.data.id, msg.data.data);
+  private projectionUpdate(msg: any) {
+
+
+    // Deserialize
+    const changeList = JSON.parse(msg.data);
+
+    console.log('Received in pU:', changeList);
+
+    // Loop updated projections
+    Object.keys(changeList).forEach((id, i) => {
+      this.scheduler.projectionUpdate(id, changeList[id]);
+    });
+
+    // changeList.forEach(({ id, data }: IProjectionMessage) => {
+    //  this.scheduler.projectionUpdate(id, data);
+    // });
   }
 
   private static checkIfValidProjectionId(projectionId: string | string[]): string[] {
