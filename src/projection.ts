@@ -2,8 +2,8 @@ import { IGyreEvent, IReducer } from './interfaces';
 
 export class Projection {
   // Members
-  private state: object;
-  private readonly reducer: IReducer;
+  protected state: object;
+  protected  readonly reducer: IReducer;
 
   constructor(state: object = {}, reducer: IReducer) {
     this.state = state;
@@ -13,10 +13,11 @@ export class Projection {
   /**
    * Apply events on this projection. If the state has been altered, return true.
    * @param {IGyreEvent} evt
+   * @param {object} parentState
    * @returns {boolean}
    */
-  applyEvent(evt: IGyreEvent): boolean {
-    const res = this.reducer(this.state, evt);
+  applyEvent(evt: IGyreEvent, parentState: object = {}): boolean {
+    const res = this.reducer(this.state, evt, parentState);
     if (res !== void 0) {
       this.state = res;
       return true;

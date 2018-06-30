@@ -12,6 +12,13 @@ export class Gyre {
 
   constructor(ecworker: Worker) {
     this.startWorker(ecworker);
+
+    setTimeout(
+      (function tick() {
+        this.scheduler.runOnce();
+        setTimeout(tick.bind(this), 0);
+      }).bind(this),
+      0);
   }
 
   trigger({ id, data }: IGyreEvent) {
@@ -64,12 +71,8 @@ export class Gyre {
   }
 
   private projectionUpdate(msg: any) {
-
-
     // Deserialize
-    const changeList = JSON.parse(msg.data);
-
-    console.log('Received in pU:', changeList);
+    const changeList = msg.data;
 
     // Loop updated projections
     Object.keys(changeList).forEach((id, i) => {

@@ -1,6 +1,6 @@
-import { Projection, IReducer } from '../src/projection';
+import { Projection } from '../src/projection';
 import { ECManager } from '../src/ecmanager';
-import { IGyreCommand, IGyreEvent, ICommandHandler } from '../src/interfaces';
+import { IGyreCommand, IGyreEvent, ICommandHandler, IReducer } from '../src/interfaces';
 
 describe('ECManager', () => {
   it('should be instantiable', () => {
@@ -40,10 +40,23 @@ describe('ECManager', () => {
         }
       };
 
+      const reducer3: IReducer = (state, evt, parentState) => {
+        switch (evt.id) {
+          case 'add':
+            return Object.assign({}, state, {
+              val: state.val + parentState.val + evt.data,
+            })
+        }
+      };
+
       const aProjection1 = new Projection({ val: 1 }, reducer1);
       const aProjection2 = new Projection({ val: 1 }, reducer2);
+      const aChainedProjection = new Projection({ val: 2 }, reducer3);
+      const aChainedProjection2 = new Projection({ val: 2 }, reducer3);
       anECManager.addProjection('someProjection', aProjection1);
       anECManager.addProjection('anotherProjection', aProjection2);
+      anECManager.addProjection('chainedProjection', aChainedProjection, 'someProjection');
+      anECManager.addProjection('chainedProjection2', aChainedProjection2, 'chainedProjection');
     });
 
 
@@ -70,14 +83,14 @@ describe('ECManager', () => {
       anECManager.execute([], [evtAdd, evtSubtract]);
 
       // Get changes
-      const changeList: Map<string, any> = anECManager.getChangeList();
-      const changeList2: Map<string, any> = anECManager.getChangeList();
+      const changeList = anECManager.getChangeList();
+      const changeList2 = anECManager.getChangeList();
 
-      expect(changeList.size).toEqual(2);
-      expect(changeList.get('someProjection').val).toEqual(3);
-      expect(changeList.get('anotherProjection').val).toEqual(-1);
+      expect(Object.keys(changeList).length).toEqual(4);
+      expect(changeList['someProjection'].val).toEqual(3);
+      expect(changeList['anotherProjection'].val).toEqual(-1);
 
-      expect(changeList2.size).toEqual(0);
+      expect(Object.keys(changeList2).length).toEqual(0);
     });
 
     it('to issue commands and use command handlers', () => {
@@ -106,10 +119,26 @@ describe('ECManager', () => {
       anECManager.execute([], []);
 
       // Get changes
-      const changeList: Map<string, any> = anECManager.getChangeList();
+      const changeList = anECManager.getChangeList();
 
-      expect(changeList.size).toEqual(1);
-      expect(changeList.get('someProjection').val).toEqual(2);
+      expect(Object.keys(changeList).length).toEqual(3);
+      expect(changeList['someProjection'].val).toEqual(2);
+    });
+
+    it('supporting chained projections', () => {
+      const evtAdd: IGyreEvent = {
+        id: 'add',
+        data: 2,
+      };
+      anECManager.execute([], [evtAdd]);
+
+      // Get changes
+      const changeList = anECManager.getChangeList();
+
+      expect(Object.keys(changeList).length).toEqual(3);
+      expect(changeList['someProjection'].val).toEqual(3);
+      expect(changeList['chainedProjection'].val).toEqual(7);
+      expect(changeList['chainedProjection2'].val).toEqual(11);
     });
   });
 });

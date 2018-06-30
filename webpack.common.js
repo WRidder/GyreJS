@@ -2,8 +2,7 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    main: './src/index.ts',
-    ecworker: './src/index_ecworker.ts',
+    main: './src/index.ts'
   },
   module: {
     rules: [

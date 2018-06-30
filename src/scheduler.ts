@@ -100,6 +100,8 @@ export class Scheduler {
 
       // Get work item
       const item = this.readyQueue.pop();
+      const rdqId = Scheduler.createIDForIQueueItem(item);
+      this.readyQueueIDlist.delete(rdqId);
       const cb = this.getCallbackById(item.lsId);
       if (!cb) {
         continue;
@@ -111,12 +113,14 @@ export class Scheduler {
         try {
           ret = item.genFn.next();
         } catch (e) {
+          const listener = this.listeners.get(item.lsId);
           console.error(
-            `[GyreJS] Error during invocation of listener (id: ${item.lsId}) for projection ${item.pId}: `,
+            `[GyreJS] Error during invocation of listener (id: ${listener.id}) for projection '${item.pId}': `,
             e);
         }
         if (!ret.done) {
           this.readyQueue.push(item);
+          this.readyQueueIDlist.add(rdqId);
         }
         continue;
       }
@@ -126,8 +130,9 @@ export class Scheduler {
       try {
         res = cb(this.projectionData.get(item.pId), item.pId);
       } catch (e) {
+        const listener = this.listeners.get(item.lsId);
         console.error(
-          `[GyreJS] Error during invocation of listener (id: ${item.lsId}) for projection ${item.pId}: `,
+          `[GyreJS] Error during invocation of listener (id: ${listener.id}) for projection '${item.pId}': `,
           e);
       }
 
@@ -196,6 +201,7 @@ export class Scheduler {
       }
 
       let i = this.readyQueue.length;
+
       if (i === 0 || listener.priority > this.readyQueue[i - 1].priority) {
         this.addItemToQueue(queueItem, i);
       } else if (this.readyQueue[0].priority > listener.priority) {

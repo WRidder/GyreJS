@@ -26,7 +26,7 @@
   },
   "scripts": {
     "start": "webpack-dev-server --open --config webpack.dev.js",
-    "test": "jest --watch",
+    "test": "jest --coverage",
     "lint": "npm run lint-ci --force",
     "lint-ci": "tslint --project .",
     "build": "webpack --config webpack.dev.js",
@@ -45,6 +45,9 @@
       "ts",
       "tsx",
       "js"
-    ]
+    ],
+    "collectCoverage": true,
+    "coverageDirectory": "<rootDir>/coverage",
+    "coverageReporters": ["html"]
   }
 }

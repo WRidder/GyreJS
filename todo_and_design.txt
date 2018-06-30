@@ -20,23 +20,32 @@ Internals:
 
 Misc:
 - [Done] Could allow for cooperative scheduling (yielding), maybe use ES2015 yield?
-- Use both for render side as well as for tasks
--- For tasks, could use multiple workers. Use 'affinity' (modulo #workers?) to distribute.
--- TaskScheduler and RenderScheduler
 - [Done] Listener maybe subscribe to multiple projections?
 - [Done] Use pop instead of shift to get items from queue, it's usually much faster (does not require reindexing)
 - [Done] How to deal with starvation? I.e. increment priority of remaining items in queue.
+- [Done] Compensate for desired fps. Even if timeslot is 10ms, if time since last update is too long for FPS, reduce timeslot.
 
 To fix:
 - [Done] Prevent adding same listener for a projection in queue more than once
 
 Assumptions:
 - Scheduler is only top-level function in renderer thread
+-- Deals with 'view only' libraries like react.
 - Any events, like click handlers, should be seen as interrupt handlers, and their execution as short as possible.
 
 ECManager
 =========
-- Add timed events and commands using setInterval
+- [Done] Add timed events and commands using setInterval
+- [Done] Support chained projections
+- Only push projections which have active listeners
+-- lazy update projections which have no active listeners? (i.e. return data asap to main thread)
+--- keep a map of projections (ids) and amount of listeners?
+--- Might not be needed, maybe only event if projection is listened to at all. Can be determined by gyre.
+- Publish projection update at fixed interval.
+
+TaskManager
+===========
+-- For tasks, could use multiple workers. Use 'affinity' (modulo #workers?) to distribute.
 
 Terminology
 =============
@@ -58,9 +67,12 @@ Considerations / design decisions
 -- If no, data can be kept in worker only
 -- If yes, the scheduler should probably keep copy of latest state of projection..
 --- Means data duplication, this is a downside.
+-- Can also notify worker to sent data and only update new registered listeners
 - ShouldUpdate functions are probably important
 - Add possibility for hooks, i.e. for (de)serialization (for example if you want to use ImmutableJS)
 - Cannot use sharedworkers due to Safari not supporting it.
+- Support chained projections to tailor data as much as possible for views. Keep projection updates as small as possible.
+-- Serialization should stay < ~ 10ms.
 
 Possible future features (only if a real need exists)
 ========================
@@ -74,6 +86,8 @@ Proper tooling is the most important part and has a front-row seat in this proje
 -- Support custom events which can be used to trace function execution
 -- Allow show diff of each projection as result from event
 --- https://github.com/zgrossbart/jdd
+-- Can show size of projection to be exported to main thread by serializing it in debug mode
+
 
 Inspiration
 ========================
@@ -85,6 +99,7 @@ Documentation
 - User doc
 -- OVerview of where does business logic go (in commands (for validation)/projections), etc
 - Developer doc
+- [Done] Coverage report
 
 Child extensions
 ================
@@ -118,11 +133,12 @@ Code layout
 Public release of lib
 =====================
 - Squash commit history
-- Distribution methods
+- Distribution methods (look at VueJS)
 -- See: https://nolanlawson.com/2015/10/19/the-struggles-of-publishing-a-javascript-library/
 -- web compatible format (UMD, AMD,…) in ./dist
 -- S5 compiled source in lib (keeping the file structure of src)
 -- cdn (jsDelivr / cdnjs)
+- Coverage report
 
 USPs
 ====
@@ -130,3 +146,12 @@ USPs
 - Supports multithreading
 - Fully tested (100% coverage?)
 - Typescript support (also comes with the types)
+
+Best practices
+==============
+- Use many projections, can use chained projections. Try to get data layout to be as optimal for views.
+
+Monetization
+============
+- Patreon, books, videos, donations, debugging website.
+- If large sum: able to hire someone to do SLA.

@@ -36,9 +36,10 @@ export interface IReducer {
      *
      * @param state The current state of the projection.
      * @param event The event to apply.
+     * @param parentState State of parent projection
      * @return Returns the new state if it has been changed.
      */
-    (state: object, event: IGyreEvent): any | undefined;
+    (state: any, event: IGyreEvent, parentState?: any): any | undefined;
 }
 export interface IECInterface {
     trigger: Function;
