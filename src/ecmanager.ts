@@ -14,7 +14,7 @@ export class ECManager {
   private commands: IGyreCommand[] = [];
   private changeList: any = {};
 
-  constructor(interval: number) {
+  constructor(interval: number = 16) {
     setInterval(
       () => {
         postMessage(this.getChangeList());

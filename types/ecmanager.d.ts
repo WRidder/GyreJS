@@ -10,7 +10,7 @@ export declare class ECManager {
     private events;
     private commands;
     private changeList;
-    constructor(interval: number);
+    constructor(interval?: number);
     addProjection(id: string, projection: Projection, parentProjection?: string): void;
     addCommandHandler(id: string, cmdHandler: ICommandHandler): void;
     execute(cmds: IGyreCommand[], evts: IGyreEvent[]): void;

@@ -3,6 +3,15 @@ Overview
 Main components: Scheduler, Projections, Event Queue, Commands, Events, Tasks
 Commands/events: ConfirmOrder / OrderConfirmed
 
+
+GyreJs general functionality
+============================
+- Provide hooks, e.g. for serialization.
+
+To investigate / check / trace
+======================
+- How webworker messages are queued by event loop.
+
 Scheduler
 ================
 Public API:
@@ -24,6 +33,9 @@ Misc:
 - [Done] Use pop instead of shift to get items from queue, it's usually much faster (does not require reindexing)
 - [Done] How to deal with starvation? I.e. increment priority of remaining items in queue.
 - [Done] Compensate for desired fps. Even if timeslot is 10ms, if time since last update is too long for FPS, reduce timeslot.
+- Batch commands/events being send to ECManager
+-- Send at end of listener update cycle
+-
 
 To fix:
 - [Done] Prevent adding same listener for a projection in queue more than once
@@ -41,11 +53,13 @@ ECManager
 -- lazy update projections which have no active listeners? (i.e. return data asap to main thread)
 --- keep a map of projections (ids) and amount of listeners?
 --- Might not be needed, maybe only event if projection is listened to at all. Can be determined by gyre.
-- Publish projection update at fixed interval.
+- [Done] Publish projection update at fixed interval.
+- Option to set minimal interval between updates for a given projection.
 
 TaskManager
 ===========
 -- For tasks, could use multiple workers. Use 'affinity' (modulo #workers?) to distribute.
+- Task probably needs an initialization function. E.g. for threejs, create all the objects.
 
 Terminology
 =============
@@ -73,6 +87,8 @@ Considerations / design decisions
 - Cannot use sharedworkers due to Safari not supporting it.
 - Support chained projections to tailor data as much as possible for views. Keep projection updates as small as possible.
 -- Serialization should stay < ~ 10ms.
+- High precision timing is problematic due to the newly implemented mitigations against spectre/meltdown attacks.
+-- Precision of performance.now and date.gettime is ~2ms in firefox. 100us + 100us jitter in chrome/IE.
 
 Possible future features (only if a real need exists)
 ========================
@@ -87,7 +103,34 @@ Proper tooling is the most important part and has a front-row seat in this proje
 -- Allow show diff of each projection as result from event
 --- https://github.com/zgrossbart/jdd
 -- Can show size of projection to be exported to main thread by serializing it in debug mode
+-- Projection stats
+--- data size
+--- time taken for transmission (record timestamp on send and receive)
+--- (number of) events reacted to
+--- number of (indirect) listeners / chained projections
 
+-- Stats page
+--- numbers: nr of received evts/cmds, total data size,
+--- graphs: (#evts/cmds, transmitted and received data size, listeners.
+
+- For tracing
+-- Listener invocation
+--- to track: time, errors
+--- Add support for Gyre.trace() function (only in dev mode?)
+---- Can track in which listener itś called, due to either timestamp or keeping a counter (ts probably not precise enough)
+-- command / events send to ECmanager, also size.
+--- seralization time
+
+- Warnings / checks
+-- If commandhandlers or chaned projections change the parent / source state.
+-- Time overrides
+
+- Enable / disable detailed reporting (or itś just trace mode which you can enable)
+
+- for charts, use: https://vx-demo.now.sh/
+- ui lib: semantic ui react + semantic theme.
+- i18n: https://github.com/airbnb/polyglot.js
+- Create chrome/firefox extensions.
 
 Inspiration
 ========================
@@ -110,9 +153,16 @@ Sensible hooks
 Demos
 ======
 - A page with 100 updating graphs
+-- Could react to mouse movement for example, or scroll location. Which udpates the data.
 -- show difference single-threaded and multi-threaded version. So, 2 different pages.
 - Reddit viewer
 - have examples on codesandbox or codepen
+- WebGL 3D demo
+-- https://github.com/lo-th/Oimo.js/ (physics) + threejs
+-- oimo can run in a task, e.g. using setinterval
+
+Examples
+- View libraries: react, vue, riot.js, preact
 
 Production use notes
 ====================
@@ -140,16 +190,24 @@ Public release of lib
 -- cdn (jsDelivr / cdnjs)
 - Coverage report
 
+Support libs
+=============
+- gyrejs-router (very simple router solution)
+-- react-gyrejs-router (sort of copy of: https://github.com/reactjs/react-router-redux)
+-- vue-gyrejs-router (mimic functionality of vue router?)
+
 USPs
 ====
 - No dependencies
 - Supports multithreading
 - Fully tested (100% coverage?)
 - Typescript support (also comes with the types)
+- minimal surface API (it just works)
 
 Best practices
 ==============
 - Use many projections, can use chained projections. Try to get data layout to be as optimal for views.
+- State in projections should be serializable.
 
 Monetization
 ============
