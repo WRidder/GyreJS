@@ -55,7 +55,7 @@ export class Scheduler {
       while (i) {
         if (pIdsToUnsubscribe.indexOf(this.readyQueue[i - 1].pId) > -1) {
           this.readyQueueIDlist.delete(Scheduler.createIDForIQueueItem(this.readyQueue[i - 1]));
-          this.readyQueue.splice(i,1);
+          this.readyQueue.splice(i, 1);
         }
         i -= 1;
       }
@@ -230,6 +230,6 @@ export class Scheduler {
   }
 
   private static createIDForIQueueItem(qItem: IQueueItem): string {
-    return qItem.lsId + '-' + qItem.pId;
+    return `${qItem.lsId}-${qItem.pId}`;
   }
 }

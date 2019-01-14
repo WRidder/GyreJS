@@ -83,7 +83,7 @@ export class ECManager {
 
   setTimedEvent(interval: number) {
     const evt: IGyreEvent = {
-      id: 'timedEvt_' + interval,
+      id: `timedEvt_${interval}`,
       data: interval,
     };
 
@@ -99,7 +99,7 @@ export class ECManager {
 
   setTimedCommand(interval: number) {
     const cmd: IGyreCommand = {
-      id: 'timedCmd_' + interval,
+      id: `timedCmd_${interval}`,
       data: interval,
     };
 
