@@ -8,7 +8,8 @@
   "devDependencies": {
     "@types/jest": "^22.2.2",
     "clean-webpack-plugin": "^0.1.19",
-    "jest": "^22.4.3",
+    "ifdef-loader": "^2.1.1",
+    "jest": "^22.4.4",
     "npm-run-all": "^4.1.2",
     "ts-jest": "^22.4.2",
     "ts-loader": "^4.1.0",
@@ -37,6 +38,7 @@
   "author": "Wilbert van de Ridder",
   "license": "MIT",
   "jest": {
+    "testURL": "http://localhost/",
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
@@ -48,6 +50,8 @@
     ],
     "collectCoverage": true,
     "coverageDirectory": "<rootDir>/coverage",
-    "coverageReporters": ["html"]
+    "coverageReporters": [
+      "html"
+    ]
   }
 }

@@ -3,11 +3,21 @@ const common = require('./webpack.common.js');
 const path = require('path');
 const TypedocWebpackPlugin = require('typedoc-webpack-plugin');
 
-module.exports = merge(common, {
+module.exports = merge.smart(common, {
   mode: 'development',
   devtool: 'inline-source-map',
   devServer: {
     contentBase: './lib'
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: [
+          { loader: "ifdef-loader", options: { DEBUG: true } }
+        ],
+      }
+    ]
   },
   plugins: [
     new TypedocWebpackPlugin({

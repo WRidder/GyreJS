@@ -1,5 +1,6 @@
 const path = require('path');
 
+
 module.exports = {
   entry: {
     main: './src/index.ts'
@@ -8,7 +9,10 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: [
+          { loader: 'ts-loader'},
+          { loader: "ifdef-loader", options: opts }
+        ],
         exclude: /node_modules/
       }
     ]

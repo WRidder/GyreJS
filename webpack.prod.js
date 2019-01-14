@@ -8,6 +8,16 @@ const path = require('path');
 module.exports = merge(common, {
   mode: 'production',
   devtool: 'source-map',
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: [
+          { loader: "ifdef-loader", options: { DEBUG: false } }
+        ],
+      }
+    ]
+  },
   plugins: [
     new UglifyJSPlugin({
       sourceMap: true
