@@ -7,6 +7,7 @@
     "target": "es6",
     "jsx": "react",
     "declaration": true,
+    "esModuleInterop": true,
     "lib": [
       "es2016",
       "webworker"
