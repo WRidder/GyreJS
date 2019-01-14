@@ -12,7 +12,7 @@ jobs:
         - npm run lint-ci
         - npm run test
     - stage: npm release
-      if: tag IS present
+      if: tag IS present AND branch = master
       node_js: "8"
       script: npm build-prod
       deploy:
