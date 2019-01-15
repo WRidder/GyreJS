@@ -7,6 +7,7 @@ stages:
   - precache
   - lint
   - test
+  - coverage
   - release
 
 # defaults
@@ -46,7 +47,7 @@ jobs:
         - "9"
         - "11"
       script:
-        - npm run test
+        - npm run test && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
     - stage: release
       if: tag IS present
       script: npm build-prod
