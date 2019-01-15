@@ -1,17 +1,39 @@
 language: node_js
+node_js:
+  - "9"
 stages:
+  - precache
+  - lint
   - test
-  - npm release
+  - release
+before_install: |
+  [[ ! -x ~/npm/node_modules/.bin/npm ]] && {
+    # caching feature creates `~/npm` for us
+    cd ~/npm && npm install npm
+    cd -
+  } || true
+  # avoids bugs around https://github.com/travis-ci/travis-ci/issues/5092
+  export PATH=~/npm/node_modules/.bin:$PATH
+# this avoids compilation in most cases (where we don't need it)
+install: npm ci --ignore-scripts
+cache:
+  directories:
+    - ~/.npm # cache npm's cache
+    - ~/npm # cache latest npm
+
 jobs:
   include:
+    - stage: precache
+      script: true
     - stage: test
-      node_js:
-        - "8"
-        - "9"
+        script:
+          - npm run lint-ci
+          - npm run test
+    - stage: test
       script:
         - npm run lint-ci
         - npm run test
-    - stage: npm release
+    - stage: release
       if: tag IS present AND branch = master
       node_js: "8"
       script: npm build-prod
@@ -22,3 +44,11 @@ jobs:
         skip_cleanup: true
         on:
           tags: true
+
+notifications:
+  webhooks:
+    urls:
+      - "$GITTER_WEBHOOK"
+    on_success: change
+    on_failure: always
+    on_start: never
