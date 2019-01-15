@@ -47,7 +47,7 @@ jobs:
         - "9"
         - "11"
       script:
-        - npm run test && ls && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
+        - npm run test && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
     - stage: release
       if: tag IS present
       script: npm run build-prod
