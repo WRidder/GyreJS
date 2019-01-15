@@ -48,7 +48,7 @@ jobs:
       script:
         - npm run test
     - stage: release
-      if: tag IS present AND branch = master
+      if: tag IS present
       script: npm build-prod
       deploy:
         provider: npm
