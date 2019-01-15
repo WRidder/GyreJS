@@ -25,13 +25,11 @@ jobs:
   include:
     - stage: precache
       script: true
-    - stage: test
+    - stage: lint
         script:
           - npm run lint-ci
-          - npm run test
     - stage: test
       script:
-        - npm run lint-ci
         - npm run test
     - stage: release
       if: tag IS present AND branch = master
