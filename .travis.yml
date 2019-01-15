@@ -11,7 +11,7 @@ stages:
 
 # defaults
 language: node_js
-node_js: '11'
+node_js: '8'
 addons:
   apt:
     packages:
@@ -41,11 +41,14 @@ jobs:
       script:
         - npm run lint-ci
     - stage: test
+      node_js:
+        - "8"
+        - "9"
+        - "11"
       script:
         - npm run test
     - stage: release
       if: tag IS present AND branch = master
-      node_js: "8"
       script: npm build-prod
       deploy:
         provider: npm
