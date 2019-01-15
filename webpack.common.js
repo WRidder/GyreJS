@@ -10,7 +10,6 @@ module.exports = {
       {
         test: /\.tsx?$/,
         use: [
-          { loader: "ifdef-loader", options: { DEBUG: false } },
           { loader: 'ts-loader'},
         ],
         exclude: /node_modules/

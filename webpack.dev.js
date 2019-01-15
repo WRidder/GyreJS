@@ -9,16 +9,6 @@ module.exports = merge.smart(common, {
   devServer: {
     contentBase: './lib'
   },
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: [
-          { loader: "ifdef-loader", options: { DEBUG: true } }
-        ],
-      }
-    ]
-  },
   plugins: [
     new TypedocWebpackPlugin({
       out: './docs',
