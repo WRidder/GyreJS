@@ -9,32 +9,42 @@ interface IProjectionMessage {
 export class Gyre {
   private scheduler = new Scheduler();
   private bWorker: Worker;
+  private evtList: IGyreEvent[] = [];
+  private cmdList: IGyreCommand[] = [];
 
   constructor(ecworker: Worker) {
     this.startWorker(ecworker);
 
     setTimeout(
       (function tick() {
+        // run scheduler
         this.scheduler.runOnce();
+
+        // Post messages (trace this)
+        // TODO: do we actually want to batch these messages? Introduces delay, but reduces comm overhead.
+        this.bWorker.postMessage({
+          data:  this.evtList,
+          type: 'event',
+        });
+        this.evtList = [];
+
+        this.bWorker.postMessage({
+          data:  this.cmdtList,
+          type: 'command',
+        });
+        this.cmdList = [];
+
         setTimeout(tick.bind(this), 0);
       }).bind(this),
       0);
   }
 
-  trigger({ id, data }: IGyreEvent) {
-    this.bWorker.postMessage({
-      id,
-      data,
-      type: 'event',
-    });
+  trigger(evt: IGyreEvent) {
+    this.evtList.push(evt);
   }
 
-  issue({ id, data }: IGyreCommand) {
-    this.bWorker.postMessage({
-      id,
-      data,
-      type: 'command',
-    });
+  issue(cmd: IGyreCommand) {
+    this.cmdList.push(cmd);
   }
 
   register (projectionId: string | string[], cb: IListener,
