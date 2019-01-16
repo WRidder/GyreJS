@@ -1,6 +1,6 @@
 {
   "name": "gyrejs",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "Uni-directional data flow library",
   "main": "lib/main.js",
   "types": "types/index.d.ts",
