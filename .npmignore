@@ -3,6 +3,7 @@
 /.editorconfig
 /.gitignore
 /.npmignore
+/.travis.yml
 /tests/
 tsconfig.json
 tslint.json
