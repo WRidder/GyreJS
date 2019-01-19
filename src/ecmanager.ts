@@ -15,15 +15,13 @@ export class ECManager {
   private changeList: any = {};
 
   constructor(interval: number = 16) {
-    setInterval(
-      () => {
-        postMessage(this.getChangeList());
-      },
-      interval);
+    setInterval(() => {
+      postMessage(this.getChangeList());
+    }, interval);
   }
 
   addProjection(id: string, projection: Projection, parentProjection?: string) {
-    if  (this.projections.has(id)) {
+    if (this.projections.has(id)) {
       throw `[GyreJs] Projection ids must be unique. Id '${id}' has already been registered.`;
     }
 
@@ -33,11 +31,10 @@ export class ECManager {
       if (this.projectionDependencyList.has(parentProjection)) {
         this.projectionDependencyList.set(
           parentProjection,
-          this.projectionDependencyList.get(parentProjection).concat(id));
+          this.projectionDependencyList.get(parentProjection).concat(id),
+        );
       } else {
-        this.projectionDependencyList.set(
-          parentProjection,
-          [id]);
+        this.projectionDependencyList.set(parentProjection, [id]);
       }
     } else {
       this.projectionTopLevelList.push(id);
@@ -75,7 +72,7 @@ export class ECManager {
     this.commands.push(cmd);
   }
 
-  getChangeList(): { [index:string] : any } {
+  getChangeList(): { [index: string]: any } {
     const list = this.changeList;
     this.changeList = {};
     return list;
@@ -90,11 +87,10 @@ export class ECManager {
     this.timedEvents.set(
       interval,
       // @ts-ignore
-      setInterval(
-        () => {
-          this.handleEvent(evt);
-        },
-        interval));
+      setInterval(() => {
+        this.handleEvent(evt);
+      }, interval),
+    );
   }
 
   setTimedCommand(interval: number) {
@@ -106,11 +102,10 @@ export class ECManager {
     this.timedCommands.set(
       interval,
       // @ts-ignore
-      setInterval(
-        () => {
-          this.handleCommand(cmd);
-        },
-        interval));
+      setInterval(() => {
+        this.handleCommand(cmd);
+      }, interval),
+    );
   }
 
   private handleEvents() {
@@ -128,7 +123,7 @@ export class ECManager {
 
   private handleEvent(evt: IGyreEvent) {
     // Get all top-level projections.
-    this.projectionTopLevelList.forEach((id) => {
+    this.projectionTopLevelList.forEach(id => {
       this.applyEventIterative(evt, id);
     });
   }

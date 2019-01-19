@@ -3,7 +3,7 @@ import { IGyreEvent, IReducer } from './interfaces';
 export class Projection {
   // Members
   protected state: object;
-  protected  readonly reducer: IReducer;
+  protected readonly reducer: IReducer;
 
   constructor(state: object = {}, reducer: IReducer) {
     this.state = state;

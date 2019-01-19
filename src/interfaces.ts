@@ -9,8 +9,12 @@ export interface IGyreEvent {
 }
 
 export interface ICommandHandler {
-  (cmd: IGyreCommand, issue: (evt: IGyreCommand) => void, trigger: (evt: IGyreEvent) => void,
-   getProjectionState: (id: string) => any): void;
+  (
+    cmd: IGyreCommand,
+    issue: (evt: IGyreCommand) => void,
+    trigger: (evt: IGyreEvent) => void,
+    getProjectionState: (id: string) => any,
+  ): void;
 }
 
 export interface IGyreOptions {
@@ -55,5 +59,4 @@ export interface IReducer {
 export interface IECInterface {
   trigger: Function;
   issue: Function;
-
 }

@@ -1,5 +1,5 @@
 import { IGyreCommand, IGyreEvent, IGyreOptions, IECInterface, IListenerOptions, IListener } from './interfaces';
-import { Scheduler } from './scheduler';
+import { Scheduler } from "./scheduler";
 
 interface IProjectionMessage {
   id: string;
@@ -16,27 +16,28 @@ export class Gyre {
     this.startWorker(ecworker);
 
     setTimeout(
-      (function tick() {
+      function tick() {
         // run scheduler
         this.scheduler.runOnce();
 
         // Post messages (trace this)
         // TODO: do we actually want to batch these messages? Introduces delay, but reduces comm overhead.
         this.bWorker.postMessage({
-          data:  this.evtList,
+          data: this.evtList,
           type: 'event',
         });
         this.evtList = [];
 
         this.bWorker.postMessage({
-          data:  this.cmdtList,
+          data: this.cmdList,
           type: 'command',
         });
         this.cmdList = [];
 
         setTimeout(tick.bind(this), 0);
-      }).bind(this),
-      0);
+      }.bind(this),
+      0,
+    );
   }
 
   trigger(evt: IGyreEvent) {
@@ -47,8 +48,7 @@ export class Gyre {
     this.cmdList.push(cmd);
   }
 
-  register (projectionId: string | string[], cb: IListener,
-            opts: IListenerOptions = { priority: 0, id: 'unnamed' }) {
+  register(projectionId: string | string[], cb: IListener, opts: IListenerOptions = { priority: 0, id: 'unnamed' }) {
     const pIds = Gyre.checkIfValidProjectionId(projectionId);
 
     if (typeof cb !== 'function') {
@@ -68,7 +68,7 @@ export class Gyre {
     this.scheduler.register(pIds, ccb);
   }
 
-  unregister (lsId: number, projectionId?: string[] | string) {
+  unregister(lsId: number, projectionId?: string[] | string) {
     const pIds = Gyre.checkIfValidProjectionId(projectionId);
     this.scheduler.unregister(lsId, pIds);
   }
@@ -103,13 +103,13 @@ export class Gyre {
       throw 'ProjectionId should be a(n array of) string(s) with non-zero length.';
     }
     if (typeof projectionId !== 'string') {
-      projectionId.forEach((pId) => {
+      projectionId.forEach(pId => {
         if (typeof pId !== 'string' || pId.length === 0) {
           throw 'ProjectionId should be a(n array of) string(s) with non-zero length.';
         }
       });
     }
 
-    return (typeof projectionId === 'string') ? [projectionId] : projectionId;
+    return typeof projectionId === 'string' ? [projectionId] : projectionId;
   }
 }

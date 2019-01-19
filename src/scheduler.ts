@@ -24,8 +24,11 @@ export class Scheduler {
 
   constructor() {}
 
-  register(pIds: string[], cb: (data: any, pId: string) => any,
-           opts: IListenerOptions = { priority: 0, id: 'unnamed' }) {
+  register(
+    pIds: string[],
+    cb: (data: any, pId: string) => any,
+    opts: IListenerOptions = { priority: 0, id: 'unnamed' },
+  ) {
     const lsId = this.listenerCount;
     this.listeners.set(this.listenerCount, {
       cb,
@@ -66,14 +69,14 @@ export class Scheduler {
    * Comment for method ´setTimeBudget´.
    * @param ms  Comment for parameter ´target´.
    */
-  setTimeBudget(this:Scheduler, ms: number): void {
+  setTimeBudget(this: Scheduler, ms: number): void {
     this.timeBudget = ms;
   }
 
   /**
    * Comment for method ´getTimeBudget´.
    */
-  getTimeBudget(this:Scheduler): number {
+  getTimeBudget(this: Scheduler): number {
     return this.timeBudget;
   }
 
@@ -95,9 +98,7 @@ export class Scheduler {
     const startTime = Scheduler.getCurrentTime();
     let ranOnce = false;
 
-    while ((Scheduler.getCurrentTime() < (startTime + this.timeBudget) ||
-      !ranOnce) && this.readyQueue.length > 0) {
-
+    while ((Scheduler.getCurrentTime() < startTime + this.timeBudget || !ranOnce) && this.readyQueue.length > 0) {
       // Get work item
       const item = this.readyQueue.pop();
       const rdqId = Scheduler.createIDForIQueueItem(item);
@@ -116,7 +117,8 @@ export class Scheduler {
           const listener = this.listeners.get(item.lsId);
           console.error(
             `[GyreJS] Error during invocation of listener (id: ${listener.id}) for projection '${item.pId}': `,
-            e);
+            e,
+          );
         }
         if (!ret.done) {
           this.readyQueue.push(item);
@@ -133,7 +135,8 @@ export class Scheduler {
         const listener = this.listeners.get(item.lsId);
         console.error(
           `[GyreJS] Error during invocation of listener (id: ${listener.id}) for projection '${item.pId}': `,
-          e);
+          e,
+        );
       }
 
       // Check if it is a generator function
@@ -154,7 +157,7 @@ export class Scheduler {
     // Check if we ran out of budget. If so, increment priorities to prevent starvation.
     // However, priorities above 89 are fixed.
     if (this.readyQueue.length) {
-      this.readyQueue.forEach((qItem) => {
+      this.readyQueue.forEach(qItem => {
         qItem.priority += qItem.priority < 89 ? 1 : 0;
       });
     }
@@ -167,7 +170,7 @@ export class Scheduler {
     return Date.now();
   }
 
-  private getCallbackById(lsId: number): (data: any, pId: string) => void  | GeneratorFunction | null {
+  private getCallbackById(lsId: number): (data: any, pId: string) => void | GeneratorFunction | null {
     const listener = this.listeners.get(lsId);
     if (listener) {
       return listener.cb;
@@ -178,7 +181,7 @@ export class Scheduler {
   private addIListenerToQueue(lsId: number) {
     const listener = this.listeners.get(lsId);
 
-    listener.pIds.forEach((pId) => {
+    listener.pIds.forEach(pId => {
       if (this.projectionData.has(pId)) {
         this.scheduleIListener(lsId, pId);
       }
