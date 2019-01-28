@@ -57,7 +57,7 @@
     "transform": {
       ".(ts|tsx)": "ts-jest"
     },
-    "testRegex": "(/tests/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "testRegex": "/tests/run_all.ts",
     "moduleFileExtensions": [
       "ts",
       "tsx",
