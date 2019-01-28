@@ -1,4 +1,14 @@
-import { IGyreCommand, IGyreEvent, ICommandHandler } from './interfaces';
+import {
+  ICommandHandler,
+  IGyreCommand,
+  IGyreEvent,
+  IIncomingWebWorkerMsg,
+  isGyreCommand,
+  isGyreEvent,
+  IWorker,
+  ProjectionUpdateList,
+  WebWorkerMsgType,
+} from '../common/interfaces';
 import { Projection } from './projection';
 
 export class ECManager {
@@ -12,12 +22,49 @@ export class ECManager {
   private cmdHandlers: Map<string, ICommandHandler> = new Map();
   private events: IGyreEvent[] = [];
   private commands: IGyreCommand[] = [];
-  private changeList: any = {};
+  private changeList: ProjectionUpdateList = {};
 
-  constructor(interval: number = 16) {
+  constructor(interval: number = 16, worker: IWorker) {
+    worker.onmessage = this.handleIncomingMessages.bind(this);
+
     setInterval(() => {
-      postMessage(this.getChangeList());
+      worker.postMessage({
+        type: WebWorkerMsgType.ProjectionUpdates,
+        contents: this.getChangeList(),
+      });
     }, interval);
+  }
+
+  private handleIncomingMessages({ data: { type, contents } }: IIncomingWebWorkerMsg) {
+    switch (type) {
+      case WebWorkerMsgType.CommandList: {
+        if (Array.isArray(contents)) {
+          contents.forEach(this.issue.bind(this));
+        }
+        break;
+      }
+      case WebWorkerMsgType.Command: {
+        if (isGyreCommand(contents)) {
+          this.issue(contents);
+        }
+        break;
+      }
+      case WebWorkerMsgType.EventList: {
+        if (Array.isArray(contents)) {
+          contents.forEach(this.trigger.bind(this));
+        }
+        break;
+      }
+      case WebWorkerMsgType.Event: {
+        if (isGyreEvent(contents)) {
+          this.trigger(contents);
+        }
+        break;
+      }
+    }
+
+    // Execute
+    this.execute();
   }
 
   addProjection(id: string, projection: Projection, parentProjection?: string) {
@@ -45,7 +92,7 @@ export class ECManager {
     this.cmdHandlers.set(id, cmdHandler);
   }
 
-  execute(cmds: IGyreCommand[], evts: IGyreEvent[]) {
+  execute(cmds?: IGyreCommand[], evts?: IGyreEvent[]) {
     if (evts) {
       this.events = this.events.concat(evts);
     }
@@ -72,7 +119,7 @@ export class ECManager {
     this.commands.push(cmd);
   }
 
-  getChangeList(): { [index: string]: any } {
+  getChangeList(): ProjectionUpdateList {
     const list = this.changeList;
     this.changeList = {};
     return list;
@@ -145,7 +192,7 @@ export class ECManager {
   }
 
   private addToChangelist(id: string, state: any) {
-    // Check if has current listeners
+    // TODO: Check if has current listeners
     this.changeList[id] = state;
   }
 

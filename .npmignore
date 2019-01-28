@@ -9,3 +9,4 @@ tsconfig.json
 tslint.json
 wallaby.js
 /webpack.*
+/src

@@ -8,6 +8,7 @@
     "jsx": "react",
     "declaration": true,
     "esModuleInterop": true,
+    "moduleResolution": "node",
     "lib": [
       "es2016",
       "webworker"

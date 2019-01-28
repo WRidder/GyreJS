@@ -1,4 +1,4 @@
-import { Gyre, IGyreEvent, IGyreCommand, IListenerOptions  } from '../src/index';
+import { Gyre, IGyreEvent, IGyreCommand, IListenerOptions } from '../src/index';
 
 describe('The library', () => {
   it('exports a Gyre object', () => {

@@ -1,5 +1,5 @@
-import { Projection } from '../src/projection';
-import { IGyreEvent, IReducer } from '../src/interfaces';
+import { Projection } from '../src/datalayer/projection';
+import { IGyreEvent, IReducer } from '../src/common/interfaces';
 
 describe('Projection', () => {
   it('should be instantiable', () => {

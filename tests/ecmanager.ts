@@ -1,10 +1,15 @@
-import { Projection } from '../src/projection';
-import { ECManager } from '../src/ecmanager';
-import { IGyreCommand, IGyreEvent, ICommandHandler, IReducer } from '../src/interfaces';
+import { Projection } from '../src/datalayer/projection';
+import { ECManager } from '../src/datalayer/ecmanager';
+import { IGyreCommand, IGyreEvent, ICommandHandler, IReducer } from '../src/common/interfaces';
+
+const workerMock = {
+  onmessage: () => {},
+  postMessage: () => {},
+};
 
 describe('ECManager', () => {
   it('should be instantiable', () => {
-    const anECManager = new ECManager();
+    const anECManager = new ECManager(16, workerMock);
     expect(typeof anECManager === 'object').toBe(true);
   });
 
@@ -12,7 +17,7 @@ describe('ECManager', () => {
     let anECManager: ECManager;
 
     beforeEach(() => {
-      anECManager = new ECManager();
+      anECManager = new ECManager(16, workerMock);
 
       const reducer1: IReducer = (state: any, evt: IGyreEvent) => {
         switch (evt.id) {
@@ -45,7 +50,7 @@ describe('ECManager', () => {
           case 'add':
             return Object.assign({}, state, {
               val: state.val + parentState.val + evt.data,
-            })
+            });
         }
       };
 
@@ -58,7 +63,6 @@ describe('ECManager', () => {
       anECManager.addProjection('chainedProjection', aChainedProjection, 'someProjection');
       anECManager.addProjection('chainedProjection2', aChainedProjection2, 'chainedProjection');
     });
-
 
     it('to trigger events', () => {
       const evtAdd: IGyreEvent = {

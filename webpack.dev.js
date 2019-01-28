@@ -3,7 +3,7 @@ const common = require('./webpack.common.js');
 const path = require('path');
 const TypedocWebpackPlugin = require('typedoc-webpack-plugin');
 
-module.exports = merge.smart(common, {
+const cfg = merge.smart(common, {
   mode: 'development',
   devtool: 'inline-source-map',
   devServer: {
@@ -29,3 +29,21 @@ module.exports = merge.smart(common, {
     globalObject: 'this'
   }
 });
+
+const cfgTracing = merge.smart(cfg, {
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: [
+          { loader: "ifdef-loader", options: { TRACING: true } }
+        ],
+      }
+    ]
+  },
+  output: {
+    filename: 'tracing/[name].js',
+  }
+});
+
+module.exports = [cfg, cfgTracing];

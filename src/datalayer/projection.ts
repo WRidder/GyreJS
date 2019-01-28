@@ -1,4 +1,4 @@
-import { IGyreEvent, IReducer } from './interfaces';
+import { IGyreEvent, IReducer } from '../common/interfaces';
 
 export class Projection {
   // Members

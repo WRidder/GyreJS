@@ -1,5 +1,5 @@
-import { Scheduler } from '../src/scheduler';
-import { IListenerOptions } from '../src/interfaces';
+import { Scheduler } from '../src/viewlayer/scheduler';
+import { IListenerOptions } from '../src/common/interfaces';
 
 jest.useFakeTimers();
 
@@ -17,7 +17,7 @@ describe('Scheduler', () => {
   });
 
   describe('provides an API', () => {
-    let aScheduler : Scheduler;
+    let aScheduler: Scheduler;
     let cb: (data: any, pId: string) => any;
 
     beforeEach(() => {
@@ -35,14 +35,14 @@ describe('Scheduler', () => {
         aScheduler.register(projectionToSubscribeTo, cb, options);
       });
 
-      it.skip('which throws an error for invalid projection id.', () => {
+      it('which throws an error for invalid projection id.', () => {
         expect(() => aScheduler.register([''], cb)).toThrow();
         expect(() => aScheduler.register(['', ''], cb)).toThrow();
         // @ts-ignore: need to check invalid inputs for non-TypeScript users.
         expect(() => aScheduler.register([null, 3], cb)).toThrow();
       });
 
-      it.skip('which throws an error for invalid callback.', () => {
+      it('which throws an error for invalid callback.', () => {
         const projectionToSubscribeTo = ['SomeProjection'];
         expect(() => aScheduler.register(projectionToSubscribeTo, undefined)).toThrow();
       });
@@ -76,7 +76,7 @@ describe('Scheduler', () => {
   });
 
   describe('when run', () => {
-    let aScheduler : Scheduler;
+    let aScheduler: Scheduler;
     const realDate = Date;
 
     beforeEach(() => {
@@ -111,7 +111,6 @@ describe('Scheduler', () => {
     afterEach(() => {
       global.Date = realDate;
     });
-
 
     it('calls listeners in order of priority', () => {
       const callArray: number[] = [];
@@ -285,5 +284,3 @@ describe('Scheduler', () => {
     });
   });
 });
-
-

@@ -1,6 +1,16 @@
-import { Gyre } from './gyre';
-import { IGyreCommand, IGyreEvent, IListenerOptions } from './interfaces';
-import { Projection } from './projection';
-import { ECManager } from './ecmanager';
+import { Gyre } from './viewlayer/gyre';
+import { IGyreCommand, IGyreEvent, IListenerOptions, IWorker } from './common/interfaces';
+import { Projection } from './datalayer/projection';
+import { ECManager } from './datalayer/ecmanager';
 
-export { Gyre, ECManager, Projection, IGyreCommand, IGyreEvent, IListenerOptions };
+export {
+  // Classes
+  ECManager,
+  Gyre,
+  Projection,
+  // Interfaces
+  IGyreCommand,
+  IGyreEvent,
+  IListenerOptions,
+  IWorker,
+};

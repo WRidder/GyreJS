@@ -5,7 +5,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const common = require('./webpack.common.js');
 const path = require('path');
 
-module.exports = merge(common, {
+const cfg = merge(common, {
   mode: 'production',
   devtool: 'source-map',
   plugins: [
@@ -24,3 +24,21 @@ module.exports = merge(common, {
     globalObject: 'this'
   }
 });
+
+const cfgTracing = merge.smart(cfg, {
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: [
+          { loader: "ifdef-loader", options: { TRACING: true } }
+        ],
+      }
+    ]
+  },
+  output: {
+    filename: 'tracing/[name].min.js',
+  }
+});
+
+module.exports = [cfg, cfgTracing];
